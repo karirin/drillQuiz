@@ -7,6 +7,26 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		180A9FCF2CE231EA00B35C83 /* StampAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180A9FCE2CE231EA00B35C83 /* StampAnimationView.swift */; };
+		182534302CC3EB68001CFE16 /* SplashScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1825342F2CC3EB68001CFE16 /* SplashScreenView.swift */; };
+		182899C62CBBC4B0001BD535 /* ReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182899C52CBBC4B0001BD535 /* ReviewView.swift */; };
+		18324D1B2CA11BC300B4043D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 18324D1A2CA11BC300B4043D /* GoogleService-Info.plist */; };
+		183A77872CB40E180000B839 /* HelpModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183A77862CB40E180000B839 /* HelpModalView.swift */; };
+		18A44FDE2CA2C73D00907CF6 /* ManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A44FDD2CA2C73D00907CF6 /* ManagerView.swift */; };
+		18A44FE02CA2E18000907CF6 /* SansuTabListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A44FDF2CA2E18000907CF6 /* SansuTabListView.swift */; };
+		18A44FEC2CA7928600907CF6 /* 倒した.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FE12CA7928600907CF6 /* 倒した.mp3 */; };
+		18A44FED2CA7928600907CF6 /* 正解.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FE22CA7928600907CF6 /* 正解.mp3 */; };
+		18A44FEE2CA7928600907CF6 /* 敵攻撃.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FE32CA7928600907CF6 /* 敵攻撃.mp3 */; };
+		18A44FEF2CA7928600907CF6 /* 味方攻撃.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FE42CA7928600907CF6 /* 味方攻撃.mp3 */; };
+		18A44FF02CA7928600907CF6 /* カウントダウン.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FE52CA7928600907CF6 /* カウントダウン.mp3 */; };
+		18A44FF12CA7928600907CF6 /* おとも切り替え.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FE62CA7928600907CF6 /* おとも切り替え.mp3 */; };
+		18A44FF22CA7928600907CF6 /* ホームに戻る.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FE72CA7928600907CF6 /* ホームに戻る.mp3 */; };
+		18A44FF32CA7928600907CF6 /* キャンセル.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FE82CA7928600907CF6 /* キャンセル.mp3 */; };
+		18A44FF42CA7928600907CF6 /* レベルアップ回復.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FE92CA7928600907CF6 /* レベルアップ回復.mp3 */; };
+		18A44FF52CA7928600907CF6 /* ガチャる.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FEA2CA7928600907CF6 /* ガチャる.mp3 */; };
+		18A44FF62CA7928600907CF6 /* 不正解.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FEB2CA7928600907CF6 /* 不正解.mp3 */; };
+		18C37B172D104FE700326A2E /* ProgressExpBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C37B162D104FE700326A2E /* ProgressExpBar.swift */; };
+		18D090A62CAC12C900F8B8D8 /* BannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D090A52CAC12C900F8B8D8 /* BannerView.swift */; };
 		18FC72572C93128E00A95341 /* drillApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72562C93128E00A95341 /* drillApp.swift */; };
 		18FC72592C93128E00A95341 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72582C93128E00A95341 /* ContentView.swift */; };
 		18FC725B2C93128F00A95341 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 18FC725A2C93128F00A95341 /* Assets.xcassets */; };
@@ -15,7 +35,6 @@
 		18FC72722C93128F00A95341 /* drillUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72712C93128F00A95341 /* drillUITests.swift */; };
 		18FC72742C93128F00A95341 /* drillUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72732C93128F00A95341 /* drillUITestsLaunchTests.swift */; };
 		18FC72812C93139700A95341 /* TopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72802C93139700A95341 /* TopView.swift */; };
-		18FC72852C93159700A95341 /* ManagerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72842C93159700A95341 /* ManagerListView.swift */; };
 		18FC72872C93160500A95341 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18FC72862C93160500A95341 /* AVKit.framework */; };
 		18FC72892C93160D00A95341 /* Charts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18FC72882C93160D00A95341 /* Charts.framework */; };
 		18FC728B2C93162100A95341 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18FC728A2C93162100A95341 /* StoreKit.framework */; };
@@ -33,7 +52,6 @@
 		18FC72A42C931D5E00A95341 /* BarChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72A32C931D5E00A95341 /* BarChartView.swift */; };
 		18FC72A62C931D8200A95341 /* PentagonManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72A52C931D8200A95341 /* PentagonManagerView.swift */; };
 		18FC72A82C931DCB00A95341 /* ActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72A72C931DCB00A95341 /* ActivityIndicator.swift */; };
-		18FC72AB2C9440E300A95341 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 18FC72AA2C9440E300A95341 /* GoogleService-Info.plist */; };
 		18FC72AD2C951D1400A95341 /* SansuListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72AC2C951D1400A95341 /* SansuListView.swift */; };
 		18FC72AF2C95244200A95341 /* Sansu1ListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72AE2C95244200A95341 /* Sansu1ListView.swift */; };
 		18FC72B12C95257200A95341 /* Interstitial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72B02C95257200A95341 /* Interstitial.swift */; };
@@ -82,7 +100,6 @@
 		18FC73092C977D0900A95341 /* SignUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC73082C977D0900A95341 /* SignUp.swift */; };
 		18FC730B2C97852E00A95341 /* IllustratedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC730A2C97852E00A95341 /* IllustratedView.swift */; };
 		18FC730D2C97857E00A95341 /* TittlesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC730C2C97857E00A95341 /* TittlesView.swift */; };
-		18FC730F2C9786E900A95341 /* GachaManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC730E2C9786E900A95341 /* GachaManagerView.swift */; };
 		18FC73132C97873900A95341 /* GachaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC73122C97873900A95341 /* GachaView.swift */; };
 		18FC73152C97876600A95341 /* GachaAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC73142C97876600A95341 /* GachaAnimationView.swift */; };
 		18FC73172C9787E800A95341 /* CoinModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC73162C9787E800A95341 /* CoinModalView.swift */; };
@@ -93,6 +110,8 @@
 		18FC73212C9822FE00A95341 /* PentagonKokugoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC73202C9822FE00A95341 /* PentagonKokugoView.swift */; };
 		18FC73232C9AF75A00A95341 /* TutorialModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC73222C9AF75A00A95341 /* TutorialModalView.swift */; };
 		18FC73292C9B18BC00A95341 /* ChangeNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC73282C9B18BC00A95341 /* ChangeNameView.swift */; };
+		18FC732B2C9FC58F00A95341 /* ContactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC732A2C9FC58F00A95341 /* ContactView.swift */; };
+		18FC732D2C9FC8D100A95341 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC732C2C9FC8D100A95341 /* RootView.swift */; };
 		D8884DC89308D8D467B10A23 /* Pods_drill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EA68BDB3E5E61F365110C02 /* Pods_drill.framework */; };
 		E1E37089297968A390E906DE /* libPods-drillUITests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 23602D5380A15A6D06914647 /* libPods-drillUITests.a */; };
 		EFBBB6E2268FAFA6AE916187 /* libPods-drillTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A92C1632B8ACF9D8BE952664 /* libPods-drillTests.a */; };
@@ -117,6 +136,27 @@
 
 /* Begin PBXFileReference section */
 		0EC3159EEF81CC2ABC5833FC /* Pods-drill-drillUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-drill-drillUITests.debug.xcconfig"; path = "Target Support Files/Pods-drill-drillUITests/Pods-drill-drillUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		180A9FCE2CE231EA00B35C83 /* StampAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StampAnimationView.swift; sourceTree = "<group>"; };
+		1825342F2CC3EB68001CFE16 /* SplashScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenView.swift; sourceTree = "<group>"; };
+		182899C52CBBC4B0001BD535 /* ReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewView.swift; sourceTree = "<group>"; };
+		18324D192CA1132A00B4043D /* StoreKit.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = StoreKit.storekit; sourceTree = "<group>"; };
+		18324D1A2CA11BC300B4043D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		183A77862CB40E180000B839 /* HelpModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpModalView.swift; sourceTree = "<group>"; };
+		18A44FDD2CA2C73D00907CF6 /* ManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagerView.swift; sourceTree = "<group>"; };
+		18A44FDF2CA2E18000907CF6 /* SansuTabListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SansuTabListView.swift; sourceTree = "<group>"; };
+		18A44FE12CA7928600907CF6 /* 倒した.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "倒した.mp3"; path = "../../DrillQuiz/it/倒した.mp3"; sourceTree = "<group>"; };
+		18A44FE22CA7928600907CF6 /* 正解.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "正解.mp3"; path = "../../DrillQuiz/it/正解.mp3"; sourceTree = "<group>"; };
+		18A44FE32CA7928600907CF6 /* 敵攻撃.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "敵攻撃.mp3"; path = "../../DrillQuiz/it/敵攻撃.mp3"; sourceTree = "<group>"; };
+		18A44FE42CA7928600907CF6 /* 味方攻撃.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "味方攻撃.mp3"; path = "../../DrillQuiz/it/味方攻撃.mp3"; sourceTree = "<group>"; };
+		18A44FE52CA7928600907CF6 /* カウントダウン.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "カウントダウン.mp3"; path = "../../DrillQuiz/it/カウントダウン.mp3"; sourceTree = "<group>"; };
+		18A44FE62CA7928600907CF6 /* おとも切り替え.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "おとも切り替え.mp3"; path = "../../DrillQuiz/it/おとも切り替え.mp3"; sourceTree = "<group>"; };
+		18A44FE72CA7928600907CF6 /* ホームに戻る.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ホームに戻る.mp3"; path = "../../DrillQuiz/it/ホームに戻る.mp3"; sourceTree = "<group>"; };
+		18A44FE82CA7928600907CF6 /* キャンセル.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "キャンセル.mp3"; path = "../../DrillQuiz/it/キャンセル.mp3"; sourceTree = "<group>"; };
+		18A44FE92CA7928600907CF6 /* レベルアップ回復.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "レベルアップ回復.mp3"; path = "../../DrillQuiz/it/レベルアップ回復.mp3"; sourceTree = "<group>"; };
+		18A44FEA2CA7928600907CF6 /* ガチャる.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ガチャる.mp3"; path = "../../DrillQuiz/it/ガチャる.mp3"; sourceTree = "<group>"; };
+		18A44FEB2CA7928600907CF6 /* 不正解.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "不正解.mp3"; path = "../../DrillQuiz/it/不正解.mp3"; sourceTree = "<group>"; };
+		18C37B162D104FE700326A2E /* ProgressExpBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressExpBar.swift; sourceTree = "<group>"; };
+		18D090A52CAC12C900F8B8D8 /* BannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BannerView.swift; sourceTree = "<group>"; };
 		18FC72532C93128E00A95341 /* drill.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = drill.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		18FC72562C93128E00A95341 /* drillApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = drillApp.swift; sourceTree = "<group>"; };
 		18FC72582C93128E00A95341 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -128,7 +168,6 @@
 		18FC72712C93128F00A95341 /* drillUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = drillUITests.swift; sourceTree = "<group>"; };
 		18FC72732C93128F00A95341 /* drillUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = drillUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		18FC72802C93139700A95341 /* TopView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopView.swift; sourceTree = "<group>"; };
-		18FC72842C93159700A95341 /* ManagerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagerListView.swift; sourceTree = "<group>"; };
 		18FC72862C93160500A95341 /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
 		18FC72882C93160D00A95341 /* Charts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Charts.framework; path = System/Library/Frameworks/Charts.framework; sourceTree = SDKROOT; };
 		18FC728A2C93162100A95341 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
@@ -146,7 +185,6 @@
 		18FC72A52C931D8200A95341 /* PentagonManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PentagonManagerView.swift; sourceTree = "<group>"; };
 		18FC72A72C931DCB00A95341 /* ActivityIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicator.swift; sourceTree = "<group>"; };
 		18FC72A92C933D9A00A95341 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		18FC72AA2C9440E300A95341 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		18FC72AC2C951D1400A95341 /* SansuListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SansuListView.swift; sourceTree = "<group>"; };
 		18FC72AE2C95244200A95341 /* Sansu1ListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sansu1ListView.swift; sourceTree = "<group>"; };
 		18FC72B02C95257200A95341 /* Interstitial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interstitial.swift; sourceTree = "<group>"; };
@@ -195,7 +233,6 @@
 		18FC73082C977D0900A95341 /* SignUp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUp.swift; sourceTree = "<group>"; };
 		18FC730A2C97852E00A95341 /* IllustratedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllustratedView.swift; sourceTree = "<group>"; };
 		18FC730C2C97857E00A95341 /* TittlesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TittlesView.swift; sourceTree = "<group>"; };
-		18FC730E2C9786E900A95341 /* GachaManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GachaManagerView.swift; sourceTree = "<group>"; };
 		18FC73122C97873900A95341 /* GachaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GachaView.swift; sourceTree = "<group>"; };
 		18FC73142C97876600A95341 /* GachaAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GachaAnimationView.swift; sourceTree = "<group>"; };
 		18FC73162C9787E800A95341 /* CoinModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinModalView.swift; sourceTree = "<group>"; };
@@ -206,6 +243,8 @@
 		18FC73202C9822FE00A95341 /* PentagonKokugoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PentagonKokugoView.swift; sourceTree = "<group>"; };
 		18FC73222C9AF75A00A95341 /* TutorialModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialModalView.swift; sourceTree = "<group>"; };
 		18FC73282C9B18BC00A95341 /* ChangeNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeNameView.swift; sourceTree = "<group>"; };
+		18FC732A2C9FC58F00A95341 /* ContactView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactView.swift; sourceTree = "<group>"; };
+		18FC732C2C9FC8D100A95341 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		23602D5380A15A6D06914647 /* libPods-drillUITests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-drillUITests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		397BB9EAAB51C9115E9E7464 /* Pods-drill-drillUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-drill-drillUITests.release.xcconfig"; path = "Target Support Files/Pods-drill-drillUITests/Pods-drill-drillUITests.release.xcconfig"; sourceTree = "<group>"; };
 		7EA68BDB3E5E61F365110C02 /* Pods_drill.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_drill.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -253,6 +292,7 @@
 		18FC724A2C93128E00A95341 = {
 			isa = PBXGroup;
 			children = (
+				18324D192CA1132A00B4043D /* StoreKit.storekit */,
 				18FC72552C93128E00A95341 /* drill */,
 				18FC72662C93128F00A95341 /* drillTests */,
 				18FC72702C93128F00A95341 /* drillUITests */,
@@ -277,18 +317,22 @@
 			children = (
 				18FC72A92C933D9A00A95341 /* Info.plist */,
 				18FC72562C93128E00A95341 /* drillApp.swift */,
+				182899C52CBBC4B0001BD535 /* ReviewView.swift */,
+				18FC732C2C9FC8D100A95341 /* RootView.swift */,
 				18FC72582C93128E00A95341 /* ContentView.swift */,
+				183A77862CB40E180000B839 /* HelpModalView.swift */,
+				18D090A52CAC12C900F8B8D8 /* BannerView.swift */,
 				18FC73282C9B18BC00A95341 /* ChangeNameView.swift */,
+				180A9FCE2CE231EA00B35C83 /* StampAnimationView.swift */,
 				18FC73222C9AF75A00A95341 /* TutorialModalView.swift */,
 				18FC73142C97876600A95341 /* GachaAnimationView.swift */,
-				18FC730E2C9786E900A95341 /* GachaManagerView.swift */,
 				18FC73122C97873900A95341 /* GachaView.swift */,
 				18FC73162C9787E800A95341 /* CoinModalView.swift */,
 				18FC730A2C97852E00A95341 /* IllustratedView.swift */,
+				18FC732A2C9FC58F00A95341 /* ContactView.swift */,
 				18FC73182C97883B00A95341 /* StoreKitView.swift */,
 				18FC73062C96E55A00A95341 /* RankingView.swift */,
 				18FC730C2C97857E00A95341 /* TittlesView.swift */,
-				18FC72842C93159700A95341 /* ManagerListView.swift */,
 				18FC729B2C931B6C00A95341 /* RewardView.swift */,
 				18FC72B82C952A7800A95341 /* TimerView.swift */,
 				18FC72802C93139700A95341 /* TopView.swift */,
@@ -309,7 +353,9 @@
 				18FC72992C931AF800A95341 /* PreView.swift */,
 				18FC72952C931ABA00A95341 /* TermsOfServiceView.swift */,
 				18FC729D2C931C1600A95341 /* ManagerTabView.swift */,
+				18A44FDD2CA2C73D00907CF6 /* ManagerView.swift */,
 				18FC72AC2C951D1400A95341 /* SansuListView.swift */,
+				18A44FDF2CA2E18000907CF6 /* SansuTabListView.swift */,
 				18FC72FE2C96CBCF00A95341 /* IncorrectSansuListView.swift */,
 				18FC73082C977D0900A95341 /* SignUp.swift */,
 				18FC73002C96CC5900A95341 /* IncorrectShakaiListView.swift */,
@@ -352,7 +398,20 @@
 				18FC72B02C95257200A95341 /* Interstitial.swift */,
 				18FC72972C931AD300A95341 /* PrivacyView.swift */,
 				18FC72932C9319D500A95341 /* AudioManager.swift */,
-				18FC72AA2C9440E300A95341 /* GoogleService-Info.plist */,
+				1825342F2CC3EB68001CFE16 /* SplashScreenView.swift */,
+				18C37B162D104FE700326A2E /* ProgressExpBar.swift */,
+				18A44FE62CA7928600907CF6 /* おとも切り替え.mp3 */,
+				18A44FE52CA7928600907CF6 /* カウントダウン.mp3 */,
+				18A44FEA2CA7928600907CF6 /* ガチャる.mp3 */,
+				18A44FE82CA7928600907CF6 /* キャンセル.mp3 */,
+				18A44FE72CA7928600907CF6 /* ホームに戻る.mp3 */,
+				18A44FE92CA7928600907CF6 /* レベルアップ回復.mp3 */,
+				18A44FE22CA7928600907CF6 /* 正解.mp3 */,
+				18A44FE32CA7928600907CF6 /* 敵攻撃.mp3 */,
+				18A44FE12CA7928600907CF6 /* 倒した.mp3 */,
+				18A44FEB2CA7928600907CF6 /* 不正解.mp3 */,
+				18A44FE42CA7928600907CF6 /* 味方攻撃.mp3 */,
+				18324D1A2CA11BC300B4043D /* GoogleService-Info.plist */,
 				18FC725A2C93128F00A95341 /* Assets.xcassets */,
 				18FC725C2C93128F00A95341 /* Preview Content */,
 			);
@@ -527,9 +586,20 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				18A44FEE2CA7928600907CF6 /* 敵攻撃.mp3 in Resources */,
+				18A44FF12CA7928600907CF6 /* おとも切り替え.mp3 in Resources */,
+				18A44FF22CA7928600907CF6 /* ホームに戻る.mp3 in Resources */,
+				18A44FF42CA7928600907CF6 /* レベルアップ回復.mp3 in Resources */,
+				18A44FF62CA7928600907CF6 /* 不正解.mp3 in Resources */,
+				18A44FF32CA7928600907CF6 /* キャンセル.mp3 in Resources */,
+				18A44FED2CA7928600907CF6 /* 正解.mp3 in Resources */,
 				18FC725E2C93128F00A95341 /* Preview Assets.xcassets in Resources */,
+				18A44FEC2CA7928600907CF6 /* 倒した.mp3 in Resources */,
+				18A44FEF2CA7928600907CF6 /* 味方攻撃.mp3 in Resources */,
 				18FC725B2C93128F00A95341 /* Assets.xcassets in Resources */,
-				18FC72AB2C9440E300A95341 /* GoogleService-Info.plist in Resources */,
+				18324D1B2CA11BC300B4043D /* GoogleService-Info.plist in Resources */,
+				18A44FF52CA7928600907CF6 /* ガチャる.mp3 in Resources */,
+				18A44FF02CA7928600907CF6 /* カウントダウン.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -658,6 +728,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				18FC731F2C9822FD00A95341 /* PentagonShakaiView.swift in Sources */,
+				18A44FDE2CA2C73D00907CF6 /* ManagerView.swift in Sources */,
 				18FC72C52C952C7900A95341 /* ModalReturnView.swift in Sources */,
 				18FC72C92C95B14F00A95341 /* Sansu3ListView.swift in Sources */,
 				18FC72D92C95B2D000A95341 /* Shakai6ListView.swift in Sources */,
@@ -667,6 +738,7 @@
 				18FC72F02C95C59800A95341 /* Rika1ListView.swift in Sources */,
 				18FC73092C977D0900A95341 /* SignUp.swift in Sources */,
 				18FC72B12C95257200A95341 /* Interstitial.swift in Sources */,
+				182534302CC3EB68001CFE16 /* SplashScreenView.swift in Sources */,
 				18FC72942C9319D500A95341 /* AudioManager.swift in Sources */,
 				18FC73012C96CC5900A95341 /* IncorrectShakaiListView.swift in Sources */,
 				18FC72E42C95BED600A95341 /* Kokugo4ListView.swift in Sources */,
@@ -675,6 +747,7 @@
 				18FC73152C97876600A95341 /* GachaAnimationView.swift in Sources */,
 				18FC731B2C981E0500A95341 /* PentagonSansuView.swift in Sources */,
 				18FC72E82C95BED600A95341 /* Kokugo2ListView.swift in Sources */,
+				180A9FCF2CE231EA00B35C83 /* StampAnimationView.swift in Sources */,
 				18FC72E92C95BED600A95341 /* Kokugo3ListView.swift in Sources */,
 				18FC72C12C952C0300A95341 /* ModalTitleView.swift in Sources */,
 				18FC72AD2C951D1400A95341 /* SansuListView.swift in Sources */,
@@ -685,12 +758,15 @@
 				18FC730D2C97857E00A95341 /* TittlesView.swift in Sources */,
 				18FC72FB2C95C8D500A95341 /* RikaListView.swift in Sources */,
 				18FC72A02C931D1600A95341 /* AvatarListView.swift in Sources */,
+				18FC732B2C9FC58F00A95341 /* ContactView.swift in Sources */,
 				18FC72922C93184E00A95341 /* AuthManager.swift in Sources */,
 				18FC72F92C95C8D300A95341 /* ShakaiListView.swift in Sources */,
 				18FC730B2C97852E00A95341 /* IllustratedView.swift in Sources */,
 				18FC73072C96E55A00A95341 /* RankingView.swift in Sources */,
+				18D090A62CAC12C900F8B8D8 /* BannerView.swift in Sources */,
 				18FC72A62C931D8200A95341 /* PentagonManagerView.swift in Sources */,
 				18FC72BD2C952B6F00A95341 /* AnswerSelectionView.swift in Sources */,
+				182899C62CBBC4B0001BD535 /* ReviewView.swift in Sources */,
 				18FC73172C9787E800A95341 /* CoinModalView.swift in Sources */,
 				18FC73032C96CCF400A95341 /* IncorrectRikaListView.swift in Sources */,
 				18FC72A22C931D3400A95341 /* GraphManagerView.swift in Sources */,
@@ -700,11 +776,15 @@
 				18FC72DC2C95B2D000A95341 /* Shakai3ListView.swift in Sources */,
 				18FC72902C93182900A95341 /* SettingView.swift in Sources */,
 				18FC72F52C95C59800A95341 /* Rika6ListView.swift in Sources */,
+				18FC732D2C9FC8D100A95341 /* RootView.swift in Sources */,
+				18C37B172D104FE700326A2E /* ProgressExpBar.swift in Sources */,
+				183A77872CB40E180000B839 /* HelpModalView.swift in Sources */,
 				18FC72BB2C952AA500A95341 /* ProgressBar3.swift in Sources */,
 				18FC72C32C952C5D00A95341 /* ModalExplanationView.swift in Sources */,
 				18FC72F42C95C59800A95341 /* Rika5ListView.swift in Sources */,
 				18FC72BF2C952BA000A95341 /* QuizResultView.swift in Sources */,
 				18FC72B32C95269700A95341 /* QuizView.swift in Sources */,
+				18A44FE02CA2E18000907CF6 /* SansuTabListView.swift in Sources */,
 				18FC729C2C931B6C00A95341 /* RewardView.swift in Sources */,
 				18FC72F12C95C59800A95341 /* Rika4ListView.swift in Sources */,
 				18FC72812C93139700A95341 /* TopView.swift in Sources */,
@@ -719,7 +799,6 @@
 				18FC73052C96CD3200A95341 /* IncorrectKokugoListView.swift in Sources */,
 				18FC72E52C95BED600A95341 /* Kokugo5ListView.swift in Sources */,
 				18FC72D12C95B15800A95341 /* Sansu6ListView.swift in Sources */,
-				18FC72852C93159700A95341 /* ManagerListView.swift in Sources */,
 				18FC72B52C95273800A95341 /* AppState.swift in Sources */,
 				18FC72572C93128E00A95341 /* drillApp.swift in Sources */,
 				18FC72F22C95C59800A95341 /* Rika2ListView.swift in Sources */,
@@ -732,7 +811,6 @@
 				18FC72AF2C95244200A95341 /* Sansu1ListView.swift in Sources */,
 				18FC72DD2C95B2D000A95341 /* Shakai4ListView.swift in Sources */,
 				18FC72CF2C95B15400A95341 /* Sansu5ListView.swift in Sources */,
-				18FC730F2C9786E900A95341 /* GachaManagerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -895,24 +973,26 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2.1;
 				DEVELOPMENT_ASSET_PATHS = "\"drill/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = drill/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "ドリルクエスト";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.drill";
+				MARKETING_VERSION = 2.1;
+				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.drillQuiz3948";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -927,24 +1007,26 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2.1;
 				DEVELOPMENT_ASSET_PATHS = "\"drill/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = drill/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "ドリルクエスト";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.drill";
+				MARKETING_VERSION = 2.1;
+				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.drillQuiz3948";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;

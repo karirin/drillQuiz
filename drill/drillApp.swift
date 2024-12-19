@@ -48,6 +48,21 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             print("Failed to set audio session category.")
         }
 
+        let userDefaults = UserDefaults.standard
+        if !userDefaults.bool(forKey: "hasLaunchedBefore") {
+            let authManager = AuthManager()
+//            authManager.anonymousSignIn(){
+//                DispatchQueue.main.async {
+//                    authManager.createUser() {
+//                        DispatchQueue.main.async {
+//                            print("USERID:\(authManager.currentUserId!)")
+//                        }
+//                    }
+//                }
+//            }
+            userDefaults.set(true, forKey: "hasLaunchedBefore")
+            userDefaults.synchronize()
+        }
         return true
     }
 
@@ -112,13 +127,18 @@ struct drillApp: App {
     
     var body: some Scene {
         WindowGroup {
-            TopView()
+//            TopView(authManager: authManager)
+            RootView(authManager: authManager)
                 .onAppear{
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                        if appState.isBannerVisible {
-                            AuthManager.shared.updatePreFlag(userId: AuthManager.shared.currentUserId!, userPreFlag: 0){ success in
+                    if let userId = authManager.currentUserId {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                            if appState.isBannerVisible {
+                                AuthManager.shared.updatePreFlag(userId: AuthManager.shared.currentUserId!, userPreFlag: 0){ success in
+                                }
                             }
                         }
+                    } else {
+                        authManager.anonymousSignIn(){}
                     }
                 }
         }

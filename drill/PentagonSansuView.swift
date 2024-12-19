@@ -46,7 +46,7 @@ struct PentagonSansuGraphShape: Shape {
     func path(in rect: CGRect) -> Path {
         let center = CGPoint(x: rect.midX, y: rect.midY)
         let baseRadius = min(rect.width, rect.height) / 2 - 10
-        let angle = (2 * CGFloat.pi) / 4
+        let angle = (2 * CGFloat.pi) / 6
 
         var path = Path()
 
@@ -103,7 +103,7 @@ struct PentagonSansuGraphBackgroundShape: Shape {
     func path(in rect: CGRect) -> Path {
         let center = CGPoint(x: rect.midX, y: rect.midY)
         let radius = min(rect.width, rect.height) / 2 - 10
-        let angle = (2 * CGFloat.pi) / 4
+        let angle = (2 * CGFloat.pi) / 6
 
         // ここから追加
         let scale: [CGFloat] = [0.1,0.2,0.3, 0.4,0.5, 0.6,0.7, 0.8,0.9, 1.0]

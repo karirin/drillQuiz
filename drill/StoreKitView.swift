@@ -29,21 +29,26 @@ class Store: ObservableObject {
     
     @MainActor
     func fetchProducts() async {
+        let requestedProductIDs = ["Drill.coin1000", "Drill.coin4000", "Drill.coin15000"]
+        print("リクエストする製品: \(requestedProductIDs)")
+        
         do {
-            let fetchedProducts = try await Product.products(for: ["it.coin1000", "it.coin4000", "it.coin15000"])
-//            let fetchedProducts = try await Product.products(for: ["consumable.it1", "consumable.it2", "consumable.it3"])
+            let fetchedProducts = try await Product.products(for: requestedProductIDs)
+            print("取得した製品: \(fetchedProducts.map { $0.displayName })")
             
             // コインの量に基づいてソート
             productList = fetchedProducts.sorted { product1, product2 in
-                // name属性からコインの量を表す数値を抽出
                 let value1 = Int(product1.displayName.filter("0123456789".contains)) ?? 0
                 let value2 = Int(product2.displayName.filter("0123456789".contains)) ?? 0
                 return value1 > value2
             }
+            
+            print("ソートされたproductList: \(productList.map { $0.displayName })")
         } catch {
             print("製品の取得に失敗しました: \(error)")
         }
     }
+
 
     
     private func newTransactionListenerTask() -> Task<Void, Never> {
@@ -164,7 +169,7 @@ struct StoreKitView: View {
                     }
                 }
                 .onAppear{
-//                    print("store.productList:\(store.productList)")
+                    print("store.productList:\(store.productList)")
                 }
             }
             .listStyle(GroupedListStyle())

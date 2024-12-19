@@ -55,258 +55,329 @@ struct ContentView: View {
     @Environment(\.requestReview) var requestReview
     @State private var userPreFlag: Int = 0
     @State private var preFlag: Bool = false
-    @State private var startFlag: Bool = true
+    @State private var startFlag: Bool = false
     @State private var isFlag: Bool = false
     @State private var showCreateButton: Bool = false
+    @State private var selectedAvatar: Avatar?
+    @State private var isUserExists: Bool? = nil
+    @State private var csFlag: Bool = false
+    @State private var helpFlag: Bool = false
+    @State private var showLoginBonus: Bool = false
+    @State private var currentBonus: Int = 0 // 追加: 現在のボーナス額を保持
+    @State private var loginCount: Int = 0
+    @State private var showCoinAlert: Bool = false
+    @State private var isSignUpFlag: Bool = true
+    @State private var isPresentingTraining: Bool = true
     
     var body: some View {
         NavigationView {
             ZStack{
                 if isLoading {
-                    Text("")
+                    VStack{
+                        ActivityIndicator()
+                    }
                         .frame(maxWidth:.infinity,maxHeight:.infinity)
                 } else {
-                    ScrollView(.vertical, showsIndicators: false) {
                     VStack {
                         if userPreFlag != 1 {
-//                            BannerView()
-//                                .frame(height: 60)
+                            BannerView()
+                                .frame(height: 60)
+                                .padding(.bottom, -10)
                         }
-                        HStack{
-                            
-                            Image(systemName: "person.circle")
-                                .foregroundColor(Color("fontGray"))
-                            Text("\(userName)")
-                                .foregroundColor(Color("fontGray"))
-                            ZStack {
-                                Image("コインバー")
-                                    .resizable()
-                                    .frame(width:80,height:30)
-                                Text(" \(userMoney)")
-                                    .foregroundColor(Color("fontGray"))
-                                    .padding(.leading,25)
-                                    .padding(.top,3)
-                            }
-                            Spacer()
-                            Button(action: {
-                                isPresentingSettingView = true
-                            }) {
-                                Image("お問い合わせバー")
-                                    .resizable()
-                                    .frame(width:140,height:50)
-                                    .shadow(radius: 1)
-                            }
-                        }
-                        .padding(.horizontal)
-                        VStack{
-                            HStack {
-                                ZStack{
-                                    if authManager.rewardFlag == 2 {
-                                        Image("フレーム倍")
-                                            .resizable()
-                                            .frame(width:180,height:200)
-                                            .opacity(1.0)
-                                    } else {
-                                        Image("フレーム")
-                                            .resizable()
-                                            .frame(width:180,height:200)
-                                            .opacity(1.0)
+                        ZStack{
+                            Image("背景IT")
+                                .resizable()
+                                .edgesIgnoringSafeArea(.all)
+                            ScrollView(.vertical, showsIndicators: false) {
+                                VStack(spacing:0) {
+                                    HStack{
+                                        ZStack {
+                                            Image("ユーザー名")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(height:30)
+                                            Text("\(userName)").padding(.leading,25)
+                                        }
+                                        Spacer()
+                                        ZStack {
+                                            Image("コインバー")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(height:30)
+                                            Text(" \(userMoney)")
+                                                .padding(.leading,25)
+                                                .padding(.top,3)
+                                        }
+                                        Button(action: {
+                                            isPresentingSettingView = true
+                                        }) {
+                                            Image("お問い合わせバー")
+                                                .resizable()
+                                                .frame(width:140,height:50)
+                                                .shadow(radius: 1)
+                                        }
                                     }
-                                    Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
-                                        .resizable()
-                                        .frame(width: 100,height:100)
-                                }
-                                
-                                .font(.system(size: 24))
-                                Spacer()
-                                    .frame(width: 30)
-                                VStack{
+                                    HStack{
                                         ZStack {
                                             Image("レベルバー")
                                                 .resizable()
-                                                .frame(width:90,height:30)
+                                                .scaledToFit()
+                                                .frame(height:30)
+                                                .padding(.bottom,5)
                                             Text("\(authManager.level)")
                                                 .foregroundColor(Color("fontGray"))
                                                 .padding(.leading,25)
-                                                .padding(.top,7)
                                         }
-                                        HStack(alignment: .top){
-                                            VStack(spacing: 0){
-                                                ZStack {
-                                                    Image("ハートバー")
-                                                        .resizable()
-                                                        .frame(width:90,height:30)
-                                                    Text("\(userHp + (avatar.first?["health"] as? Int ?? 0))")
-                                                        .multilineTextAlignment(.leading)
-                                                        .foregroundColor(Color("fontGray"))
-                                                        .padding(.leading,45)
-                                                        .padding(.top,8)
+                                        ProgressExpBar(level: authManager.level, experience: authManager.experience)
+                                            .frame(height: 20)
+                                    }
+                                }
+                                .padding(.horizontal)
+                                VStack(spacing: 10) {
+                                    ZStack{
+                                        HStack(spacing: isSmallDevice() ? 0 : -20) {
+                                            ZStack{
+                                                Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(width: isSmallDevice() ? 150 : 200)
+                                                    .shadow(color: Color.black.opacity(0.3), radius: 5, x: 5, y: 5)
+                                                    .shadow(color: Color.black.opacity(0.2), radius: 10, x: -5, y: 0)
+                                            }
+                                            .padding(.top, isSmallDevice() ? 20 : 30)
+                                            .padding(.trailing, isSmallDevice() ? 0 : 0)
+                                            HStack{
+                                                VStack{
+                                                    VStack(spacing:0){
+                                                        ZStack {
+                                                            Image("ハートバー")
+                                                                .resizable()
+                                                                .scaledToFit()
+                                                                .frame(height: isSmallDevice() ? 40 : 40)
+                                                            Text("\(userHp + (avatar.first?["health"] as? Int ?? 0))")
+                                                                .multilineTextAlignment(.leading)
+                                                                .font(.system(size: 20))
+                                                                .padding(.leading,45)
+                                                                .padding(.top,10)
+                                                        }
+                                                        HStack(spacing:3){
+                                                            ZStack{
+                                                                Image("上昇バー１")
+                                                                    .resizable()
+                                                                    .scaledToFit()
+                                                                    .frame(height: isSmallDevice() ? 30 : 30)
+                                                                HStack(spacing: 0){
+                                                                    Text("＋\(avatar.first?["health"] as? Int ?? 0)")
+                                                                        .padding(.top,3)
+                                                                        .font(.system(size: 18))
+                                                                    Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
+                                                                        .resizable()
+                                                                        .scaledToFit()
+                                                                        .frame(height:isSmallDevice() ? 30 : 40)
+                                                                        .padding(.top,8)
+                                                                }
+                                                                .padding(.leading,40)
+                                                            }.padding(.leading,40)
+                                                        }
+                                                    }
+                                                    VStack(spacing:0){
+                                                        ZStack {
+                                                            Image("攻撃バー")
+                                                                .resizable()
+                                                                .scaledToFit()
+                                                                .frame(height:isSmallDevice() ? 40 : 40)
+                                                            Text("\(userAttack + (avatar.first?["attack"] as? Int ?? 0))")
+                                                                .multilineTextAlignment(.leading)
+                                                                .padding(.leading,45)
+                                                                .padding(.top,8)
+                                                                .font(.system(size: 20))
+                                                        }
+                                                        HStack(spacing:3){
+                                                            ZStack{
+                                                                Image("上昇バー２")
+                                                                    .resizable()
+                                                                    .scaledToFit()
+                                                                    .frame(height:isSmallDevice() ? 30 : 30)
+                                                                HStack(spacing: 0){
+                                                                    Text("＋\(avatar.first?["attack"] as? Int ?? 0)")
+                                                                        .padding(.top,3)
+                                                                        .font(.system(size:18))
+                                                                    Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
+                                                                        .resizable()
+                                                                        .scaledToFit()
+                                                                        .frame(height:isSmallDevice() ? 30 : 40)
+                                                                        .padding(.top,8)
+                                                                }
+                                                                .padding(.leading,40)
+                                                            }.padding(.leading,40)
+                                                        }
+                                                    }
                                                 }
-                                                HStack(spacing:3){
-                                                    Image("上昇バー１")
-                                                        .resizable()
-                                                        .frame(width:25,height:25)
-                                                    Text("＋\(avatar.first?["health"] as? Int ?? 0)")
-                                                        .padding(.leading,-5)
-                                                        .padding(.top,8)
-                                                    Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
-                                                        .resizable()
-                                                        .frame(width: 30,height:30)
-                                                        .padding(.top,8)
-                                                }.foregroundColor(Color("fontGray"))
-                                                //                                                .padding(.leading)
+                                            }
+                                            .padding(.top, isSmallDevice() ? 10 : 0)
+                                        }
+                                    }
+                                    VStack(spacing:-5){
+                                        HStack{
+                                            VStack{
+                                                HStack{
+                                                    Spacer()
+                                                    ZStack{
+                                                        Button(action: {
+                                                            self.isPresentingTraining = true
+                                                            audioManager.playSound()
+                                                        }) {
+                                                            Image("ダンジョンボタン")
+                                                                .resizable()
+                                                                .scaledToFit()
+                                                                .frame(width:isSmallDevice() ? 150 : 160)
+                                                            
+                                                        }.shadow(radius:10)
+                                                            .padding(.leading ,10)
+                                                        
+                                                        Color.black.opacity(0.3)
+                                                            .cornerRadius(10)
+                                                            .padding(.leading , 30)
+                                                            .padding(.trailing , 20)
+                                                            .padding(.vertical,3)
+                                                        Text("準備中です")
+                                                            .font(.system(size: 20))
+                                                            .fontWeight(.bold)
+                                                            .foregroundColor(.white)
+                                                            .padding(.leading,15)
+                                                    }
+                                                    Button(action: {
+                                                        self.isPresentingQuizList = true
+                                                        audioManager.playSound()
+                                                    }) {
+                                                        Image("トレーニングボタン")
+                                                            .resizable()
+                                                            .scaledToFit()
+                                                            .frame(width:isSmallDevice() ? 150 : 160)
+                                                            .background(GeometryReader { geometry in
+                                                                Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
+                                                            })
+                                                            .padding(.leading ,10)
+                                                    }
+                                                    .shadow(radius:10)
+                                                    .padding(.trailing)
+                                                    Spacer()
+                                                }
+                                                HStack{
+                                                    Button(action: {
+                                                        self.isPresentingGachaView = true
+                                                        audioManager.playSound()
+                                                    }) {
+                                                        Image("ガチャボタン")
+                                                            .resizable()
+                                                            .scaledToFit()
+                                                            .frame(width: isSmallDevice() ? 160 : 160)
+                                                    }
+                                                    .shadow(radius:10)
+                                                    Button(action: {
+                                                        self.isPresentingRankingView = true
+                                                        audioManager.playSound()
+                                                    }) {
+                                                        Image("ランキングボタン")
+                                                            .resizable()
+                                                            .scaledToFit()
+                                                            .frame(width: isSmallDevice() ? 180 : 170)
+                                                    }.shadow(radius:10).padding(.bottom, -5)
+                                                }
+                                                HStack{
+                                                    Button(action: {
+                                                        // 画面遷移のトリガーをオンにする
+                                                        self.isPresentingIllustratedView = true
+                                                        audioManager.playSound()
+                                                    }) {
+                                                        Image("おとも図鑑ボタン")
+                                                            .resizable()
+                                                            .scaledToFit()
+                                                            .frame(width: isSmallDevice() ? 160 : 160)
+                                                    }.shadow(radius:10)
+                                                    
+                                                    Button(action: {
+                                                        self.isPresentingTittleView = true
+                                                        audioManager.playSound()
+                                                    }) {
+                                                        Image("称号ボタン")
+                                                            .resizable()
+                                                            .scaledToFit()
+                                                            .frame(width: isSmallDevice() ? 160 : 160)
+                                                    }.shadow(radius:10).padding(.bottom, -5)
+                                                }.padding(.leading,-10)
                                             }
                                         }
-                                        HStack(alignment: .top){
-                                            VStack(spacing: 0) {
-                                                ZStack {
-                                                    Image("攻撃バー")
-                                                        .resizable()
-                                                        .frame(width:90,height:30)
-                                                    Text("\(userAttack + (avatar.first?["attack"] as? Int ?? 0))").foregroundColor(Color("fontGray"))
-                                                        .multilineTextAlignment(.leading)
-                                                        .padding(.leading,45)
-                                                        .padding(.top,7)
-                                                }
-                                                HStack(spacing:3){
-                                                    Image("上昇バー２")
-                                                        .resizable()
-                                                        .frame(width:25,height:25)
-                                                    Text("＋\(avatar.first?["attack"] as? Int ?? 0)")
-                                                        .padding(.leading,-5)
-                                                        .padding(.top,8)
-                                                    Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
-                                                        .resizable()
-                                                        .frame(width: 30,height:30)
-                                                        .padding(.top,8)
-                                                }
-                                                .padding(.leading,3)
-                                                .foregroundColor(Color("fontGray"))
-                                            }
-                                        }
-                                }
-                            }
-                            HStack{
-                                Text("経験値").foregroundColor(Color("fontGray"))
-                                ProgressBar(value: Float(authManager.experience) / Float(authManager.level * 100))
-                                    .frame(height: 20)
-                                Text("\(authManager.experience) / \(authManager.level * 100)")
-                                    .foregroundColor(Color("fontGray"))
-                            }
-                            .padding(.horizontal)
-                            VStack(spacing:-5){
-                                HStack{
+                                    }
                                     VStack{
-                                        Button(action: {
-                                            // 画面遷移のトリガーをオンにする
-                                            self.isPresentingGachaView = true
-                                            audioManager.playSound()
-                                        }) {
-                                            Image("ガチャボタン1")
-                                                .resizable()
-//                                                .frame(width:180,height:65)
-                                                .frame(width: isSmallDevice() ? 160 : 160, height: isSmallDevice() ? 50 : 55)
-                                        }.padding(.bottom)
-                                        Button(action: {
-                                            // 画面遷移のトリガーをオンにする
-                                            self.isPresentingRankingView = true
-                                            audioManager.playSound()
-                                        }) {
-                                            Image("ランキングボタン1")
-                                                .resizable()
-    //                                                .frame(width:180,height:65)
-                                                .frame(width: isSmallDevice() ? 160 : 160, height: isSmallDevice() ? 50 : 55)
+                                        Group{
+                                            NavigationLink("", destination: ManagerView().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizList)
+                                            //
+                                            NavigationLink("", destination: GachaView(), isActive: $isPresentingGachaView)
+                                            //
+                                            NavigationLink("", destination: IllustratedView(isPresenting: .constant(false)).navigationBarBackButtonHidden(true), isActive: $isPresentingIllustratedView)
                                         }
+                                        NavigationLink("", destination: TittlesView(isPresenting: .constant(false)).navigationBarBackButtonHidden(true), isActive: $isPresentingTittleView)
+                                        NavigationLink("", destination: RankingView(audioManager: audioManager).navigationBarBackButtonHidden(true), isActive: $isPresentingRankingView)
+                                        //                                NavigationLink("", destination: Test(isPresenting: .constant(false), viewModel: QuizBeginnerStoryViewModel()).navigationBarBackButtonHidden(true), isActive: $isPresentingStoryView)
+                                        //
+                                        NavigationLink("", destination: ContactView(audioManager: AudioManager()).navigationBarBackButtonHidden(true), isActive: $isPresentingSettingView)
+                                        //                                    NavigationLink("", destination:  PentagonView(authManager: authManager).navigationBarBackButtonHidden(true), isActive: $isPresentingPentagonView)
+                                        //                                }
+                                        
                                     }
-                                    Spacer()
-                                        .frame(width:20)
-                                    VStack{
-                                        Button(action: {
-                                            audioManager.playSound()
-                                            // 画面遷移のトリガーをオンにする
-                                            self.isPresentingQuizList = true
-                                        }) {
-                                            Image("ダンジョンボタン1")
-                                                .resizable()
-                                            //                                            .frame(width:130,height:130)
-                                                .frame(width: isSmallDevice() ? 135 : 135, height: isSmallDevice() ? 130 : 135)
-                                        }
-                                        .padding(.top)
-                                        .background(GeometryReader { geometry in
-                                            Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
-                                        })
-                                    }
+                                    //                            .padding(.horizontal,5)
                                 }
-                                HStack{
-                                    Button(action: {
-                                        // 画面遷移のトリガーをオンにする
-                                        self.isPresentingIllustratedView = true
-                                        audioManager.playSound()
-                                    }) {
-                                        Image("おとも図鑑ボタン1")
-                                            .resizable()
-                                            .frame(width: isSmallDevice() ? 160 : 160, height: isSmallDevice() ? 50 : 55)
-                                    }
-                                    .padding(.top)
-                                    Spacer()
-                                        .frame(width:15)
-                                    Button(action: {
-                                        // 画面遷移のトリガーをオンにする
-                                        self.isPresentingTittleView = true
-                                        audioManager.playSound()
-                                    }) {
-                                        Image("称号ボタン1")
-                                            .resizable()
-//                                                .frame(width:180,height:65)
-                                            .frame(width: isSmallDevice() ? 160 : 160, height: isSmallDevice() ? 50 : 55)
-                                    }.padding(.top)
-                                    
-                                }
+                                .padding(.top, -15)
                             }
-                            .shadow(radius: 3)
-                            VStack{
-                                Group{
-                                    NavigationLink("", destination: ManagerTabView().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizList)
-//
-                                NavigationLink("", destination: GachaView(), isActive: $isPresentingGachaView)
-//                                
-                                NavigationLink("", destination: IllustratedView(isPresenting: .constant(false)).navigationBarBackButtonHidden(true), isActive: $isPresentingIllustratedView)
-                                }
-                                    NavigationLink("", destination: TittlesView(isPresenting: .constant(false)).navigationBarBackButtonHidden(true), isActive: $isPresentingTittleView)
-                                NavigationLink("", destination: RankingView(audioManager: audioManager).navigationBarBackButtonHidden(true), isActive: $isPresentingRankingView)
-//                                NavigationLink("", destination: Test(isPresenting: .constant(false), viewModel: QuizBeginnerStoryViewModel()).navigationBarBackButtonHidden(true), isActive: $isPresentingStoryView)
-//                                
-//                                NavigationLink("", destination: ContactView(audioManager: AudioManager()).navigationBarBackButtonHidden(true), isActive: $isPresentingSettingView)
-                                    //                                    NavigationLink("", destination:  PentagonView(authManager: authManager).navigationBarBackButtonHidden(true), isActive: $isPresentingPentagonView)
-                                    //                                }
-                                
-                            }
-                            //                            .padding(.horizontal,5)
                         }
-                    }
                     }
                     .onPreferenceChange(ViewPositionKey.self) { positions in
                         self.buttonRect = positions.first ?? .zero
                     }
+                }
+                if showLoginBonus {
+                    Color.black.opacity(0.4)
+                        .edgesIgnoringSafeArea(.all)
+                        .onTapGesture {
+                            showLoginBonus = false
+                            showCoinAlert = true
+                        }
+                    StampAnimationView(loginCount: $loginCount)
+                        .onTapGesture {
+                            showLoginBonus = false
+                            showCoinAlert = true
+                        }
+                }
+                if csFlag {
+                    ReviewView(audioManager: audioManager, isPresented: $csFlag, helpFlag: $helpFlag)
+                }
+                
+                if helpFlag {
+                    HelpModalView(audioManager: AudioManager(), isPresented: $helpFlag)
                 }
                 
                 if startFlag {
                     TutorialModalView(isPresented: $startFlag, isFlag: $isFlag, showAlert: $startFlag)
                 }
                 
+                if customerFlag == true {
+                    HelpModalView(audioManager: AudioManager(), isPresented: $customerFlag)
+                }
+                
                 if isFlag {
-                    ChangeNameView(isPresented: $isFlag)
+                    ChangeNameView(isPresented: $isFlag, tutorialNum: $tutorialNum, authManager: authManager)
                 }
                 
                 if tutorialNum == 1 {
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
                             .overlay(
-//                                RoundedRectangle(cornerRadius: 30, style: .continuous)
-                                Circle()
+                                RoundedRectangle(cornerRadius: 30, style: .continuous)
+//                                Circle()
                                 
                                     .frame(width: buttonRect.width, height: buttonRect.height)
-                                    .position(x: buttonRect.midX, y: buttonRect.midY+8)
+                                    .position(x: buttonRect.midX, y: buttonRect.midY)
                                     .blendMode(.destinationOut)
                             )
                             .ignoresSafeArea()
@@ -317,7 +388,7 @@ struct ContentView: View {
                         Spacer()
                             .frame(height: buttonRect.minY - bubbleHeight)
                         VStack(alignment: .trailing, spacing: .zero) {
-                            Text("「ダンジョン」をクリックしてください。")
+                            Text("「学習モード」をクリックしてください。")
                                 .font(.callout)
                                 .padding(5)
                                 .font(.system(size: 24.0))
@@ -347,7 +418,6 @@ struct ContentView: View {
                             Button(action: {
                                 tutorialNum = 0 // タップでチュートリアルを終了
                                 authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
-                                       // データベースのアップデートが成功したかどうかをハンドリング
                                    }
                             }) {
                                 Image("スキップ")
@@ -378,66 +448,117 @@ struct ContentView: View {
         .onTapGesture {
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
+        .alert(isPresented: $showCoinAlert) {
+            Alert(
+                title: Text("ログインボーナス！！"),
+                message: Text("\(currentBonus)コイン獲得しました"),
+                dismissButton: .default(Text("OK")) {
+                    // アラートが閉じられた後のアクションが必要ならここに記述
+                }
+            )
+        }
         .onAppear {
             let userDefaults = UserDefaults.standard
             if !userDefaults.bool(forKey: "hasLaunchedBeforeOnappear") {
+                isSignUpFlag = false
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                     startFlag = true
                     showCreateButton = true
+                    isFlag = false
+                    authManager.saveUserToDatabase(userName: userName) { success in
+                        if success {
+                            authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
+                                self.userName = name ?? ""
+                                self.avatar = avatar ?? [[String: Any]]()
+                                self.userMoney = money ?? 0
+                                self.userHp = hp ?? 100
+                                self.userAttack = attack ?? 20
+                                self.tutorialNum = tutorialNum ?? 0
+                                self.isLoading = false
+                            }
+                        } else {
+                        }
+                    }
+                    }
                 }
-            }
             userDefaults.set(true, forKey: "hasLaunchedBeforeOnappear")
             userDefaults.synchronize()
-            authManager.fetchPreFlag()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                userPreFlag = authManager.userPreFlag
-                if userPreFlag != 1 {
-                    executeProcessEveryFortyTimes()
-                }
-            }
-            executeProcessEveryTwentyTimes()
-            authManager.fetchUserCsFlag()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                if authManager.userCsFlag == 0 {
-                    executeProcessEveryThreeTimes()
-                }
-            }
-            authManager.fetchUserRewardFlag()
-            reward.checkRewardReset()
-            authManager.fetchLastClickedDate(userId: authManager.currentUserId ?? "") { lastDate in
-                if let lastDate = lastDate {
-                    // 2. 現在の日時との差を計算
-                    let currentDate = Date()
-                    let timeInterval = currentDate.timeIntervalSince(lastDate)
-                    
-                    // 3. 24時間以上経過しているか確認
-                    if timeInterval >= 86400 {  // 86400秒 = 24時間
-                        isButtonEnabled = true
-                    } else {
-                        isButtonEnabled = false
+            if let userId = authManager.currentUserId {
+                authManager.checkIfUserIdExists(userId: userId) { exists in
+                    self.isUserExists = exists
+                    if isUserExists != nil {
+                        authManager.fetchPreFlag()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                            userPreFlag = authManager.userPreFlag
+                            if userPreFlag != 1 {
+                                executeProcessEveryFortyTimes()
+                            }
+                        }
+                        authManager.fetchUserCsFlag()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                            if authManager.userCsFlag == 0 {
+                                executeProcessEveryThreeTimes()
+                                executeProcessEveryTwentyTimes()
+                            }
+                        }
+                        authManager.fetchUserRewardFlag()
+                        reward.checkRewardReset()
+                        authManager.fetchLastClickedDate(userId: authManager.currentUserId ?? "") { lastDate in
+                            if let lastDate = lastDate {
+                                // 2. 現在の日時との差を計算
+                                let currentDate = Date()
+                                let timeInterval = currentDate.timeIntervalSince(lastDate)
+                                
+                                // 3. 24時間以上経過しているか確認
+                                if timeInterval >= 86400 {  // 86400秒 = 24時間
+                                    isButtonEnabled = true
+                                } else {
+                                    isButtonEnabled = false
+                                }
+                            } else {
+                                isButtonEnabled = true
+                            }
+                        }
+                        authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
+                            self.userName = name ?? ""
+                            self.avatar = avatar ?? [[String: Any]]()
+                            self.userMoney = money ?? 0
+                            self.userHp = hp ?? 100
+                            self.userAttack = attack ?? 20
+                            self.tutorialNum = tutorialNum ?? 0
+                            self.isLoading = false
+                            
+                            if self.userName.isEmpty {
+                                self.isFlag = true
+                            }
+                            
+                            authManager.checkAndGrantLoginBonus { granted in
+                                if granted {
+                                    self.currentBonus = self.authManager.loginBonus
+                                    self.loginCount = self.authManager.loginCount
+                                    if isSignUpFlag {
+                                        self.showLoginBonus = true
+                                    }
+                                }
+                            }
+                        }
+                        authManager.fetchAvatars {
+                            self.avatar = authManager.avatars.map { avatar in
+                                return ["name": avatar.name]
+                            }
+                        }
+                        authManager.fetchUserExperienceAndLevel()
+                            }
+                        }
                     }
-                } else {
-                    isButtonEnabled = true
                 }
-            }
-            authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
-                self.userName = name ?? ""
-                self.avatar = avatar ?? [[String: Any]]()
-                self.userMoney = money ?? 0
-                self.userHp = hp ?? 100
-                self.userAttack = attack ?? 20
-                self.tutorialNum = tutorialNum ?? 0
-                self.isLoading = false
-            }
-            authManager.fetchAvatars {
-                self.avatar = authManager.avatars.map { avatar in
-                    return ["name": avatar.name]
-                }
-            }
-            authManager.fetchUserExperienceAndLevel()
-        }
         .sheet(isPresented: $preFlag) {
             PreView(audioManager: audioManager)
+        }
+        .onChange(of: showCoinAlert) { userMoney in
+            authManager.getUserMoney { userMoney in
+                self.userMoney = userMoney
+            }
         }
         .onChange(of: showLoginModal) { userMoney in
             authManager.getUserMoney { userMoney in
@@ -454,7 +575,6 @@ struct ContentView: View {
                 authManager.fetchUserExperienceAndLevel()
                 authManager.fetchUserRewardFlag()
             }
-
             .background(Color("purple2").opacity(0.6))  // ここで背景色を設定
             .edgesIgnoringSafeArea(.all)  // 画面の端まで背景色を伸ばす
             }
@@ -479,8 +599,8 @@ struct ContentView: View {
         UserDefaults.standard.set(count, forKey: "TwentyLaunchCount")
         
         // 10回に1回の割合で処理を実行
-        if count % 20 == 0 {
-            requestReview()
+        if count % 15 == 0 {
+            csFlag = true
         }
     }
     
@@ -506,7 +626,7 @@ struct ContentView: View {
         UserDefaults.standard.set(count, forKey: "launchCount")
         
         // 3回に1回の割合で処理を実行
-        if count % 5 == 0 {
+        if count % 20 == 0 {
             customerFlag = true
         }
     }

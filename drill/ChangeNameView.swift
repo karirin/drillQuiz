@@ -10,26 +10,37 @@ import Firebase
 
 struct ChangeNameView: View {
     @Binding var isPresented: Bool
+    @Binding var tutorialNum: Int
+//    @Binding var userName: String
+    @State private var userName: String = ""
     @State private var showAlert = false
-    @State private var userName = ""
-    @ObservedObject var authManager = AuthManager()
+    @ObservedObject var authManager: AuthManager
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         ZStack{
             Color.black.opacity(0.4)
                 .edgesIgnoringSafeArea(.all)
-                .onTapGesture {
-                    if !userName.isEmpty {
-                        showAlert = true
-                        isPresented = false
-                    }
-                }
+//                .onTapGesture {
+//                    if !userName.isEmpty {
+//                        showAlert = true
+//                        isPresented = false
+//                        authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 1) { success in
+//                            tutorialNum = 1
+//                            // データベースのアップデートが成功したかどうかをハンドリング
+//                        }
+//                    }
+//                }
             VStack{
                 HStack{
                     Spacer()
-                    Text("名前を登録する")
-                        .font(.system(size:22))
+                    VStack {
+                        Text("名前を登録する")
+                            .font(.system(size:22))
+                        Text("※１度登録すると変更することができません")
+                            .font(.system(size:14))
+                            .padding(.vertical,5)
+                    }
                     Spacer()
                 }
                 .padding(.top)
@@ -52,7 +63,10 @@ struct ChangeNameView: View {
                         .font(.system(size: 20))
                         .font(.caption)
                     Button(action: {
-                        authManager.saveUserToDatabase(userName: userName) { success in
+                        authManager.updateUserName(userName: userName) { success in
+                            if success {
+                                showAlert = true
+                            }
                         }
                         showAlert = true
                     }, label: {
@@ -81,28 +95,15 @@ struct ChangeNameView: View {
         .padding(20)
         .cornerRadius(20)
         .shadow(radius: 10)
-        .overlay(
-            Button(action: {
-                isPresented = false
-            }) {
-                if !userName.isEmpty {
-                    Image(systemName: "xmark.circle.fill")
-                        .resizable()
-                        .frame(width: 50, height: 50)
-                        .foregroundColor(.gray)
-                        .background(.white)
-                        .cornerRadius(30)
-                        .padding()
-                }
-            }
-                .offset(x: 10, y: -15),
-            alignment: .topTrailing
-        )
         .alert(isPresented: $showAlert) {
             Alert(
                 title: Text(""),
-                message: Text("プロフィールが編集されました"),
+                message: Text("名前が登録されました"),
                 dismissButton: .default(Text("OK")) {
+                    authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 1) { success in
+                        tutorialNum = 1
+                        isPresented = false
+                    }
                 }
             )
         }
@@ -126,6 +127,8 @@ struct ChangeNameView: View {
 struct ChangeNameView_Previews: PreviewProvider {
     
     static var previews: some View {
-        ChangeNameView(isPresented: .constant(false))
+        @ObservedObject var authManager = AuthManager.shared
+//        ChangeNameView(isPresented: .constant(false), tutorialNum: .constant(1), userName: .constant("name"))
+        ChangeNameView(isPresented: .constant(false), tutorialNum: .constant(1), authManager: authManager)
     }
 }

@@ -67,13 +67,13 @@ struct SansuListView: View {
                             Button(action: {
                                 audioManager.playKetteiSound()
                                 // 画面遷移のトリガーをオンにする
-//                                if userPreFlag != 1 {
-//                                    preFlag = true
-//                                } else {
+                                if userPreFlag != 1 {
+                                    preFlag = true
+                                } else {
                                     if !isIncorrectAnswersEmpty {
                                         self.isPresentingQuizIncorrectAnswer = true
                                     }
-//                                }
+                                }
                             }) {
                                 if isLoading {
                                     ZStack{
@@ -94,16 +94,18 @@ struct SansuListView: View {
                                                 .resizable()
                                                 .frame(height: isIPad() ? 200 : 70)
                                         }
-//                                        if userPreFlag != 1 {
-//                                            
-//                                            ZStack{
-//                                                Color.black.opacity(0.45)
-//                                                    .cornerRadius(30)
-//                                                Text("プレミアムプランを登録すると\n復習機能が開放されます")
-//                                                    .foregroundStyle(.white)
-//                                                    .bold()
-//                                            }
-//                                        }
+                                        if userPreFlag != 1 {
+                                            
+                                            ZStack{
+                                                Color.black.opacity(0.45)
+                                                    .cornerRadius(30)
+                                                Text("プレミアムプランを登録すると\n復習機能が開放されます")
+                                                    .font(.system(size: isIPad() ? 50 : 20))
+                                                    .foregroundStyle(.white)
+                                                    .bold()
+                                                    .multilineTextAlignment(.center)
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -161,7 +163,6 @@ struct SansuListView: View {
                             .padding(.leading,15)
                                 Button(action: {
                                     audioManager.playKetteiSound()
-                                    // 画面遷移のトリガーをオンにする
                                     self.isPresentingQuizBeginner = true
                                 }) {
                                     Image("算数１")
@@ -170,12 +171,11 @@ struct SansuListView: View {
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding(.horizontal)
-                            
-                            .background(GeometryReader { geometry in
-                                Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
-                            })
                                 .padding(.bottom)
                                 .shadow(radius: 3)
+                                .background(GeometryReader { geometry in
+                                    Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
+                                })
                                 .fullScreenCover(isPresented: $isPresentingQuizBeginner) {
                                                 Sansu1ListView(isPresenting: $isPresentingQuizBeginner)
                                             }
@@ -230,7 +230,7 @@ struct SansuListView: View {
                                         }
                             Button(action: {
                                 audioManager.playKetteiSound()
-                                self.isPresentingQuizAdvanced = true
+                                self.isPresentingQuizNetwork = true
                             }) {
                                 Image("算数５")
                                     .resizable()
@@ -240,12 +240,12 @@ struct SansuListView: View {
                             .padding(.horizontal)
                             .padding(.bottom)
                             .shadow(radius: 3)
-                            .fullScreenCover(isPresented: $isPresentingQuizAdvanced) {
-                                Sansu5ListView(isPresenting: $isPresentingQuizAdvanced)
+                            .fullScreenCover(isPresented: $isPresentingQuizNetwork) {
+                                Sansu5ListView(isPresenting: $isPresentingQuizNetwork)
                                         }
                             Button(action: {
                                 audioManager.playKetteiSound()
-                                self.isPresentingQuizAdvanced = true
+                                self.isPresentingQuizSecurity = true
                             }) {
                                 //                    Image("IT基礎知識の問題の上級")
                                 Image("算数６")
@@ -256,8 +256,8 @@ struct SansuListView: View {
                             .padding(.horizontal)
                             .padding(.bottom)
                             .shadow(radius: 3)
-                            .fullScreenCover(isPresented: $isPresentingQuizAdvanced) {
-                                Sansu6ListView(isPresenting: $isPresentingQuizAdvanced)
+                            .fullScreenCover(isPresented: $isPresentingQuizSecurity) {
+                                Sansu6ListView(isPresenting: $isPresentingQuizSecurity)
                                         }
                             .padding(.bottom,130)
                         }
@@ -313,29 +313,25 @@ struct SansuListView: View {
                 .onPreferenceChange(ViewPositionKey.self) { positions in
                     self.buttonRect = positions.first ?? .zero
                 }
-                if tutorialNum == 3 {
+                if tutorialNum == 2 {
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
-                        // スポットライトの領域をカットアウ
                             .overlay(
                                 RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .frame(width: buttonRect.width - 20, height: buttonRect.height)
-                                    .position(x: buttonRect.midX, y: isSmallDevice() ? buttonRect.midY : buttonRect.midY)
+                                    .frame(width: buttonRect.width, height: buttonRect.height)
+                                    .position(x: buttonRect.midX, y: isSmallDevice() ? buttonRect.midY - 130 : buttonRect.midY - 165)
                                     .blendMode(.destinationOut)
                             )
+//                            .padding(.horizontal, -10)
                             .ignoresSafeArea()
                             .compositingGroup()
                             .background(.clear)
                     }
                     VStack {
                         Spacer()
-                            .frame(height:isSmallDevice() ? buttonRect.minY + bubbleHeight : buttonRect.minY + bubbleHeight)
+                            .frame(height:isSmallDevice() ? buttonRect.minY + bubbleHeight - 110 : buttonRect.minY + bubbleHeight - 140)
                         VStack(alignment: .trailing, spacing: .zero) {
-//                            Image("上矢印")
-//                                .resizable()
-//                                .frame(width: 20, height: 20)
-//                                .padding(.trailing, 306.0)
-                            Text("「基礎理解の問題」をクリックしてください。")
+                            Text("「【１年生】足し算、引き算」をクリックしてください。")
                                 .font(.callout)
                                 .padding(5)
                                 .font(.system(size: 24.0))
@@ -374,6 +370,7 @@ struct SansuListView: View {
                             }
                             Spacer()
                         }
+                        .padding(.top, 20)
                         Spacer()
                     }
                 }
@@ -381,10 +378,10 @@ struct SansuListView: View {
             }
             
             .onTapGesture {
-                if tutorialNum == 3 {
+                if tutorialNum == 2 {
                         audioManager.playSound()
                     tutorialNum = 0
-                    authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 4) { success in
+                    authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 3) { success in
                         // データベースのアップデートが成功したかどうかをハンドリング
                     }
                 }
@@ -407,6 +404,7 @@ struct SansuListView: View {
                 authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
                     if let fetchedTutorialNum = tutorialNum {
                         self.tutorialNum = fetchedTutorialNum
+                        print("sansulistView tutorialNum    :\(fetchedTutorialNum)")
                     }
                 }
                 if let userId = authManager.currentUserId {
@@ -458,6 +456,7 @@ struct SansuListView: View {
 //                }
 //            }
         .navigationViewStyle(StackNavigationViewStyle())
+
         }
     func isIPad() -> Bool {
         return UIDevice.current.userInterfaceIdiom == .pad
@@ -479,7 +478,7 @@ struct SansuListView: View {
     }
 
 #Preview {
-    SansuListView(isPresenting: .constant(false))
+//    SansuListView(isPresenting: .constant(false))
 //    ManagerListView(isPresenting: .constant(false))
-//    TopView()
+    TopView()
 }

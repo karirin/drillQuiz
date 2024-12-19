@@ -257,6 +257,7 @@ class RankingViewModel: ObservableObject {
                     }
                 }
                 answerCounts[userId] = totalAnswersForMonth
+                print("totalAnswersForMonth:\(totalAnswersForMonth)")
             }
         
             DispatchQueue.main.async {
@@ -265,6 +266,7 @@ class RankingViewModel: ObservableObject {
                     // ここではシンプルに最初のアバターの名前を使用しています。
                     let avatarName = user.avatars.first?["name"] as? String ?? ""
                     guard let answerCount = answerCounts[user.id] else { return nil }
+                    print("answerCount:\(answerCount)")
                     return UserAnswerData(userId: user.id, userName: user.userName, answerCount: answerCount, avatarName: avatarName)
                 }
                 .sorted { $0.answerCount > $1.answerCount }

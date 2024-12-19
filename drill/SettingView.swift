@@ -17,8 +17,9 @@ struct OtherApp: Identifiable {
 
 extension OtherApp {
     static let allApps = [
-        OtherApp(name: "お金クエスト", description: "ゲーム感覚でお金の知識が学べるアプリ。税金、投資、節約、予算管理などお金周りの勉強をゲーム感覚で学べます。", appStoreLink: "https://apps.apple.com/us/app/%E3%81%8A%E9%87%91%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88/id6476828253"),
+        OtherApp(name: "FPクエスト", description: "ゲーム感覚でFPの資格が学べるアプリ。３〜１級の階級別に「資産計画」「リスク管理」「金融資産運用」「タックスプランニング」「不動産」「相続・事業継承」で分野別に問題を解くことができます。", appStoreLink: "https://apps.apple.com/us/app/%E3%81%8A%E9%87%91%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88/id6476828253"),
         OtherApp(name: "英語クエスト", description: "ゲーム感覚で英語の知識が学べるアプリ。「英単語」「英熟語」「英文法」に分かれており、それぞれ『英検』『TOIEC』の難易度別に勉強をゲーム感覚で学べます。", appStoreLink: "https://apps.apple.com/us/app/%E8%8B%B1%E8%AA%9E%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88-%E8%8B%B1%E8%AA%9E%E3%81%AE%E5%95%8F%E9%A1%8C%E3%81%AE%E5%8B%89%E5%BC%B7%E3%81%A8%E5%AD%A6%E7%BF%92%E3%81%8C%E3%81%A7%E3%81%8D%E3%82%8B%E3%82%A2%E3%83%97%E3%83%AA/id6477769441"),
+        OtherApp(name: "ITクエスト", description: "ゲーム感覚でITの知識が学べるアプリ。「ITパスポート」「基本情報技術者試験」など資格ベースで勉強することができます。", appStoreLink: "https://apps.apple.com/us/app/it%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88/id6469339499"),
     ]
 }
 

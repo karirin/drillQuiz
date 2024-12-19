@@ -67,13 +67,13 @@ struct ShakaiListView: View {
                             Button(action: {
                                 audioManager.playKetteiSound()
                                 // 画面遷移のトリガーをオンにする
-//                                if userPreFlag != 1 {
-//                                    preFlag = true
-//                                } else {
+                                if userPreFlag != 1 {
+                                    preFlag = true
+                                } else {
                                     if !isIncorrectAnswersEmpty {
                                         self.isPresentingQuizIncorrectAnswer = true
                                     }
-//                                }
+                                }
                             }) {
                                 if isLoading {
                                     ZStack{
@@ -94,16 +94,18 @@ struct ShakaiListView: View {
                                                 .resizable()
                                                 .frame(height: isIPad() ? 200 : 70)
                                         }
-//                                        if userPreFlag != 1 {
-//                                            
-//                                            ZStack{
-//                                                Color.black.opacity(0.45)
-//                                                    .cornerRadius(30)
-//                                                Text("プレミアムプランを登録すると\n復習機能が開放されます")
-//                                                    .foregroundStyle(.white)
-//                                                    .bold()
-//                                            }
-//                                        }
+                                        if userPreFlag != 1 {
+                                            
+                                            ZStack{
+                                                Color.black.opacity(0.45)
+                                                    .cornerRadius(30)
+                                                Text("プレミアムプランを登録すると\n復習機能が開放されます")
+                                                    .font(.system(size: isIPad() ? 50 : 20))
+                                                    .foregroundStyle(.white)
+                                                    .bold()
+                                                    .multilineTextAlignment(.center)
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -232,7 +234,7 @@ struct ShakaiListView: View {
                                         }
                             Button(action: {
                                 audioManager.playKetteiSound()
-                                self.isPresentingQuizAdvanced = true
+                                self.isPresentingQuizNetwork = true
                             }) {
                                 //                    Image("IT基礎知識の問題の上級")
                                 Image("社会５")
@@ -243,12 +245,12 @@ struct ShakaiListView: View {
                             .padding(.horizontal)
                             .padding(.bottom)
                             .shadow(radius: 3)
-                            .fullScreenCover(isPresented: $isPresentingQuizAdvanced) {
-                                Shakai5ListView(isPresenting: $isPresentingQuizAdvanced)
+                            .fullScreenCover(isPresented: $isPresentingQuizNetwork) {
+                                Shakai5ListView(isPresenting: $isPresentingQuizNetwork)
                                         }
                             Button(action: {
                                 audioManager.playKetteiSound()
-                                self.isPresentingQuizAdvanced = true
+                                self.isPresentingQuizSecurity = true
                             }) {
                                 //                    Image("IT基礎知識の問題の上級")
                                 Image("社会６")
@@ -259,8 +261,8 @@ struct ShakaiListView: View {
                             .padding(.horizontal)
                             .padding(.bottom)
                             .shadow(radius: 3)
-                            .fullScreenCover(isPresented: $isPresentingQuizAdvanced) {
-                                Shakai6ListView(isPresenting: $isPresentingQuizAdvanced)
+                            .fullScreenCover(isPresented: $isPresentingQuizSecurity) {
+                                Shakai6ListView(isPresenting: $isPresentingQuizSecurity)
                                         }
                             .padding(.bottom,130)
                         }
@@ -315,70 +317,6 @@ struct ShakaiListView: View {
 //                    )
                 .onPreferenceChange(ViewPositionKey.self) { positions in
                     self.buttonRect = positions.first ?? .zero
-                }
-                if tutorialNum == 3 {
-                    GeometryReader { geometry in
-                        Color.black.opacity(0.5)
-                        // スポットライトの領域をカットアウ
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .frame(width: buttonRect.width - 20, height: buttonRect.height)
-                                    .position(x: buttonRect.midX, y: isSmallDevice() ? buttonRect.midY : buttonRect.midY)
-                                    .blendMode(.destinationOut)
-                            )
-                            .ignoresSafeArea()
-                            .compositingGroup()
-                            .background(.clear)
-                    }
-                    VStack {
-                        Spacer()
-                            .frame(height:isSmallDevice() ? buttonRect.minY + bubbleHeight : buttonRect.minY + bubbleHeight)
-                        VStack(alignment: .trailing, spacing: .zero) {
-//                            Image("上矢印")
-//                                .resizable()
-//                                .frame(width: 20, height: 20)
-//                                .padding(.trailing, 306.0)
-                            Text("「基礎理解の問題」をクリックしてください。")
-                                .font(.callout)
-                                .padding(5)
-                                .font(.system(size: 24.0))
-                                .padding(.all, 16.0)
-                                .background(Color("Color2"))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.gray, lineWidth: 15)
-                                )
-                                .cornerRadius(20)
-                                .padding(.horizontal, 16)
-                                .foregroundColor(Color("fontGray"))
-                                .shadow(radius: 10)
-                        }
-                        .background(GeometryReader { geometry in
-                            Path { _ in
-                                DispatchQueue.main.async {
-                                    self.bubbleHeight = geometry.size.height
-                                }
-                            }
-                        })
-                        Spacer()
-                    }
-                    .ignoresSafeArea()
-                    VStack{
-                        HStack{
-                            Button(action: {
-                                tutorialNum = 0 // タップでチュートリアルを終了
-                                authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
-                                }
-                            }) {
-                                Image("スキップ")
-                                    .resizable()
-                                    .frame(width:200,height:60)
-                                    .padding(.leading)
-                            }
-                            Spacer()
-                        }
-                        Spacer()
-                    }
                 }
                     
             }
@@ -461,11 +399,11 @@ struct ShakaiListView: View {
 //                }
 //            }
         .navigationViewStyle(StackNavigationViewStyle())
+
         }
     func isIPad() -> Bool {
         return UIDevice.current.userInterfaceIdiom == .pad
     }
-    
     func fetchNumberOfIncorrectAnswers(userId: String, completion: @escaping (Int) -> Void) {
     let ref = Database.database().reference().child("IncorrectShakaiAnswers").child(userId)
     ref.observeSingleEvent(of: .value) { snapshot in

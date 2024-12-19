@@ -34,7 +34,7 @@ struct Sansu1ListView: View {
             explanation: "7から3を引くと4になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　5, 2, 8, 4",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　5, 2, 8, 4",
             choices: [
                 "2, 4, 5, 8",
                 "8, 5, 4, 2",
@@ -68,7 +68,7 @@ struct Sansu1ListView: View {
             explanation: "6から2を引くと4になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　3, 7, 1, 9",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　3, 7, 1, 9",
             choices: [
                 "1, 3, 7, 9",
                 "9, 7, 3, 1",
@@ -101,7 +101,7 @@ struct Sansu1ListView: View {
             explanation: "10から4を引くと6になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　10, 3, 6, 2",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　10, 3, 6, 2",
             choices: [
                 "2, 3, 6, 10",
                 "10, 6, 3, 2",
@@ -134,7 +134,7 @@ struct Sansu1ListView: View {
             explanation: "9から5を引くと4になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　6, 1, 4, 8",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　6, 1, 4, 8",
             choices: [
                 "1, 4, 6, 8",
                 "8, 6, 4, 1",
@@ -167,7 +167,7 @@ struct Sansu1ListView: View {
             explanation: "8から3を引くと5になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　7, 2, 5, 9",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　7, 2, 5, 9",
             choices: [
                 "2, 5, 7, 9",
                 "9, 7, 5, 2",
@@ -200,7 +200,7 @@ struct Sansu1ListView: View {
             explanation: "10から6を引くと4になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　9, 3, 7, 5",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　9, 3, 7, 5",
             choices: [
                 "3, 5, 7, 9",
                 "9, 7, 5, 3",
@@ -233,7 +233,7 @@ struct Sansu1ListView: View {
             explanation: "7から2を引くと5になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　8, 2, 6, 4",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　8, 2, 6, 4",
             choices: [
                 "2, 4, 6, 8",
                 "8, 6, 4, 2",
@@ -266,7 +266,7 @@ struct Sansu1ListView: View {
             explanation: "9から4を引くと5になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　4, 7, 1, 5",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　4, 7, 1, 5",
             choices: [
                 "1, 4, 5, 7",
                 "7, 5, 4, 1",
@@ -284,7 +284,7 @@ struct Sansu1ListView: View {
                 "13",
                 "14"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1, // 修正: 元は2でしたが、正解は1
             explanation: "10に2を足すと12になります。"
         ),
         QuizQuestion(
@@ -299,7 +299,7 @@ struct Sansu1ListView: View {
             explanation: "6から1を引くと5になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　3, 6, 9, 2",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　3, 6, 9, 2",
             choices: [
                 "2, 3, 6, 9",
                 "9, 6, 3, 2",
@@ -332,7 +332,7 @@ struct Sansu1ListView: View {
             explanation: "8から2を引くと6になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　3, 9, 1, 6",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　3, 9, 1, 6",
             choices: [
                 "1, 3, 6, 9",
                 "9, 6, 3, 1",
@@ -365,7 +365,7 @@ struct Sansu1ListView: View {
             explanation: "5から3を引くと2になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　5, 7, 2, 8",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　5, 7, 2, 8",
             choices: [
                 "2, 5, 7, 8",
                 "8, 7, 5, 2",
@@ -398,7 +398,7 @@ struct Sansu1ListView: View {
             explanation: "10から7を引くと3になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　6, 4, 9, 1",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　6, 4, 9, 1",
             choices: [
                 "1, 4, 6, 9",
                 "9, 6, 4, 1",
@@ -431,7 +431,7 @@ struct Sansu1ListView: View {
             explanation: "12から5を引くと7になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　8, 3, 7, 5",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　8, 3, 7, 5",
             choices: [
                 "3, 5, 7, 8",
                 "8, 7, 5, 3",
@@ -464,7 +464,7 @@ struct Sansu1ListView: View {
             explanation: "15から8を引くと7になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　2, 8, 1, 5",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　2, 8, 1, 5",
             choices: [
                 "1, 2, 5, 8",
                 "8, 5, 2, 1",
@@ -497,7 +497,7 @@ struct Sansu1ListView: View {
             explanation: "18から9を引くと9になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　7, 3, 6, 9",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　7, 3, 6, 9",
             choices: [
                 "3, 6, 7, 9",
                 "9, 7, 6, 3",
@@ -530,7 +530,7 @@ struct Sansu1ListView: View {
             explanation: "14から7を引くと7になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　3, 7, 2, 9",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　3, 7, 2, 9",
             choices: [
                 "2, 3, 7, 9",
                 "9, 7, 3, 2",
@@ -563,7 +563,7 @@ struct Sansu1ListView: View {
             explanation: "20から5を引くと15になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　4, 1, 6, 3",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　4, 1, 6, 3",
             choices: [
                 "1, 3, 4, 6",
                 "6, 4, 3, 1",
@@ -596,7 +596,7 @@ struct Sansu1ListView: View {
             explanation: "16から8を引くと8になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　5, 2, 7, 4",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　5, 2, 7, 4",
             choices: [
                 "2, 4, 5, 7",
                 "7, 5, 4, 2",
@@ -629,7 +629,7 @@ struct Sansu1ListView: View {
             explanation: "13から6を引くと7になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　6, 3, 8, 1",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　6, 3, 8, 1",
             choices: [
                 "1, 3, 6, 8",
                 "8, 6, 3, 1",
@@ -662,7 +662,7 @@ struct Sansu1ListView: View {
             explanation: "18から9を引くと9になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　5, 3, 8, 2",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　5, 3, 8, 2",
             choices: [
                 "8, 5, 3, 2",
                 "5, 8, 2, 3",
@@ -695,7 +695,7 @@ struct Sansu1ListView: View {
             explanation: "20から12を引くと8になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　9, 1, 7, 4",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　9, 1, 7, 4",
             choices: [
                 "1, 4, 7, 9",
                 "9, 7, 4, 1",
@@ -724,11 +724,11 @@ struct Sansu1ListView: View {
                 "10",
                 "11"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 2, // 修正: 元は0でしたが、正解は1
             explanation: "17から8を引くと9になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　6, 3, 9, 1",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　6, 3, 9, 1",
             choices: [
                 "1, 3, 6, 9",
                 "9, 6, 3, 1",
@@ -757,11 +757,11 @@ struct Sansu1ListView: View {
                 "13",
                 "14"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1, // 修正: 元は2でしたが、正解は1
             explanation: "19から7を引くと12になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　4, 7, 2, 5",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　4, 7, 2, 5",
             choices: [
                 "7, 5, 4, 2",
                 "2, 4, 5, 7",
@@ -794,7 +794,7 @@ struct Sansu1ListView: View {
             explanation: "15から6を引くと9になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　8, 4, 2, 6",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　8, 4, 2, 6",
             choices: [
                 "4, 6, 2, 8",
                 "2, 4, 6, 8",
@@ -827,7 +827,7 @@ struct Sansu1ListView: View {
             explanation: "20から11を引くと9になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　3, 7, 5, 9",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　3, 7, 5, 9",
             choices: [
                 "7, 9, 5, 3",
                 "5, 7, 9, 3",
@@ -856,11 +856,11 @@ struct Sansu1ListView: View {
                 "11",
                 "12"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2, // 修正: 元は1でしたが、正解は2
             explanation: "18から7を引くと11になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　9, 2, 6, 3",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　9, 2, 6, 3",
             choices: [
                 "2, 3, 6, 9",
                 "9, 6, 3, 2",
@@ -893,7 +893,7 @@ struct Sansu1ListView: View {
             explanation: "22から13を引くと9になります。"
         ),
         QuizQuestion(
-            question: "次の数字を順番に並べ替えましょう:\n　　　　　　4, 7, 1, 5",
+            question: "次の数字を順番に並べ替えましょう\n　　　　　　4, 7, 1, 5",
             choices: [
                 "7, 5, 4, 1",
                 "1, 4, 5, 7",

@@ -52,16 +52,34 @@ struct GraphManagerView: View {
                     })
                     .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                 }
-//                Color.black.opacity(0.45)
-//                .onTapGesture {
-//                    preFlag = true
-//                }
-//                VStack{
-//                    Image(systemName: "lock.fill")
-//                        .font(.system(size: 44))
-//                    Text("プレミアムプランに登録すると\n毎日の回答数や問題の正答率をグラフで確認することができます")
-//                        .bold()
-//                }
+                Color.black.opacity(0.45)
+                .onTapGesture {
+                    preFlag = true
+                }
+                VStack{
+                    Image(systemName: "lock.fill")
+                        .font(.system(size: 44))
+                        .foregroundStyle(.white)
+                    Text("プレミアムプランに登録すると\n毎日の回答数や問題の正答率をグラフで確認することができます")
+                        .bold()
+                        .foregroundStyle(.white)
+                }
+            }else {
+                VStack{
+                    TopTabView(list: list, selectedTab: $selectedTab)
+                    TabView(selection: $selectedTab,
+                            content: {
+                        
+                        BarChartView(authManager: authManager, data: sampleData)
+                            .navigationViewStyle(StackNavigationViewStyle())
+                            .tag(0)
+                        
+                        //    PentagonView(authManager: authManager, flag: .constant(false))
+                        PentagonManagerView()
+                            .tag(1)
+                    })
+                    .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                }
             }
         }
             .sheet(isPresented: $preFlag) {

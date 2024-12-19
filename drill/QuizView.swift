@@ -333,7 +333,7 @@ struct QuizView: View {
     
     // 次の問題へ移る処理
     func moveToNextQuiz() {
-        if monsterType == 3 && monsterHP <= 0 {
+        if monsterType == 2 && monsterHP <= 0 {
             // 最後のモンスターが倒された場合、結果画面へ遷移
             showCompletionMessage = true
             timer?.invalidate()
@@ -790,7 +790,7 @@ struct QuizView: View {
                                 }
                             }
                         }
-                        if quizLevel != .incorrectAnswer && quizLevel != .incorrectITAnswer && quizLevel != .incorrectInfoAnswer && quizLevel != .incorrectAppliedAnswer && quizLevel != .incorrectESAnswer && quizLevel != .incorrectITStrategyAnswer {
+                        if quizLevel != .incorrectAnswer && quizLevel != .incorrectITAnswer && quizLevel != .incorrectInfoAnswer && quizLevel != .incorrectAppliedAnswer && quizLevel != .incorrectESAnswer && quizLevel != .incorrectITStrategyAnswer && quizLevel != .incorrectSansuAnswer && quizLevel != .incorrectKokugoAnswer && quizLevel != .incorrectShakaiAnswer && quizLevel != .incorrectRikaAnswer {
                             
                             VStack{
                                 HStack{
@@ -847,14 +847,8 @@ struct QuizView: View {
                             AnswerSelectionView(choices: currentQuiz.choices, correctAnswerIndex: hasAnswered ? currentQuiz.correctAnswerIndex : nil) { index in
                                 answerSelectionAction(index: index)
                             }
-                            
-                            //            AnswerSelectionView(choices: currentQuiz.choices) { index in
-                            //                                            answerSelectionAction(index: index)
-                            //                                        }
                             .onAppear{
-                                
                                 showTutorial = true
-                                //                print("AnswerSelectionView currentQuiz.choices:\(currentQuiz.choices)")
                             }
                             .frame(maxWidth: .infinity)
                             .shadow(radius: 1)
@@ -913,7 +907,7 @@ struct QuizView: View {
                         ModalView(isSoundOn: $isSoundOn, isPresented: $showHomeModal, isPresenting: $isPresenting, audioManager: audioManager, showHomeModal: $showHomeModal,tutorialNum: $tutorialNum,pauseTimer:pauseTimer,resumeTimer: resumeTimer, userFlag: $userFlag)
                     }
                 }
-                if tutorialNum == 4 && showTutorial == true {
+                if tutorialNum == 3 && showTutorial == true {
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
                         // スポットライトの領域をカットアウ
@@ -985,7 +979,7 @@ struct QuizView: View {
                         .padding()
                     }
                 }
-                if tutorialNum == 5 && showTutorial == true{
+                if tutorialNum == 4 && showTutorial == true{
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
                             .ignoresSafeArea()
@@ -1054,7 +1048,7 @@ struct QuizView: View {
                         Spacer()
                     }
                 }
-                if tutorialNum == 6 && showTutorial == true{
+                if tutorialNum == 5 && showTutorial == true{
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
                         // スポットライトの領域をカットアウ
@@ -1125,7 +1119,7 @@ struct QuizView: View {
                         .padding()
                     }
                 }
-                if tutorialNum == 7 && showTutorial == true{
+                if tutorialNum == 6 && showTutorial == true{
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
                         // スポットライトの領域をカットアウ
@@ -1208,7 +1202,11 @@ struct QuizView: View {
             .onTapGesture {
                 //                audioManager.playSound()
                 if showCountdown == false {
-                    if tutorialNum == 4 {
+                    if tutorialNum == 3 {
+                        tutorialNum = 4
+                        authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 4) { success in
+                        }
+                    } else if tutorialNum == 4 {
                         tutorialNum = 5
                         authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 5) { success in
                         }
@@ -1217,10 +1215,6 @@ struct QuizView: View {
                         authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 6) { success in
                         }
                     } else if tutorialNum == 6 {
-                        tutorialNum = 7
-                        authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 7) { success in
-                        }
-                    } else if tutorialNum == 7 {
                         resumeTimer()
                         tutorialNum = 0
                         authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
@@ -1239,6 +1233,7 @@ struct QuizView: View {
                     self.userHp = hp ?? 100
                     self.userAttack = attack ?? 20
                     self.tutorialNum = tutorialNum ?? 0
+                    print("authManager.fetchUserInfo1    :\(self.tutorialNum)")
                     if let additionalAttack = self.avator.first?["attack"] as? Int {
                         self.userAttack = self.userAttack + additionalAttack
                     }
@@ -1263,7 +1258,6 @@ struct QuizView: View {
                 }
                 self.startTime = Date()
                 authManager.fetchUserRewardFlag()
-                
                 if quizLevel == .incorrectITAnswer{
                     fetchNumberOfIncorrectSansuAnswers(userId: authManager.currentUserId!) { count in
                         self.incorrectAnswerCount = count
@@ -1304,6 +1298,38 @@ struct QuizView: View {
                     if quizLevel == .incorrectAppliedAnswer {
                         userAttack = 0
                     }
+                }else if quizLevel == .incorrectSansuAnswer {
+                    fetchNumberOfIncorrectSansuAnswers(userId: authManager.currentUserId!) { count in
+                        self.incorrectAnswerCount = count
+                        incorrectCount = count
+                    }
+                    if quizLevel == .incorrectSansuAnswer {
+                        userAttack = 0
+                    }
+                }else if quizLevel == .incorrectKokugoAnswer {
+                    fetchNumberOfIncorrectKokugoAnswers(userId: authManager.currentUserId!) { count in
+                        self.incorrectAnswerCount = count
+                        incorrectCount = count
+                    }
+                    if quizLevel == .incorrectKokugoAnswer {
+                        userAttack = 0
+                    }
+                }else if quizLevel == .incorrectRikaAnswer {
+                    fetchNumberOfIncorrectRikaAnswers(userId: authManager.currentUserId!) { count in
+                        self.incorrectAnswerCount = count
+                        incorrectCount = count
+                    }
+                    if quizLevel == .incorrectRikaAnswer {
+                        userAttack = 0
+                    }
+                }else if quizLevel == .incorrectShakaiAnswer {
+                    fetchNumberOfIncorrectShakaiAnswers(userId: authManager.currentUserId!) { count in
+                        self.incorrectAnswerCount = count
+                        incorrectCount = count
+                    }
+                    if quizLevel == .incorrectShakaiAnswer {
+                        userAttack = 0
+                    }
                 }else if quizLevel == .incorrectAnswer {
                     fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
                         self.incorrectAnswerCount = count
@@ -1314,10 +1340,6 @@ struct QuizView: View {
                     }
                 }
                 
-                //                fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                //                self.incorrectAnswerCount = count
-                //                incorrectCount = count
-                //                }
                 if quizLevel == .incorrectAnswer {
                     userAttack = 0
                 }
@@ -1326,7 +1348,8 @@ struct QuizView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                     userFlag = authManager.userFlag
                     userPreFlag = authManager.userPreFlag
-                }            }
+                }
+            }
             .onDisappear {
                 // QuizViewが閉じるときの時刻を記録する
                 // ただし、playerExperienceとplayerMoneyが5以外の時だけ
@@ -2296,21 +2319,22 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 80
+                            monsterUnderHP = 80
+                            monsterAttack = 20
+                        case 2:
+                            monsterHP = 120
+                            monsterUnderHP = 120
+                            monsterAttack = 30
+                        case 3:
+                            monsterHP = 160
+                            monsterUnderHP = 160
+                            monsterAttack = 40
+                        default:
+                            monsterHP = 30
                     }
+
                 case .sansu2:
                     monsterBackground = "sansu2Background"
                     playerExperience = 20
@@ -2320,21 +2344,22 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 100
+                            monsterUnderHP = 100
+                            monsterAttack = 25
+                        case 2:
+                            monsterHP = 140
+                            monsterUnderHP = 140
+                            monsterAttack = 35
+                        case 3:
+                            monsterHP = 180
+                            monsterUnderHP = 180
+                            monsterAttack = 45
+                        default:
+                            monsterHP = 30
                     }
+
                 case .sansu3:
                     monsterBackground = "sansu3Background"
                     playerExperience = 20
@@ -2344,21 +2369,22 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 120
+                            monsterUnderHP = 120
+                            monsterAttack = 30
+                        case 2:
+                            monsterHP = 160
+                            monsterUnderHP = 160
+                            monsterAttack = 40
+                        case 3:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        default:
+                            monsterHP = 30
                     }
+
                 case .sansu4:
                     monsterBackground = "sansu4Background"
                     playerExperience = 20
@@ -2368,21 +2394,22 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 140
+                            monsterUnderHP = 140
+                            monsterAttack = 35
+                        case 2:
+                            monsterHP = 180
+                            monsterUnderHP = 180
+                            monsterAttack = 45
+                        case 3:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        default:
+                            monsterHP = 30
                     }
+
                 case .sansu5:
                     monsterBackground = "sansu5Background"
                     playerExperience = 20
@@ -2392,21 +2419,22 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 160
+                            monsterUnderHP = 160
+                            monsterAttack = 40
+                        case 2:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        case 3:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        default:
+                            monsterHP = 30
                     }
+
                 case .sansu6:
                     monsterBackground = "sansu6Background"
                     playerExperience = 20
@@ -2416,21 +2444,22 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        case 2:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        case 3:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        default:
+                            monsterHP = 30
                     }
+
                 case .shakai1:
                     monsterBackground = "shakai1Background"
                     playerExperience = 20
@@ -2440,21 +2469,22 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 80
+                            monsterUnderHP = 80
+                            monsterAttack = 20
+                        case 2:
+                            monsterHP = 120
+                            monsterUnderHP = 120
+                            monsterAttack = 30
+                        case 3:
+                            monsterHP = 160
+                            monsterUnderHP = 160
+                            monsterAttack = 40
+                        default:
+                            monsterHP = 30
                     }
+
                 case .shakai2:
                     monsterBackground = "shakai2Background"
                     playerExperience = 20
@@ -2464,21 +2494,22 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 100
+                            monsterUnderHP = 100
+                            monsterAttack = 25
+                        case 2:
+                            monsterHP = 140
+                            monsterUnderHP = 140
+                            monsterAttack = 35
+                        case 3:
+                            monsterHP = 180
+                            monsterUnderHP = 180
+                            monsterAttack = 45
+                        default:
+                            monsterHP = 30
                     }
+
                 case .shakai3:
                     monsterBackground = "shakai3Background"
                     playerExperience = 20
@@ -2488,21 +2519,22 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 120
+                            monsterUnderHP = 120
+                            monsterAttack = 30
+                        case 2:
+                            monsterHP = 160
+                            monsterUnderHP = 160
+                            monsterAttack = 40
+                        case 3:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        default:
+                            monsterHP = 30
                     }
+
                 case .shakai4:
                     monsterBackground = "shakai4Background"
                     playerExperience = 20
@@ -2512,21 +2544,22 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 140
+                            monsterUnderHP = 140
+                            monsterAttack = 35
+                        case 2:
+                            monsterHP = 180
+                            monsterUnderHP = 180
+                            monsterAttack = 45
+                        case 3:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        default:
+                            monsterHP = 30
                     }
+
                 case .shakai5:
                     monsterBackground = "shakai5Background"
                     playerExperience = 20
@@ -2536,21 +2569,22 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 160
+                            monsterUnderHP = 160
+                            monsterAttack = 40
+                        case 2:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        case 3:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        default:
+                            monsterHP = 30
                     }
+
                 case .shakai6:
                     monsterBackground = "shakai6Background"
                     playerExperience = 20
@@ -2560,21 +2594,22 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        case 2:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        case 3:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        default:
+                            monsterHP = 30
                     }
+
                 case .rika1:
                     monsterBackground = "rika1Background"
                     playerExperience = 20
@@ -2584,21 +2619,22 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 80
+                            monsterUnderHP = 80
+                            monsterAttack = 20
+                        case 2:
+                            monsterHP = 120
+                            monsterUnderHP = 120
+                            monsterAttack = 30
+                        case 3:
+                            monsterHP = 160
+                            monsterUnderHP = 160
+                            monsterAttack = 40
+                        default:
+                            monsterHP = 30
                     }
+
                 case .rika2:
                     monsterBackground = "rika2Background"
                     playerExperience = 20
@@ -2608,21 +2644,22 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 100
+                            monsterUnderHP = 100
+                            monsterAttack = 25
+                        case 2:
+                            monsterHP = 140
+                            monsterUnderHP = 140
+                            monsterAttack = 35
+                        case 3:
+                            monsterHP = 180
+                            monsterUnderHP = 180
+                            monsterAttack = 45
+                        default:
+                            monsterHP = 30
                     }
+
                 case .rika3:
                     monsterBackground = "rika3Background"
                     playerExperience = 20
@@ -2632,21 +2669,22 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 120
+                            monsterUnderHP = 120
+                            monsterAttack = 30
+                        case 2:
+                            monsterHP = 160
+                            monsterUnderHP = 160
+                            monsterAttack = 40
+                        case 3:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        default:
+                            monsterHP = 30
                     }
+
                 case .rika4:
                     monsterBackground = "rika4Background"
                     playerExperience = 20
@@ -2656,21 +2694,22 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 140
+                            monsterUnderHP = 140
+                            monsterAttack = 35
+                        case 2:
+                            monsterHP = 180
+                            monsterUnderHP = 180
+                            monsterAttack = 45
+                        case 3:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        default:
+                            monsterHP = 30
                     }
+
                 case .rika5:
                     monsterBackground = "rika5Background"
                     playerExperience = 20
@@ -2680,21 +2719,22 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 160
+                            monsterUnderHP = 160
+                            monsterAttack = 40
+                        case 2:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        case 3:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        default:
+                            monsterHP = 30
                     }
+
                 case .rika6:
                     monsterBackground = "rika6Background"
                     playerExperience = 20
@@ -2704,21 +2744,22 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        case 2:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        case 3:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        default:
+                            monsterHP = 30
                     }
+
                 case .kokugo1:
                     monsterBackground = "kokugo1Background"
                     playerExperience = 20
@@ -2728,21 +2769,22 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 80
+                            monsterUnderHP = 80
+                            monsterAttack = 20
+                        case 2:
+                            monsterHP = 120
+                            monsterUnderHP = 120
+                            monsterAttack = 30
+                        case 3:
+                            monsterHP = 160
+                            monsterUnderHP = 160
+                            monsterAttack = 40
+                        default:
+                            monsterHP = 30
                     }
+
                 case .kokugo2:
                     monsterBackground = "kokugo2Background"
                     playerExperience = 20
@@ -2752,21 +2794,22 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 100
+                            monsterUnderHP = 100
+                            monsterAttack = 25
+                        case 2:
+                            monsterHP = 140
+                            monsterUnderHP = 140
+                            monsterAttack = 35
+                        case 3:
+                            monsterHP = 180
+                            monsterUnderHP = 180
+                            monsterAttack = 45
+                        default:
+                            monsterHP = 30
                     }
+
                 case .kokugo3:
                     monsterBackground = "kokugo3Background"
                     playerExperience = 20
@@ -2776,21 +2819,22 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 120
+                            monsterUnderHP = 120
+                            monsterAttack = 30
+                        case 2:
+                            monsterHP = 160
+                            monsterUnderHP = 160
+                            monsterAttack = 40
+                        case 3:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        default:
+                            monsterHP = 30
                     }
+
                 case .kokugo4:
                     monsterBackground = "kokugo4Background"
                     playerExperience = 20
@@ -2800,21 +2844,22 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 140
+                            monsterUnderHP = 140
+                            monsterAttack = 35
+                        case 2:
+                            monsterHP = 180
+                            monsterUnderHP = 180
+                            monsterAttack = 45
+                        case 3:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        default:
+                            monsterHP = 30
                     }
+
                 case .kokugo5:
                     monsterBackground = "kokugo5Background"
                     playerExperience = 20
@@ -2824,21 +2869,22 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 160
+                            monsterUnderHP = 160
+                            monsterAttack = 40
+                        case 2:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        case 3:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        default:
+                            monsterHP = 30
                     }
+
                 case .kokugo6:
                     monsterBackground = "kokugo6Background"
                     playerExperience = 20
@@ -2848,32 +2894,40 @@ struct QuizView: View {
                         playerMoney = 5
                     }
                     switch newMonsterType {
-                    case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 35
-                    case 2:
-                        monsterHP = 120
-                        monsterUnderHP = 120
-                        monsterAttack =  40
-                    case 3:
-                        monsterHP = 160
-                        monsterUnderHP = 160
-                        monsterAttack = 45
-                    default:
-                        monsterHP = 30
+                        case 1:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        case 2:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        case 3:
+                            monsterHP = 200
+                            monsterUnderHP = 200
+                            monsterAttack = 50
+                        default:
+                            monsterHP = 30
                     }
+
+                // 必要に応じて他のカテゴリがあれば追加してください
+
+                default:
+                    // デフォルトの処理が必要な場合はここに記述
+                    break
+            }
                 }
             }
             .navigationBarBackButtonHidden(true)
         }
     }
-}
+
 
 struct QuizView_Previews: PreviewProvider {
     static var previews: some View {
-        Sansu1ListView(isPresenting: .constant(false))
+//        Sansu1ListView(isPresenting: .constant(false))
 //        QuizIncorrectAnswerListView(isPresenting: .constant(false))
+        TopView()
     }
 }
 

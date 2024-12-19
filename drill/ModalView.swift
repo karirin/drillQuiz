@@ -39,7 +39,7 @@ struct ModalView: View {
                         .cornerRadius(8)
                         .shadow(radius: 1)
                 }
-                NavigationLink("", destination: TopView().navigationBarBackButtonHidden(true), isActive: $isContentView)
+                NavigationLink("", destination: TopView(authManager :authManager).navigationBarBackButtonHidden(true), isActive: $isContentView)
                 
                 Button(action: {
                     isSoundOn.toggle()

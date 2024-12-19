@@ -44,7 +44,7 @@ struct IllustratedView: View {
     }
     
     let allItems: [Item] = [
-        Item(name: "ボルク", attack: 10, probability: 25, health: 20, rarity: .normal),
+        Item(name: "ナイト", attack: 20, probability: 25, health: 20, rarity: .normal),
         Item(name: "てーる", attack: 15, probability: 25, health: 15, rarity: .normal),
         Item(name: "ぷりん", attack: 20, probability: 25, health: 10, rarity: .normal),
         Item(name: "たまっち", attack: 20, probability: 25, health: 100, rarity: .normal),
@@ -78,6 +78,7 @@ struct IllustratedView: View {
     var columns: [GridItem] = [
         GridItem(.flexible()),
         GridItem(.flexible()),
+        GridItem(.flexible()),
         GridItem(.flexible())
     ]
 
@@ -100,9 +101,8 @@ struct IllustratedView: View {
                             Image(selected.name)
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(height: 180)
+                                .frame(height: 150)
                                 .cornerRadius(15)
-                                .frame(height:180)
                             HStack{
                                 ZStack {
                                     Image("ハートバー")
@@ -145,9 +145,9 @@ struct IllustratedView: View {
                             Image("\(selected.name)_シルエット")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(height: 180)
+                                .frame(height: 150)
                                 .cornerRadius(15)
-                                .frame(height:180)
+                                .frame(height:150)
                             HStack{
                                 ZStack {
                                     Image("ハートバー")
@@ -190,7 +190,7 @@ struct IllustratedView: View {
                                             Image(item.name)
                                                 .resizable()
                                                 .aspectRatio(contentMode: .fit)
-                                                .frame(width: 100, height: 100)
+                                                .frame(width: 80, height: 80)
                                                 .padding(5)
                                                 .cornerRadius(8)
                                         }
@@ -203,7 +203,7 @@ struct IllustratedView: View {
                                             Image("\(item.name)_シルエット") // シルエット画像は適宜用意してください
                                                 .resizable()
                                                 .aspectRatio(contentMode: .fit)
-                                                .frame(width: 100, height: 100)
+                                                .frame(width: 80, height: 80)
                                         }
                                     }
                                 }
@@ -226,7 +226,7 @@ Spacer()
         }
         .padding(.top,5)
         .onAppear {
-            self.selectedItem = Item(name: "ボルク", attack: 10, probability: 25, health: 20, rarity: .normal)
+            self.selectedItem = Item(name: "ナイト", attack: 20, probability: 25, health: 20, rarity: .normal)
         }
         .background(Color("purple2"))
         .navigationBarBackButtonHidden(true)

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct Sansu5ListView: View {
+struct Shakai5ListView: View {
     @Binding var isPresenting: Bool
     
     let quizBeginnerList: [QuizQuestion] = [
@@ -941,8 +941,8 @@ struct Sansu5ListView: View {
     }
 }
 
-struct Sansu5ListView_Previews: PreviewProvider {
+struct Shakai5ListView_Previews: PreviewProvider {
     static var previews: some View {
-        Sansu5ListView(isPresenting: .constant(false))
+        Shakai5ListView(isPresenting: .constant(false))
     }
 }

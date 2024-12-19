@@ -19,7 +19,7 @@ struct Kokugo6ListView: View {
                 "破れたものを直すこと",
                 "大きな失敗をすること"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『破天荒』は、今まで誰も成し遂げたことのないことを成すことを意味します。"
         ),
         QuizQuestion(
@@ -30,7 +30,7 @@ struct Kokugo6ListView: View {
                 "とうせん",
                 "ちょうせい"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『挑戦』の正しい読みは『ちょうせん』です。"
         ),
         QuizQuestion(
@@ -41,7 +41,7 @@ struct Kokugo6ListView: View {
                 "日中は外で活動し、夜は読書をすること",
                 "雨の日に仕事を休むこと"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『晴耕雨読』は、晴れた日は畑を耕し、雨の日は読書をするという、悠々自適な生活を表す言葉です。"
         ),
         QuizQuestion(
@@ -52,7 +52,7 @@ struct Kokugo6ListView: View {
                 "きっか",
                 "けいか"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『結果』の正しい読みは『けっか』です。"
         ),
         QuizQuestion(
@@ -63,7 +63,7 @@ struct Kokugo6ListView: View {
                 "伝えたいことを言葉で伝えること",
                 "心を通して情報を伝えること"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『以心伝心』は、言葉にしなくてもお互いの心が通じ合うことを意味します。"
         ),
         QuizQuestion(
@@ -74,7 +74,7 @@ struct Kokugo6ListView: View {
                 "どろく",
                 "どりゅく"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『努力』の正しい読みは『どりょく』です。"
         ),
         QuizQuestion(
@@ -85,7 +85,7 @@ struct Kokugo6ListView: View {
                 "想像が天まで届くこと",
                 "想像外の出来事が起こること"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『奇想天外』は、常識では考えられないほど奇抜な発想や行動を意味します。"
         ),
         QuizQuestion(
@@ -96,7 +96,7 @@ struct Kokugo6ListView: View {
                 "せんめい",
                 "せつみん"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『説明』の正しい読みは『せつめい』です。"
         ),
         QuizQuestion(
@@ -107,7 +107,7 @@ struct Kokugo6ListView: View {
                 "一期目で勝負を決めること",
                 "一度の会話で全てを決めること"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『一期一会』は、人生の中で一度だけの大切な出会いを意味します。"
         ),
         QuizQuestion(
@@ -118,7 +118,7 @@ struct Kokugo6ListView: View {
                 "焦り",
                 "悲しみ"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "詩の情景から、詩人の感じた気持ちは『感動』が最も適切です。"
         ),
         QuizQuestion(
@@ -129,7 +129,7 @@ struct Kokugo6ListView: View {
                 "竜が目を開けること",
                 "絵に命を吹き込むこと"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『画竜点睛』は、最後の重要な仕上げをすることで、物事の完成に至ることを意味します。"
         ),
         QuizQuestion(
@@ -140,7 +140,7 @@ struct Kokugo6ListView: View {
                 "せんけい",
                 "そけい"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『尊敬』の正しい読みは『そんけい』です。"
         ),
         QuizQuestion(
@@ -151,7 +151,7 @@ struct Kokugo6ListView: View {
                 "時期がすでに過ぎたこと",
                 "すぐに始めるべきこと"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『時期尚早』は、物事を始めるにはまだ早すぎることを意味します。"
         ),
         QuizQuestion(
@@ -162,7 +162,7 @@ struct Kokugo6ListView: View {
                 "きもん",
                 "ぎもう"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『疑問』の正しい読みは『ぎもん』です。"
         ),
         QuizQuestion(
@@ -173,7 +173,7 @@ struct Kokugo6ListView: View {
                 "厚い心を持つこと",
                 "実直であること"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『温厚篤実』は、穏やかで誠実な人柄を表します。"
         ),
         QuizQuestion(
@@ -184,7 +184,7 @@ struct Kokugo6ListView: View {
                 "りそん",
                 "りもん"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『理想』の正しい読みは『りそう』です。"
         ),
         QuizQuestion(
@@ -195,7 +195,7 @@ struct Kokugo6ListView: View {
                 "一つの刀で戦うこと",
                 "刀を両手で持つこと"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『一刀両断』は、物事を素早く決断し、迷わず実行することを意味します。"
         ),
         QuizQuestion(
@@ -206,7 +206,7 @@ struct Kokugo6ListView: View {
                 "ゆうしん",
                 "ゆうじょ"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『友情』の正しい読みは『ゆうじょう』です。"
         ),
         QuizQuestion(
@@ -217,7 +217,7 @@ struct Kokugo6ListView: View {
                 "石が火を起こすこと",
                 "光と石を同時に見ること"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『電光石火』は、非常に素早い行動や決断を意味します。"
         ),
         QuizQuestion(
@@ -228,7 +228,7 @@ struct Kokugo6ListView: View {
                 "焦り",
                 "恐怖"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "詩の情景から、詩人の感じた気持ちは『解放感』が最も適切です。"
         ),
         QuizQuestion(
@@ -437,7 +437,7 @@ struct Kokugo6ListView: View {
                 "一度死んでから生まれ変わること",
                 "死を覚悟して戦うこと"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 0,
             explanation: "『起死回生』は、絶望的な状況から立ち直ることを意味します。"
         ),
         QuizQuestion(
@@ -646,7 +646,7 @@ struct Kokugo6ListView: View {
                 "恐怖",
                 "喜び"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 0,
             explanation: "詩の情景から、詩人の感じた気持ちは『喜び』が最も適切です。"
         ),
         QuizQuestion(

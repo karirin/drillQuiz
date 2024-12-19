@@ -52,7 +52,7 @@ enum Rarity: Int {
         switch mode {
         case .normal:
             self.items = [
-                Item(name: "ボルク", attack: 10, probability: 25, health: 20, rarity: .normal),
+                Item(name: "ナイト", attack: 20, probability: 25, health: 20, rarity: .normal),
                 Item(name: "てーる", attack: 15, probability: 25, health: 15, rarity: .normal),
                 Item(name: "ぷりん", attack: 20, probability: 25, health: 10, rarity: .normal),
                 Item(name: "たまっち", attack: 20, probability: 25, health: 100, rarity: .normal),
@@ -299,40 +299,40 @@ struct GachaView: View {
                             .frame(maxWidth:130,maxHeight:50)
                             .padding(.top,-5)
                     }
-//                        Spacer()
-//                        Button(action: {
-//                            reward.ShowReward()
-//                        }) {
-//                            if reward.rewardLoaded {
-//                                Image("獲得")
-//                                    .resizable()
-//                                    .frame(maxWidth:110,maxHeight:110)
-//                            } else {
-//                                Image("獲得白黒")
-//                                    .resizable()
-//                                    .frame(maxWidth:110,maxHeight:110)
-//                            }
-//                        }
-//                        .disabled(!reward.rewardLoaded) // rewardLoadedを使用してボタンの活性状態を制御
-//                        .onChange(of: reward.rewardEarned) { rewardEarned in
-//                            showAlert = rewardEarned
-//                            print("onChange reward.rewardEarned:\(reward.rewardEarned)")
-//                        }
-//                        .alert(isPresented: $showAlert) {
-//                            Alert(
-//                                title: Text("報酬獲得！"),
-//                                message: Text("300コイン獲得しました。"),
-//                                dismissButton: .default(Text("OK"), action: {
-//                                    // アラートを閉じるアクション
-//                                    showAlert = false // アラートの表示状態を更新
-//                                    reward.rewardEarned = false // 必要に応じてrewardEarnedも更新
-//                                })
-//                            )
-//                        }
-//                        .onAppear() {
-//                            reward.LoadReward()
-//                        }
-//                        .shadow(radius: 10)
+                        Spacer()
+                        Button(action: {
+                            reward.ShowReward()
+                        }) {
+                            if reward.rewardLoaded {
+                                Image("獲得")
+                                    .resizable()
+                                    .frame(maxWidth:110,maxHeight:110)
+                            } else {
+                                Image("獲得白黒")
+                                    .resizable()
+                                    .frame(maxWidth:110,maxHeight:110)
+                            }
+                        }
+                        .disabled(!reward.rewardLoaded) // rewardLoadedを使用してボタンの活性状態を制御
+                        .onChange(of: reward.rewardEarned) { rewardEarned in
+                            showAlert = rewardEarned
+                            print("onChange reward.rewardEarned:\(reward.rewardEarned)")
+                        }
+                        .alert(isPresented: $showAlert) {
+                            Alert(
+                                title: Text("報酬獲得！"),
+                                message: Text("300コイン獲得しました。"),
+                                dismissButton: .default(Text("OK"), action: {
+                                    // アラートを閉じるアクション
+                                    showAlert = false // アラートの表示状態を更新
+                                    reward.rewardEarned = false // 必要に応じてrewardEarnedも更新
+                                })
+                            )
+                        }
+                        .onAppear() {
+                            reward.LoadReward()
+                        }
+                        .shadow(radius: 10)
                         Spacer()
                     }
                     Spacer()
@@ -385,28 +385,28 @@ struct GachaView: View {
                                     .frame(maxWidth:130,maxHeight:50)
                                     .padding(.top,-5)
                             }
-//                            Spacer()
-//                            Button(action: {
-//                                reward.ShowReward()
-//                            }) {
-//                                if reward.rewardLoaded {
-//                                    Image("獲得")
-//                                        .resizable()
-//                                        .frame(maxWidth:110,maxHeight:110)
-//                                } else {
-//                                    Image("獲得白黒")
-//                                        .resizable()
-//                                        .frame(maxWidth:110,maxHeight:110)
-//                                }
-//                            }
-//                            .disabled(!reward.rewardLoaded) // rewardLoadedを使用してボタンの活性状態を制御
-//                            .onChange(of: reward.rewardEarned) { rewardEarned in
-//                                showAlert = rewardEarned
-//                            }
-//                            .onAppear() {
-//                                reward.LoadReward()
-//                            }
-//                            .shadow(radius: 10)
+                            Spacer()
+                            Button(action: {
+                                reward.ShowReward()
+                            }) {
+                                if reward.rewardLoaded {
+                                    Image("獲得")
+                                        .resizable()
+                                        .frame(maxWidth:110,maxHeight:110)
+                                } else {
+                                    Image("獲得白黒")
+                                        .resizable()
+                                        .frame(maxWidth:110,maxHeight:110)
+                                }
+                            }
+                            .disabled(!reward.rewardLoaded) // rewardLoadedを使用してボタンの活性状態を制御
+                            .onChange(of: reward.rewardEarned) { rewardEarned in
+                                showAlert = rewardEarned
+                            }
+                            .onAppear() {
+                                reward.LoadReward()
+                            }
+                            .shadow(radius: 10)
                             Spacer()
                         }
                         Spacer()

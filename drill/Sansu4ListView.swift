@@ -52,7 +52,7 @@ struct Sansu4ListView: View {
                 "5/8",
                 "6/8"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "2/8は3/8より小さい分数です。"
         ),
         QuizQuestion(
@@ -624,7 +624,7 @@ struct Sansu4ListView: View {
                 "36平方センチメートル",
                 "38平方センチメートル"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 2,
             explanation: "長方形の面積は縦×横で求めます。9×4=36平方センチメートルです。"
         ),
         QuizQuestion(
@@ -1130,7 +1130,7 @@ struct Sansu4ListView: View {
                 "240円",
                 "320円"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "60円×5個で300円です。"
         ),
         QuizQuestion(
@@ -1141,7 +1141,7 @@ struct Sansu4ListView: View {
                 "1/3",
                 "5/6"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2,
             explanation: "4/5は3/5より大きい分数です。"
         ),
         QuizQuestion(
@@ -1185,7 +1185,7 @@ struct Sansu4ListView: View {
                 "40平方センチメートル",
                 "44平方センチメートル"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2,
             explanation: "長方形の面積は縦×横で求めます。9×4=36平方センチメートルです。"
         ),
         QuizQuestion(

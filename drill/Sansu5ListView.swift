@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct Shakai5ListView: View {
+struct Sansu5ListView: View {
     @Binding var isPresenting: Bool
     
     let quizBeginnerList: [QuizQuestion] = [
@@ -79,7 +79,7 @@ struct Shakai5ListView: View {
                 "780円",
                 "850円"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "バナナ1個160円×5個=800円です。"
         ),
 
@@ -424,7 +424,7 @@ struct Shakai5ListView: View {
                 "120立方センチメートル",
                 "130立方センチメートル"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 0,
             explanation: "直方体の体積は、縦×横×高さで計算します。10×2×5=100立方センチメートルです。"
         ),
 
@@ -614,7 +614,7 @@ struct Shakai5ListView: View {
                 "160立方センチメートル",
                 "150立方センチメートル"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "直方体の体積は、縦×横×高さで計算します。6×6×5=180立方センチメートルです。"
         ),
 
@@ -685,7 +685,7 @@ struct Shakai5ListView: View {
                 "150立方センチメートル",
                 "160立方センチメートル"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "直方体の体積は、縦×横×高さで計算します。4×5×7=140立方センチメートルです。"
         ),
 
@@ -732,7 +732,7 @@ struct Shakai5ListView: View {
                 "750円",
                 "780円"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 1,
             explanation: "メロン1個240円×3個=720円です。"
         ),
 
@@ -791,7 +791,7 @@ struct Shakai5ListView: View {
                 "100立方センチメートル",
                 "110立方センチメートル"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "直方体の体積は、縦×横×高さで計算します。9×2×5=90立方センチメートルです。"
         ),
 
@@ -945,7 +945,7 @@ struct Shakai5ListView: View {
                 "850円",
                 "910円"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "バナナ1個130円×7個=910円です。"
         ),
 
@@ -969,7 +969,7 @@ struct Shakai5ListView: View {
                 "150立方センチメートル",
                 "120立方センチメートル"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "直方体の体積は、縦×横×高さで計算します。4×7×5=140立方センチメートルです。"
         ),
 
@@ -1170,7 +1170,7 @@ struct Shakai5ListView: View {
                 "14.3",
                 "15.0"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "4.7 × 3 = 14.1です。"
         ),
 
@@ -1347,7 +1347,7 @@ struct Shakai5ListView: View {
                 "9.5",
                 "10.0"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 3,
             explanation: "2.5 × 4 = 10.0です。"
         ),
 
@@ -1391,8 +1391,8 @@ struct Shakai5ListView: View {
     }
 }
 
-struct Shakai5ListView_Previews: PreviewProvider {
+struct Sansu5ListView_Previews: PreviewProvider {
     static var previews: some View {
-        Shakai5ListView(isPresenting: .constant(false))
+        Sansu5ListView(isPresenting: .constant(false))
     }
 }

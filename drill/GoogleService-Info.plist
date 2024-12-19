@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>Swift-Beginners-app.drill</string>
+	<string>Swift-Beginners-app.drillQuiz3948</string>
 	<key>PROJECT_ID</key>
 	<string>drillquiz-5c5b3</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,7 +25,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:345750761664:ios:f10b8535b3d4a2a92cfd25</string>
+	<string>1:345750761664:ios:db99cc97367163dd2cfd25</string>
 	<key>DATABASE_URL</key>
 	<string>https://drillquiz-5c5b3-default-rtdb.firebaseio.com</string>
 </dict>

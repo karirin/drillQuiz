@@ -19,7 +19,7 @@ struct Sansu6ListView: View {
                 "18人",
                 "17人"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 0,
             explanation: "46人の35%はおおよそ16.1人なので、男子は約16人です。"
         ),
 
@@ -89,7 +89,7 @@ struct Sansu6ListView: View {
                 "24人",
                 "21人"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "55人の40%は22人です。"
         ),
 
@@ -229,7 +229,7 @@ struct Sansu6ListView: View {
                 "34人",
                 "35人"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "44人の75%は33人です。"
         ),
 
@@ -334,7 +334,7 @@ struct Sansu6ListView: View {
                 "17人",
                 "18人"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 2,
             explanation: "28人の60%は16.8なので、およそ17人です。"
         ),
 
@@ -579,7 +579,7 @@ struct Sansu6ListView: View {
                 "20人",
                 "18人"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 1,
             explanation: "50人の30%は15人です。"
         ),
 
@@ -591,7 +591,7 @@ struct Sansu6ListView: View {
                 "220平方センチメートル",
                 "201.06平方センチメートル"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 3,
             explanation: "面積は、半径の2乗×円周率で求められます。8×8×3.14=201.06平方センチメートルです。"
         ),
 
@@ -626,7 +626,7 @@ struct Sansu6ListView: View {
                 "320平方センチメートル",
                 "330平方センチメートル"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "面積は、半径の2乗×円周率で求められます。10×10×3.14=314平方センチメートルです。"
         ),
 

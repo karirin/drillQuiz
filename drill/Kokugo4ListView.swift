@@ -36,18 +36,6 @@ struct Kokugo4ListView: View {
         ),
 
         QuizQuestion(
-            question: "『部長に資料を＿＿します』の敬語として適切なものはどれですか？",
-            choices: [
-                "さしあげます",
-                "あげます",
-                "いたします",
-                "もらいます"
-            ],
-            correctAnswerIndex: 2,
-            explanation: "『いたします』は、自分の行動をへりくだって表現する丁寧語です。"
-        ),
-
-        QuizQuestion(
             question: "次の熟語『改善』の意味はどれですか？",
             choices: [
                 "何もしないこと",
@@ -69,18 +57,6 @@ struct Kokugo4ListView: View {
             ],
             correctAnswerIndex: 2,
             explanation: "『油断大敵』は、油断すると思わぬ災難に遭うという意味です。"
-        ),
-
-        QuizQuestion(
-            question: "『先生に本を＿＿します』の敬語として適切なものはどれですか？",
-            choices: [
-                "あげます",
-                "さしあげます",
-                "いたします",
-                "もらいます"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『さしあげます』は、目上の人に物を渡す際に使う敬語です。"
         ),
 
         QuizQuestion(
@@ -131,18 +107,6 @@ struct Kokugo4ListView: View {
         ),
 
         QuizQuestion(
-            question: "『社長にお話を＿＿します』の敬語として適切なものはどれですか？",
-            choices: [
-                "あげます",
-                "さしあげます",
-                "いたします",
-                "もらいます"
-            ],
-            correctAnswerIndex: 2,
-            explanation: "『いたします』は、自分の行動を謙遜して表現する敬語です。"
-        ),
-
-        QuizQuestion(
             question: "次の熟語『挑戦』の意味はどれですか？",
             choices: [
                 "失敗を恐れること",
@@ -164,18 +128,6 @@ struct Kokugo4ListView: View {
             ],
             correctAnswerIndex: 1,
             explanation: "『石橋を叩いて渡る』は、慎重に物事を進めることを意味します。"
-        ),
-
-        QuizQuestion(
-            question: "『お客様にお礼を＿＿します』の敬語として適切なものはどれですか？",
-            choices: [
-                "いただきます",
-                "さしあげます",
-                "いたします",
-                "もらいます"
-            ],
-            correctAnswerIndex: 2,
-            explanation: "『いたします』は、自分の行動をへりくだって表現する敬語です。"
         ),
 
         QuizQuestion(
@@ -226,18 +178,6 @@ struct Kokugo4ListView: View {
         ),
 
         QuizQuestion(
-            question: "『彼にお礼を＿＿します』の敬語として適切なものはどれですか？",
-            choices: [
-                "あげます",
-                "さしあげます",
-                "いたします",
-                "もらいます"
-            ],
-            correctAnswerIndex: 2,
-            explanation: "『いたします』は、自分の行動をへりくだって表現する際に使う丁寧語です。"
-        ),
-
-        QuizQuestion(
             question: "次の熟語『改善』の意味はどれですか？",
             choices: [
                 "物事をそのままにしておくこと",
@@ -259,18 +199,6 @@ struct Kokugo4ListView: View {
             ],
             correctAnswerIndex: 1,
             explanation: "『覆水盆に返らず』は、一度失ったものは取り戻せないという意味のことわざです。"
-        ),
-
-        QuizQuestion(
-            question: "『お客様に案内を＿＿します』の敬語として適切なものはどれですか？",
-            choices: [
-                "もらいます",
-                "いたします",
-                "あげます",
-                "さしあげます"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『いたします』は、自分の行動を丁寧に表現する敬語です。"
         ),
 
         QuizQuestion(
@@ -321,18 +249,6 @@ struct Kokugo4ListView: View {
         ),
 
         QuizQuestion(
-            question: "『部長に報告を＿＿します』の敬語として適切なものはどれですか？",
-            choices: [
-                "もらいます",
-                "さしあげます",
-                "いたします",
-                "あげます"
-            ],
-            correctAnswerIndex: 2,
-            explanation: "『いたします』は、自分の行動を謙遜して表現する丁寧語です。"
-        ),
-
-        QuizQuestion(
             question: "次の熟語『発展』の意味はどれですか？",
             choices: [
                 "物事が衰えること",
@@ -354,18 +270,6 @@ struct Kokugo4ListView: View {
             ],
             correctAnswerIndex: 3,
             explanation: "『明日は明日の風が吹く』は、未来のことをあまり心配せず、その時その時で対処すればよいという意味です。"
-        ),
-
-        QuizQuestion(
-            question: "『お客様に案内を＿＿します』の敬語として適切なものはどれですか？",
-            choices: [
-                "あげます",
-                "もらいます",
-                "いたします",
-                "さしあげます"
-            ],
-            correctAnswerIndex: 2,
-            explanation: "『いたします』は、自分の行動を丁寧に表現する敬語です。"
         ),
 
         QuizQuestion(
@@ -416,18 +320,6 @@ struct Kokugo4ListView: View {
         ),
 
         QuizQuestion(
-            question: "『先生にお願いを＿＿します』の敬語として適切なものはどれですか？",
-            choices: [
-                "あげます",
-                "さしあげます",
-                "いたします",
-                "もらいます"
-            ],
-            correctAnswerIndex: 2,
-            explanation: "『いたします』は、自分の行動をへりくだって表現する丁寧語です。"
-        ),
-
-        QuizQuestion(
             question: "次の熟語『工夫』の意味はどれですか？",
             choices: [
                 "同じことを繰り返すこと",
@@ -449,18 +341,6 @@ struct Kokugo4ListView: View {
             ],
             correctAnswerIndex: 3,
             explanation: "『覆水盆に返らず』は、一度起こったことや失われたものは元に戻らないという意味のことわざです。"
-        ),
-
-        QuizQuestion(
-            question: "『ご家族にお話を＿＿します』の敬語として適切なものはどれですか？",
-            choices: [
-                "いただきます",
-                "さしあげます",
-                "もらいます",
-                "いたします"
-            ],
-            correctAnswerIndex: 3,
-            explanation: "『いたします』は、自分の行動をへりくだって表現する際の丁寧語です。"
         ),
 
         QuizQuestion(
@@ -511,18 +391,6 @@ struct Kokugo4ListView: View {
         ),
 
         QuizQuestion(
-            question: "『先生にプレゼントを＿＿します』の敬語として適切なものはどれですか？",
-            choices: [
-                "さしあげます",
-                "あげます",
-                "いたします",
-                "もらいます"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『さしあげます』は、目上の人に何かを渡す際に使う適切な敬語です。"
-        ),
-
-        QuizQuestion(
             question: "次の熟語『成功』の意味はどれですか？",
             choices: [
                 "失敗を恐れること",
@@ -544,18 +412,6 @@ struct Kokugo4ListView: View {
             ],
             correctAnswerIndex: 1,
             explanation: "『立つ鳥跡を濁さず』は、去るときに後片付けをきちんとして、迷惑をかけないようにするという意味です。"
-        ),
-
-        QuizQuestion(
-            question: "『私はそれを＿＿いたします』の敬語として適切なものはどれですか？",
-            choices: [
-                "いたします",
-                "思います",
-                "さしあげます",
-                "存じます"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『いたします』は、自分の行動をへりくだって表現する丁寧語です。"
         ),
 
         QuizQuestion(
@@ -606,18 +462,6 @@ struct Kokugo4ListView: View {
         ),
 
         QuizQuestion(
-            question: "『お客様にお茶を＿＿します』の敬語として適切なものはどれですか？",
-            choices: [
-                "あげます",
-                "さしあげます",
-                "いたします",
-                "いただきます"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『さしあげます』は、目上の人に物を渡す際の丁寧な表現です。"
-        ),
-
-        QuizQuestion(
             question: "次の熟語『集中』の意味はどれですか？",
             choices: [
                 "みんなで協力すること",
@@ -639,18 +483,6 @@ struct Kokugo4ListView: View {
             ],
             correctAnswerIndex: 1,
             explanation: "『以心伝心』は、言葉を使わなくてもお互いの気持ちが通じ合うことを意味します。"
-        ),
-
-        QuizQuestion(
-            question: "『先生にお礼を＿＿します』の敬語として適切なものはどれですか？",
-            choices: [
-                "あげます",
-                "さしあげます",
-                "いたします",
-                "いただきます"
-            ],
-            correctAnswerIndex: 2,
-            explanation: "『いたします』は、自分の行動をへりくだって表現する丁寧語です。"
         ),
 
         QuizQuestion(
@@ -701,18 +533,6 @@ struct Kokugo4ListView: View {
         ),
 
         QuizQuestion(
-            question: "『お客様にご案内を＿＿します』の敬語として適切なものはどれですか？",
-            choices: [
-                "さしあげます",
-                "いたします",
-                "いただきます",
-                "もらいます"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『いたします』は、自分の行動を謙遜して表現する丁寧語です。"
-        ),
-
-        QuizQuestion(
             question: "次の熟語『勇気』の意味はどれですか？",
             choices: [
                 "恐れずに物事に立ち向かう心",
@@ -734,18 +554,6 @@ struct Kokugo4ListView: View {
             ],
             correctAnswerIndex: 0,
             explanation: "『石の上にも三年』は、辛抱強く努力を続ければ、成果が得られるという意味です。"
-        ),
-
-        QuizQuestion(
-            question: "『私はそれを＿＿と思います』の敬語として適切なものはどれですか？",
-            choices: [
-                "思います",
-                "存じます",
-                "考えます",
-                "見ます"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『存じます』は、『思います』の丁寧な表現です。"
         ),
 
         QuizQuestion(
@@ -796,18 +604,6 @@ struct Kokugo4ListView: View {
         ),
 
         QuizQuestion(
-            question: "『彼に手紙を＿＿します』の敬語として適切なものはどれですか？",
-            choices: [
-                "いただきます",
-                "さしあげます",
-                "あげます",
-                "もらいます"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『さしあげます』は目上の人に物を渡す際に使う敬語です。"
-        ),
-
-        QuizQuestion(
             question: "次の熟語『挑戦』の意味はどれですか？",
             choices: [
                 "何か新しいことに立ち向かうこと",
@@ -830,18 +626,126 @@ struct Kokugo4ListView: View {
             correctAnswerIndex: 0,
             explanation: "『急がば回れ』は、急ぐときほど安全で確実な方法を取ることが大切だという意味です。"
         ),
-
+        
         QuizQuestion(
-            question: "『先生に質問を＿＿します』の敬語として適切なものはどれですか？",
-            choices: [
-                "あげます",
-                "いたします",
-                "いただきます",
-                "もらいます"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『いたします』は、丁寧に自分の行動を表現する敬語です。"
-        ),
+                question: "『亀の甲より年の功』の意味はどれですか？",
+                choices: [
+                    "亀の甲羅が硬いこと",
+                    "年を取ると知恵がつくこと",
+                    "年を取ると動きが遅くなること",
+                    "亀のように長生きすること"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "『亀の甲より年の功』は、年齢を重ねることで得られる知恵や経験が重要であることを意味します。"
+            ),
+
+            QuizQuestion(
+                question: "『油断大敵』の意味はどれですか？",
+                choices: [
+                    "油は危険であること",
+                    "敵を見逃すと危険であること",
+                    "油断すると大きな失敗を招くこと",
+                    "敵を侮ってはいけないこと"
+                ],
+                correctAnswerIndex: 2,
+                explanation: "『油断大敵』は、油断すると思わぬ災難に遭うという意味です。"
+            ),
+
+            QuizQuestion(
+                question: "『猿も木から落ちる』の意味はどれですか？",
+                choices: [
+                    "猿は木から落ちることがない",
+                    "どんなに上手な人でも失敗することがある",
+                    "失敗すると二度と成功できない",
+                    "猿のように素早く行動すること"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "『猿も木から落ちる』は、どんなに得意なことでも失敗することがあるという意味です。"
+            ),
+
+            QuizQuestion(
+                question: "『石橋を叩いて渡る』の意味はどれですか？",
+                choices: [
+                    "壊れた橋を渡ること",
+                    "慎重に物事を進めること",
+                    "急いで物事を進めること",
+                    "橋を修理してから渡ること"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "『石橋を叩いて渡る』は、慎重に物事を進めることを意味します。"
+            ),
+
+            QuizQuestion(
+                question: "『寝耳に水』の意味はどれですか？",
+                choices: [
+                    "水が耳に入ること",
+                    "予想外の出来事に驚くこと",
+                    "寝ながら水を飲むこと",
+                    "水の音で目が覚めること"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "『寝耳に水』は、全く予想していなかったことが突然起こり、驚くことを意味します。"
+            ),
+
+            QuizQuestion(
+                question: "『針の穴から天をのぞく』の意味はどれですか？",
+                choices: [
+                    "大きな目標を見ること",
+                    "狭い視野で物事を考えること",
+                    "小さな穴から空を見ること",
+                    "針で空を刺すこと"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "『針の穴から天をのぞく』は、狭い視野や知識で物事を判断することを意味します。"
+            ),
+
+            QuizQuestion(
+                question: "『二階から目薬』の意味はどれですか？",
+                choices: [
+                    "目薬をさすときのコツ",
+                    "効果がないこと",
+                    "少しは効き目があること",
+                    "やり方が非効率であること"
+                ],
+                correctAnswerIndex: 3,
+                explanation: "『二階から目薬』は、やり方が非効率で効果が薄いことを意味することわざです。"
+            ),
+
+            QuizQuestion(
+                question: "『覆水盆に返らず』の意味はどれですか？",
+                choices: [
+                    "一度失ったものは取り戻せないこと",
+                    "水を返すことができること",
+                    "盆に水を入れること",
+                    "失敗したことをやり直すこと"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "『覆水盆に返らず』は、一度失ったものは取り戻せないという意味のことわざです。"
+            ),
+
+            QuizQuestion(
+                question: "『明日は明日の風が吹く』の意味はどれですか？",
+                choices: [
+                    "風が強く吹くという予測",
+                    "今日と明日は同じであること",
+                    "先のことは考えすぎずに、その時に任せること",
+                    "風が変われば運も変わること"
+                ],
+                correctAnswerIndex: 3,
+                explanation: "『明日は明日の風が吹く』は、未来のことをあまり心配せず、その時その時で対処すればよいという意味です。"
+            ),
+
+            QuizQuestion(
+                question: "『光陰矢のごとし』の意味はどれですか？",
+                choices: [
+                    "時間が早く過ぎ去ること",
+                    "光が速いこと",
+                    "矢のように飛ぶこと",
+                    "暗闇の中で光が輝くこと"
+                ],
+                correctAnswerIndex: 0,
+                explanation: "『光陰矢のごとし』は、時間が速く過ぎ去ることを意味することわざです。"
+            ),
 
         QuizQuestion(
             question: "次の熟語『努力』の意味はどれですか？",
@@ -889,19 +793,125 @@ struct Kokugo4ListView: View {
             correctAnswerIndex: 0,
             explanation: "『二兎を追う者は一兎をも得ず』は、欲張りすぎると何も得られないという意味です。"
         ),
-
         QuizQuestion(
-            question: "『先生に本を＿＿します』の敬語として適切なものはどれですか？",
-            choices: [
-                "さしあげます",
-                "あげます",
-                "もらいます",
-                "もらえます"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "敬語では、目上の人に対しては『さしあげます』が正しい表現です。"
-        ),
+                question: "『亀の甲より年の功』の意味はどれですか？",
+                choices: [
+                    "亀の甲羅が硬いこと",
+                    "年を取ると知恵がつくこと",
+                    "年を取ると動きが遅くなること",
+                    "亀のように長生きすること"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "『亀の甲より年の功』は、年齢を重ねることで得られる知恵や経験が重要であることを意味します。"
+            ),
 
+            QuizQuestion(
+                question: "『油断大敵』の意味はどれですか？",
+                choices: [
+                    "油は危険であること",
+                    "敵を見逃すと危険であること",
+                    "油断すると大きな失敗を招くこと",
+                    "敵を侮ってはいけないこと"
+                ],
+                correctAnswerIndex: 2,
+                explanation: "『油断大敵』は、油断すると思わぬ災難に遭うという意味です。"
+            ),
+
+            QuizQuestion(
+                question: "『猿も木から落ちる』の意味はどれですか？",
+                choices: [
+                    "猿は木から落ちることがない",
+                    "どんなに上手な人でも失敗することがある",
+                    "失敗すると二度と成功できない",
+                    "猿のように素早く行動すること"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "『猿も木から落ちる』は、どんなに得意なことでも失敗することがあるという意味です。"
+            ),
+
+            QuizQuestion(
+                question: "『石橋を叩いて渡る』の意味はどれですか？",
+                choices: [
+                    "壊れた橋を渡ること",
+                    "慎重に物事を進めること",
+                    "急いで物事を進めること",
+                    "橋を修理してから渡ること"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "『石橋を叩いて渡る』は、慎重に物事を進めることを意味します。"
+            ),
+
+            QuizQuestion(
+                question: "『寝耳に水』の意味はどれですか？",
+                choices: [
+                    "水が耳に入ること",
+                    "予想外の出来事に驚くこと",
+                    "寝ながら水を飲むこと",
+                    "水の音で目が覚めること"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "『寝耳に水』は、全く予想していなかったことが突然起こり、驚くことを意味します。"
+            ),
+
+            QuizQuestion(
+                question: "『針の穴から天をのぞく』の意味はどれですか？",
+                choices: [
+                    "大きな目標を見ること",
+                    "狭い視野で物事を考えること",
+                    "小さな穴から空を見ること",
+                    "針で空を刺すこと"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "『針の穴から天をのぞく』は、狭い視野や知識で物事を判断することを意味します。"
+            ),
+
+            QuizQuestion(
+                question: "『二階から目薬』の意味はどれですか？",
+                choices: [
+                    "目薬をさすときのコツ",
+                    "効果がないこと",
+                    "少しは効き目があること",
+                    "やり方が非効率であること"
+                ],
+                correctAnswerIndex: 3,
+                explanation: "『二階から目薬』は、やり方が非効率で効果が薄いことを意味することわざです。"
+            ),
+
+            QuizQuestion(
+                question: "『覆水盆に返らず』の意味はどれですか？",
+                choices: [
+                    "一度失ったものは取り戻せないこと",
+                    "水を返すことができること",
+                    "盆に水を入れること",
+                    "失敗したことをやり直すこと"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "『覆水盆に返らず』は、一度失ったものは取り戻せないという意味のことわざです。"
+            ),
+
+            QuizQuestion(
+                question: "『明日は明日の風が吹く』の意味はどれですか？",
+                choices: [
+                    "風が強く吹くという予測",
+                    "今日と明日は同じであること",
+                    "先のことは考えすぎずに、その時に任せること",
+                    "風が変われば運も変わること"
+                ],
+                correctAnswerIndex: 3,
+                explanation: "『明日は明日の風が吹く』は、未来のことをあまり心配せず、その時その時で対処すればよいという意味です。"
+            ),
+
+            QuizQuestion(
+                question: "『光陰矢のごとし』の意味はどれですか？",
+                choices: [
+                    "時間が早く過ぎ去ること",
+                    "光が速いこと",
+                    "矢のように飛ぶこと",
+                    "暗闇の中で光が輝くこと"
+                ],
+                correctAnswerIndex: 0,
+                explanation: "『光陰矢のごとし』は、時間が速く過ぎ去ることを意味することわざです。"
+            )
     ]
         
     @State private var shuffledQuizList: [QuizQuestion]

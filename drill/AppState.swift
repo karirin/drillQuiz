@@ -122,7 +122,7 @@ class SubscriptionViewModel: ObservableObject {
     @EnvironmentObject var appState: AppState
 
     let productIdList = [
-        "IT",
+        "DRILL",
     ]
 
     func loadProducts() async {
