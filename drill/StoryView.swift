@@ -38,6 +38,8 @@ class PositionViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     private var staminaRecoveryCancellable: AnyCancellable?
     
+    private var isTimerActive = false
+    
     // MARK: - Constants
     struct Constants {
         static let maxStamina: Int = 100
@@ -155,6 +157,20 @@ class PositionViewModel: ObservableObject {
                 self.startStaminaRecoveryTimer()
             }
         }
+    }
+    
+    func handleAppBecameActive() {
+        recoverStaminaOnAppLaunch { success in
+            if success {
+                print("アプリ復帰時のスタミナ回復に成功しました。")
+            }
+        }
+        startStaminaRecoveryTimer()
+    }
+    // アプリがバックグラウンドになった時の処理
+    func handleAppWentToBackground() {
+        saveLastActiveTime { _ in }
+        stopStaminaRecoveryTimer()
     }
     
     func recoverStamina(by amount: Int) {
@@ -381,7 +397,12 @@ class PositionViewModel: ObservableObject {
     }
     
     func startStaminaRecoveryTimer() {
-        guard staminaRecoveryCancellable == nil else { return } // 既にタイマーが動作中の場合は無視
+        guard !isTimerActive else {
+        print("タイマーは既に動作中です")
+        return
+        }
+        print("スタミナ回復タイマーを開始します")
+        isTimerActive = true
         
         staminaRecoveryCancellable = Timer.publish(every: Constants.staminaRecoveryInterval, on: .main, in: .common)
             .autoconnect()
@@ -394,6 +415,7 @@ class PositionViewModel: ObservableObject {
     func stopStaminaRecoveryTimer() {
         staminaRecoveryCancellable?.cancel()
         staminaRecoveryCancellable = nil
+        isTimerActive = false
     }
 }
 
@@ -452,6 +474,7 @@ struct StoryView: View {
     @Binding var isReturnActive: Bool
     @Binding var isPresented: Bool
     @State private var isStoryRankingModal = false
+    @State private var hasAppeared = false
 
     var body: some View {
         NavigationStack {
@@ -635,6 +658,8 @@ struct StoryView: View {
                     self.downArrowPosition = position
                 }
                 .onAppear{
+                    guard !hasAppeared else { return }
+                    hasAppeared = true
                     let userDefaults = UserDefaults.standard
                     if !userDefaults.bool(forKey: "hasLaunchedStoryOnappear") {
                         isStoryFlag = true
@@ -727,6 +752,10 @@ struct StoryView: View {
             default:
                 break
             }
+        }
+        .onDisappear {
+            // タブ切り替え時にタイマーを停止
+            viewModel.stopStaminaRecoveryTimer()
         }
     }
     

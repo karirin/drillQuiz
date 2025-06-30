@@ -25,6 +25,8 @@ struct TopView: View {
     @State private var buttonRect: CGRect = .zero
     @State private var bubbleHeight: CGFloat = 0.0
     @State var isAlert: Bool = false
+    @StateObject private var storyViewModel = PositionViewModel.shared
+    @Environment(\.scenePhase) var scenePhase
     
     var body: some View {
         ZStack{
@@ -73,6 +75,16 @@ struct TopView: View {
                 }
             }
         }
+        .onChange(of: scenePhase) { newPhase in
+             switch newPhase {
+             case .background:
+                 storyViewModel.handleAppWentToBackground()
+             case .active:
+                 storyViewModel.handleAppBecameActive()
+             default:
+                 break
+             }
+         }
     }
 }
 
