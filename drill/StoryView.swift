@@ -112,6 +112,54 @@ class PositionViewModel: ObservableObject {
         updateStaminaInFirebase()
     }
     
+    func incrementUserPosition() {
+        guard let userId = AuthManager.shared.currentUserId else {
+            print("User is not logged in.")
+            return
+        }
+        
+        // スタミナが十分か確認
+        guard self.stamina >= 10 else {
+            showStaminaAlert = true
+            return
+        }
+        
+        let newPosition = userPosition + 1
+        let newStamina = self.stamina
+        
+        // ローカルの状態を即時に更新し、アニメーションをトリガー
+        DispatchQueue.main.async {
+            withAnimation(.easeInOut(duration: 0.5)) { // アニメーションの調整
+                self.userPosition = newPosition
+                self.stamina = newStamina
+            }
+        }
+        
+        let storyRef = dbRef.child("storys").child(userId)
+        
+        // 複数のフィールドを同時に更新するためのデータ構造
+        let updates = [
+            "position": newPosition,
+            "stamina": newStamina
+        ] as [String : Any]
+        
+        // Firebase に位置とスタミナを同時に更新
+        storyRef.updateChildValues(updates) { error, _ in
+            if let error = error {
+                print("position と stamina の更新に失敗しました: \(error.localizedDescription)")
+                // 必要に応じてローカルの状態を元に戻す処理を追加
+                DispatchQueue.main.async {
+                    withAnimation {
+                        self.userPosition = newPosition - 1
+                        self.stamina = newStamina
+                    }
+                }
+            } else {
+                print("position と stamina が更新されました: position=\(newPosition), stamina=\(newStamina)")
+            }
+        }
+    }
+    
     // スタミナ回復のためのメソッド
     func recoverStaminaOnAppLaunch(completion: @escaping (Bool) -> Void) {
         stopStaminaRecoveryTimer()

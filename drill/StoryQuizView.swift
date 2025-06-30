@@ -850,7 +850,22 @@ struct StoryQuizView: View {
                     SubModalView(isSoundOn: $isSoundOn, isPresented: $showSubFlag, isPresenting: $isPresenting, audioManager: audioManager, showHomeModal: $showHomeModal,pauseTimer:pauseTimer,resumeTimer: resumeTimer, userFlag: $userFlag)
                 }
             }
-            NavigationLink("", destination: StoryQuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: 0, quizLevel: quizLevel,victoryFlag:$victoryFlag, viewModel: viewModel).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+            NavigationLink("",
+                destination: StoryQuizResultView(
+                    results: quizResults,
+                    authManager: authManager,
+                    isPresenting: $isPresenting,
+                    navigateToQuizResultView: $navigateToQuizResultView,
+                    playerExperience: playerExperience,
+                    playerMoney: playerMoney,
+                    elapsedTime: 0,
+                    quizLevel: quizLevel,
+                    victoryFlag: $victoryFlag,
+                    isUserStoryFlag: .constant(false),  // ← この行を追加
+                    viewModel: viewModel
+                ),
+                isActive: $navigateToQuizResultView
+            )
     }
         .fontWeight(.bold)
         .onTapGesture {
