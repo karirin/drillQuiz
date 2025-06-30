@@ -42,6 +42,7 @@ struct HelpModalView: View {
                                 .stroke(Color.gray, lineWidth: 1)
                         )
                     Button(action: {
+                                generateHapticFeedback()
                         if toggle == true {
                             authManager.updateUserCsFlag(userId: authManager.currentUserId!, userCsFlag: 1) { success in
                             }
@@ -99,6 +100,7 @@ struct HelpModalView: View {
         .overlay(
             // 「×」ボタンを右上に配置
             Button(action: {
+                                generateHapticFeedback()
                 audioManager.playCancelSound()
 //                print(toggle)
                 if toggle == true {

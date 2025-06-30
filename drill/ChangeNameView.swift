@@ -59,6 +59,7 @@ struct ChangeNameView: View {
                         .font(.system(size: 20))
                         .font(.caption)
                     Button(action: {
+                                generateHapticFeedback()
                         authManager.updateUserName(userName: userName) { success in
                             if success {
                                 showAlert = true
@@ -112,6 +113,7 @@ struct ChangeNameView: View {
         .overlay(
                 // 「×」ボタンを右上に配置
                 Button(action: {
+                                generateHapticFeedback()
                     if isReturnBtn {
                         isPresented = false
                     }

@@ -466,6 +466,7 @@ struct StoryRankingView: View {
                     if isReturnFlag {
                         HStack{
                             Button(action: {
+                                generateHapticFeedback()
                                 self.presentationMode.wrappedValue.dismiss()
                             }) {
                                 Image(systemName: "chevron.left")
@@ -482,6 +483,7 @@ struct StoryRankingView: View {
                                 .foregroundColor(Color("fontGray"))
                             Spacer()
                             Button(action: {
+                                generateHapticFeedback()
                                 self.presentationMode.wrappedValue.dismiss()
                             }) {
                                 Image(systemName: "chevron.left")
@@ -1026,6 +1028,7 @@ struct RankingView: View {
         }
         .navigationBarBackButtonHidden(true)
         .navigationBarItems(leading: Button(action: {
+                                generateHapticFeedback()
             self.presentationMode.wrappedValue.dismiss()
             audioManager.playCancelSound()
         }) {

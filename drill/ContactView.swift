@@ -19,6 +19,7 @@ struct ContactView: View {
             VStack(spacing: -25) {
                 HStack{
                     Button(action: {
+                                generateHapticFeedback()
                         self.presentationMode.wrappedValue.dismiss()
                         audioManager.playCancelSound()
                     }) {
@@ -33,6 +34,7 @@ struct ContactView: View {
                         .font(.system(size:24))
                     Spacer()
                     Button(action: {
+                                generateHapticFeedback()
                         self.presentationMode.wrappedValue.dismiss()
                         audioManager.playCancelSound()
                     }) {
@@ -71,6 +73,7 @@ struct ContactView: View {
                     )
                     .padding(.horizontal)
                     Button(action: {
+                                generateHapticFeedback()
                         authManager.updateContact(userId: authManager.currentUserId!, newContact: text){ success in
                             self.showAlert = true
                             self.text = ""

@@ -30,6 +30,7 @@ struct AnswerSelectionView: View {
             ForEach(0..<choices.count, id: \.self) { index in
                 Spacer()
                 Button(action: {
+                                generateHapticFeedback()
                     self.action(index)
                 }) {
                     Text(self.choices[index])

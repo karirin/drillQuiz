@@ -75,6 +75,7 @@ struct QuizResultView: View {
                         HStack{
                             Spacer()
                             Button(action: {
+                                generateHapticFeedback()
                                 showSubFlag = true
                                 audioManager.playSound()
                             }) {
@@ -106,6 +107,7 @@ struct QuizResultView: View {
                                 HStack{
                                     Spacer()
                                     Button(action: {
+                                generateHapticFeedback()
                                         isHidden.toggle() // isHidden の値を切り替える
                                     }) {
                                         Text(isHidden ? "解説" : "解説") // ボタンのラベルを動的に設定
@@ -117,6 +119,7 @@ struct QuizResultView: View {
                                     .background(Color("skyBlue"),in: RoundedRectangle(cornerRadius: 25))
                                     Spacer()
                                     Button(action: {
+                                generateHapticFeedback()
                                         //                                    isHidden.toggle() // isHidden の値を切り替える
                                     }) {
                                         Text("ランキング") // ボタンのラベルを動的に設定
@@ -316,6 +319,7 @@ struct QuizResultView: View {
             .background(Color("Color2"))
             .navigationBarBackButtonHidden(true)
             .navigationBarItems(leading: Button(action: {
+                                generateHapticFeedback()
                 isPresenting = false
                 audioManager.playCancelSound()
             }) {
@@ -461,6 +465,7 @@ struct ExperienceModalView: View {
         }.overlay(
             // 「×」ボタンを右上に配置
             Button(action: {
+                                generateHapticFeedback()
                 showModal = false
                 audioManager.playCancelSound()
             }) {
@@ -511,6 +516,7 @@ struct LevelUpModalView: View {
         .overlay(
             // 「×」ボタンを右上に配置
             Button(action: {
+                                generateHapticFeedback()
                 showLevelUpModal = false
                 audioManager.playCancelSound()
             }) {

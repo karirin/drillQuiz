@@ -25,6 +25,7 @@ struct StorySutaminaModalView: View {
                     Spacer()
                         .frame(width:270)
                     Button(action: {
+                                generateHapticFeedback()
                         isPresented = false
                         audioManager.playCancelSound()
                     }) {
@@ -45,6 +46,7 @@ struct StorySutaminaModalView: View {
                 .foregroundStyle(.white)
                 .fontWeight(.bold)
                 Button(action: {
+                                generateHapticFeedback()
                     reward.ShowSutaminaReward()
                 }) {
                     if reward.rewardLoaded {
@@ -80,6 +82,7 @@ struct StorySutaminaModalView: View {
                 }
                 
 //                Button(action: {
+//                                generateHapticFeedback()
 //                    reward.ShowReward()
 //                }) {
 //                    if reward.rewardLoaded {

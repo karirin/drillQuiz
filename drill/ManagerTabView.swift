@@ -16,6 +16,7 @@ struct TopTabView: View {
         HStack(spacing: 0) {
             ForEach(0 ..< list.count, id: \.self) { row in
                 Button(action: {
+                                generateHapticFeedback()
                     withAnimation {
                         selectedTab = row
                     }
@@ -84,6 +85,7 @@ struct ManagerTabView: View {
                             Spacer()
                             HStack {
                                 Button(action: {
+                                generateHapticFeedback()
                                     reward.ExAndMoReward()
                                 }, label: {
                                     if reward.rewardLoaded{
@@ -131,6 +133,7 @@ struct ManagerTabView: View {
         .navigationViewStyle(StackNavigationViewStyle())
         .navigationBarBackButtonHidden(true)
         .navigationBarItems(leading: Button(action: {
+                                generateHapticFeedback()
             self.presentationMode.wrappedValue.dismiss()
             audioManager.playCancelSound()
         }) {

@@ -65,6 +65,7 @@ struct KokugoListView: View {
                             .padding(.bottom)
                             .padding(.top)
                             Button(action: {
+                                generateHapticFeedback()
                                 audioManager.playKetteiSound()
                                 // 画面遷移のトリガーをオンにする
                                 if userPreFlag != 1 {
@@ -162,6 +163,7 @@ struct KokugoListView: View {
                             .padding(.bottom)
                             .padding(.leading,15)
                                 Button(action: {
+                                generateHapticFeedback()
                                     audioManager.playKetteiSound()
                                     // 画面遷移のトリガーをオンにする
                                     self.isPresentingQuizBeginner = true
@@ -184,6 +186,7 @@ struct KokugoListView: View {
                                             }
                             
                             Button(action: {
+                                generateHapticFeedback()
                                 audioManager.playKetteiSound()
                                 self.isPresentingQuizIntermediate = true
                             }) {
@@ -201,6 +204,7 @@ struct KokugoListView: View {
                                         }
                             
                             Button(action: {
+                                generateHapticFeedback()
                                 audioManager.playKetteiSound()
                                 self.isPresentingQuizGod = true
                             }) {
@@ -217,6 +221,7 @@ struct KokugoListView: View {
                                 Kokugo3ListView(isPresenting: $isPresentingQuizGod)
                                         }
                             Button(action: {
+                                generateHapticFeedback()
                                 audioManager.playKetteiSound()
                                 self.isPresentingQuizAdvanced = true
                             }) {
@@ -233,6 +238,7 @@ struct KokugoListView: View {
                                 Kokugo4ListView(isPresenting: $isPresentingQuizAdvanced)
                                         }
                             Button(action: {
+                                generateHapticFeedback()
                                 audioManager.playKetteiSound()
                                 self.isPresentingQuizNetwork = true
                             }) {
@@ -249,6 +255,7 @@ struct KokugoListView: View {
                                 Kokugo5ListView(isPresenting: $isPresentingQuizNetwork)
                                         }
                             Button(action: {
+                                generateHapticFeedback()
                                 audioManager.playKetteiSound()
                                 self.isPresentingQuizSecurity = true
                             }) {
@@ -276,6 +283,7 @@ struct KokugoListView: View {
 //                                    Spacer()
 //                                    HStack {
 //                                        Button(action: {
+//                                generateHapticFeedback()
 //                                            reward.ExAndMoReward()
 //                                        }, label: {
 //                                            if reward.rewardLoaded{
@@ -382,6 +390,7 @@ struct KokugoListView: View {
             }
             .navigationBarBackButtonHidden(true)
 //            .navigationBarItems(leading: Button(action: {
+//                                generateHapticFeedback()
 //                self.presentationMode.wrappedValue.dismiss()
 //                audioManager.playCancelSound()
 //            }) {

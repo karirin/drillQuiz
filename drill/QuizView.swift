@@ -708,6 +708,7 @@ struct QuizView: View {
                 VStack {
                     HStack{
                         Button(action: {
+                                generateHapticFeedback()
                             showHomeModal.toggle()
                             audioManager.playSound()
                         }) {
@@ -974,6 +975,7 @@ struct QuizView: View {
                         Spacer()
                         HStack{
                             Button(action: {
+                                generateHapticFeedback()
                                 tutorialNum = 0 // タップでチュートリアルを終了
                                 authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
                                     // データベースのアップデートが成功したかどうかをハンドリング
@@ -1041,6 +1043,7 @@ struct QuizView: View {
                     VStack{
                         HStack{
                             Button(action: {
+                                generateHapticFeedback()
                                 tutorialNum = 0 // タップでチュートリアルを終了
                                 authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
                                     // データベースのアップデートが成功したかどうかをハンドリング
@@ -1113,6 +1116,7 @@ struct QuizView: View {
                         Spacer()
                         HStack{
                             Button(action: {
+                                generateHapticFeedback()
                                 tutorialNum = 0 // タップでチュートリアルを終了
                                 authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
                                     // データベースのアップデートが成功したかどうかをハンドリング
@@ -1180,6 +1184,7 @@ struct QuizView: View {
                         Spacer()
                         HStack{
                             Button(action: {
+                                generateHapticFeedback()
                                 tutorialNum = 0 // タップでチュートリアルを終了
                                 authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
                                     // データベースのアップデートが成功したかどうかをハンドリング

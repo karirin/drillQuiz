@@ -302,6 +302,7 @@ struct SubscriptionView: View {
             VStack { // VStackで各要素を縦に並べる
                 HStack{
                     Button(action: {
+                                generateHapticFeedback()
                         self.presentationMode.wrappedValue.dismiss()
                         audioManager.playCancelSound()
                     }) {
@@ -316,6 +317,7 @@ struct SubscriptionView: View {
                         .font(.system(size:24))
                     Spacer()
                     Button(action: {
+                                generateHapticFeedback()
                         self.presentationMode.wrappedValue.dismiss()
                         audioManager.playCancelSound()
                     }) {
@@ -354,6 +356,7 @@ struct SubscriptionView: View {
                     VStack{ // 各商品情報をVStackで囲む
 //                        if product.displayName == "広告非表示" {
                                 Button(action: {
+                                generateHapticFeedback()
                                     Task {
                                         do {
                                             try await AppStore.sync()
@@ -374,6 +377,7 @@ struct SubscriptionView: View {
                 }
                 
             Button(action: {
+                                generateHapticFeedback()
                 Task {
                     do {
                         try await AppStore.sync()

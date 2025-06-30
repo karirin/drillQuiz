@@ -33,6 +33,7 @@ struct ModalExplanationView: View {
                               VStack{
                                   
                                   Button(action: {
+                                generateHapticFeedback()
                                       currentQuizIndex += 1
       //                                selectedAnswerIndex = nil
     //                                  startTimer()
@@ -139,6 +140,7 @@ struct ModalExplanationView: View {
                         HStack{
                             Spacer()
                             Button(action: {
+                                generateHapticFeedback()
                                 currentQuizIndex += 1
                                 isPresented = false
                                 selectedAnswerIndex = nil
@@ -159,6 +161,7 @@ struct ModalExplanationView: View {
                         //                    NavigationLink("", destination: QuizManagerView(isPresenting: .constant(false)).navigationBarBackButtonHidden(true), isActive: $isContentView)
                         
                         //                    Button(action: {
+//                                generateHapticFeedback()
                         //                        authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 3) { success in
                         //                        }
                         //                    }) {
@@ -181,6 +184,7 @@ struct ModalExplanationView: View {
                     //                .overlay(
                     //                    // 「×」ボタンを右上に配置
                     //                    Button(action: {
+//                                generateHapticFeedback()
                     //                        isPresented = false
                     //                    }) {
                     //                        Image(systemName: "xmark.circle.fill")

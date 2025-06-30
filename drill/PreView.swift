@@ -75,6 +75,7 @@ struct PreView: View {
             // ヘッダー
             HStack {
                 Button(action: {
+                                generateHapticFeedback()
                     self.presentationMode.wrappedValue.dismiss()
                     audioManager.playCancelSound()
                 }) {
@@ -90,6 +91,7 @@ struct PreView: View {
                 Spacer()
                 // レイアウトの対称性を保つために非表示のボタン
                 Button(action: {
+                                generateHapticFeedback()
                     self.presentationMode.wrappedValue.dismiss()
                     audioManager.playCancelSound()
                 }) {
@@ -258,6 +260,7 @@ struct PreView: View {
                 HStack {
                     Text("購入復元時は")
                     Button(action: {
+                                generateHapticFeedback()
                         Task {
                             do {
                                 try await AppStore.sync()
@@ -314,6 +317,7 @@ struct PreView: View {
                 
                 ForEach(viewModel.products, id: \.id) { product in
                     Button(action: {
+                                generateHapticFeedback()
                         Task {
                             do {
                                 try await AppStore.sync()

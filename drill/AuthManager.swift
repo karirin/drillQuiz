@@ -1651,6 +1651,7 @@ struct AuthManager1: View {
                 Text("Logged in with user ID: \(authManager.user!.uid)")
             }
             Button(action: {
+                                generateHapticFeedback()
                 if self.authManager.user == nil {
                     self.authManager.anonymousSignIn(){}
                 }

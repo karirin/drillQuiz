@@ -137,6 +137,7 @@ struct ContentView: View {
                                                 .padding(.top,3)
                                         }
                                         Button(action: {
+                                generateHapticFeedback()
                                             isPresentingSettingView = true
                                         }) {
                                             Image("お問い合わせバー")
@@ -252,6 +253,7 @@ struct ContentView: View {
                                                     Spacer()
                                                     ZStack{
                                                         Button(action: {
+                                generateHapticFeedback()
                                                             self.isPresentingTraining = true
                                                             audioManager.playSound()
                                                         }) {
@@ -264,6 +266,7 @@ struct ContentView: View {
                                                             .padding(.leading ,10)
                                                     }
                                                     Button(action: {
+                                generateHapticFeedback()
                                                         self.isPresentingQuizList = true
                                                         audioManager.playSound()
                                                     }) {
@@ -282,6 +285,7 @@ struct ContentView: View {
                                                 }
                                                 HStack{
                                                     Button(action: {
+                                generateHapticFeedback()
                                                         self.isPresentingGachaView = true
                                                         audioManager.playSound()
                                                     }) {
@@ -292,6 +296,7 @@ struct ContentView: View {
                                                     }
                                                     .shadow(radius:10)
                                                     Button(action: {
+                                generateHapticFeedback()
                                                         self.isPresentingRankingView = true
                                                         audioManager.playSound()
                                                     }) {
@@ -303,6 +308,7 @@ struct ContentView: View {
                                                 }
                                                 HStack{
                                                     Button(action: {
+                                generateHapticFeedback()
                                                         // 画面遷移のトリガーをオンにする
                                                         self.isPresentingIllustratedView = true
                                                         audioManager.playSound()
@@ -314,6 +320,7 @@ struct ContentView: View {
                                                     }.shadow(radius:10)
                                                     
                                                     Button(action: {
+                                generateHapticFeedback()
                                                         self.isPresentingTittleView = true
                                                         audioManager.playSound()
                                                     }) {
@@ -438,6 +445,7 @@ struct ContentView: View {
                     VStack{
                         HStack{
                             Button(action: {
+                                generateHapticFeedback()
                                 tutorialNum = 0 // タップでチュートリアルを終了
                                 authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
                                    }

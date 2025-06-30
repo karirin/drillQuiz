@@ -35,6 +35,7 @@ struct CoinModalView: View {
                             
                         Spacer()
                         Button(action: {
+                                generateHapticFeedback()
                             audioManager.playSound()
                             Task {
                                 do {
@@ -68,6 +69,7 @@ struct CoinModalView: View {
                                 .font(.system(size: isSmallDevice() ? 22 : 26))
                             Spacer()
                             Button(action: {
+                                generateHapticFeedback()
                                 audioManager.playSound()
                                 Task {
                                     do {
@@ -94,6 +96,7 @@ struct CoinModalView: View {
                                     .font(.system(size: isSmallDevice() ? 22 : 26))
                                 Spacer()
                                 Button(action: {
+                                generateHapticFeedback()
                                     audioManager.playSound()
                                     Task {
                                         do {
@@ -132,6 +135,7 @@ struct CoinModalView: View {
             .overlay(
                 // 「×」ボタンを右上に配置
                 Button(action: {
+                                generateHapticFeedback()
                     audioManager.playCancelSound()
                     isPresented = false
                 }) {

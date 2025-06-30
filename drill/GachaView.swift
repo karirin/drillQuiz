@@ -163,6 +163,7 @@ struct GachaView: View {
             VStack{
                 HStack{
                     Button(action: {
+                                generateHapticFeedback()
                         self.presentationMode.wrappedValue.dismiss()
                         audioManager.playCancelSound()
                     }) {
@@ -183,6 +184,7 @@ struct GachaView: View {
                             .padding(.top,3)
                     }
                     Button(action: {
+                                generateHapticFeedback()
                         audioManager.playSound()
                         self.showCoinModal = true
                         showUnCoinModal = false
@@ -260,6 +262,7 @@ struct GachaView: View {
                         Spacer()
                         VStack{
                         Button(action: {
+                                generateHapticFeedback()
                             authManager.decreaseUserMoney { success in
                                 if success {
                                     print("User money decreased successfully.")
@@ -302,6 +305,7 @@ struct GachaView: View {
                     }
                         Spacer()
                         Button(action: {
+                                generateHapticFeedback()
                             reward.ShowReward()
                         }) {
                             if reward.rewardLoaded {
@@ -350,6 +354,7 @@ struct GachaView: View {
                             Spacer()
                             VStack{
                                 Button(action: {
+                                generateHapticFeedback()
                                     self.showResult = false
                                     authManager.decreaseUserMoney { success in
                                         if success {
@@ -388,6 +393,7 @@ struct GachaView: View {
                             }
                             Spacer()
                             Button(action: {
+                                generateHapticFeedback()
                                 reward.ShowReward()
                             }) {
                                 if reward.rewardLoaded {
@@ -552,6 +558,7 @@ struct GachaView: View {
         .frame(maxWidth: .infinity,maxHeight: .infinity)
         .navigationBarBackButtonHidden(true)
 //                .navigationBarItems(leading: Button(action: {
+//                                generateHapticFeedback()
 //                    self.presentationMode.wrappedValue.dismiss()
 //                    audioManager.playCancelSound()
 //                }) {

@@ -136,6 +136,7 @@ struct RewardView: View {
     @ObservedObject var reward = Reward()
     var body: some View {
         Button(action: {
+                                generateHapticFeedback()
             generateHapticFeedback()
             reward.ShowReward()
         }) {

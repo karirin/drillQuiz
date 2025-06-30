@@ -60,6 +60,7 @@ struct StoryCoinModalView: View {
                             Spacer()
                                 .frame(width:270)
                             Button(action: {
+                                generateHapticFeedback()
                                 isPresented = false
                                 audioManager.playCancelSound()
                             }) {

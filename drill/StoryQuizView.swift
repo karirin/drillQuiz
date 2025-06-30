@@ -638,6 +638,7 @@ struct StoryQuizView: View {
             VStack {
                 HStack{
                     Button(action: {
+                                generateHapticFeedback()
                         showHomeModal.toggle()
                         audioManager.playSound()
                     }) {

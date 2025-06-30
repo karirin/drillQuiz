@@ -32,6 +32,7 @@ struct SubModalView: View {
                 VStack { // VStackで各要素を縦に並べる
                     HStack{
 //                        Button(action: {
+//                                generateHapticFeedback()
 //                            self.presentationMode.wrappedValue.dismiss()
 //                            audioManager.playCancelSound()
 //                        }) {
@@ -46,6 +47,7 @@ struct SubModalView: View {
                             .font(.system(size:24))
                         Spacer()
 //                        Button(action: {
+//                                generateHapticFeedback()
 //                            self.presentationMode.wrappedValue.dismiss()
 //                            audioManager.playCancelSound()
 //                        }) {
@@ -85,6 +87,7 @@ struct SubModalView: View {
                         VStack{ // 各商品情報をVStackで囲む
     //                        if product.displayName == "広告非表示" {
                                     Button(action: {
+                                generateHapticFeedback()
                                         Task {
                                             do {
                                                 try await AppStore.sync()
@@ -105,6 +108,7 @@ struct SubModalView: View {
                     }
                     
                 Button(action: {
+                                generateHapticFeedback()
                     Task {
                         do {
                             try await AppStore.sync()
@@ -150,6 +154,7 @@ struct SubModalView: View {
             .overlay(
                 // 「×」ボタンを右上に配置
                 Button(action: {
+                                generateHapticFeedback()
                     isPresented = false
                         resumeTimer()
                     audioManager.playCancelSound()

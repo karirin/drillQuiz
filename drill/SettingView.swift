@@ -138,6 +138,7 @@ struct SettingView: View {
         }
         .navigationViewStyle(StackNavigationViewStyle())
         .navigationBarItems(leading: Button(action: {
+                                generateHapticFeedback()
                             self.presentationMode.wrappedValue.dismiss()
                             audioManager.playCancelSound()
                         }) {

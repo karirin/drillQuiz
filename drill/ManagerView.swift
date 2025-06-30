@@ -46,6 +46,7 @@ struct ManagerView: View {
                             Spacer()
                             HStack {
                                 Button(action: {
+                                generateHapticFeedback()
                                     reward.ExAndMoReward()
                                 }, label: {
                                     if reward.rewardLoaded{
@@ -93,6 +94,7 @@ struct ManagerView: View {
         .navigationViewStyle(StackNavigationViewStyle())
         .navigationBarBackButtonHidden(true)
         .navigationBarItems(leading: Button(action: {
+                                generateHapticFeedback()
             self.presentationMode.wrappedValue.dismiss()
             audioManager.playCancelSound()
         }) {

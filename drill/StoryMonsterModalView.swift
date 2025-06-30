@@ -74,6 +74,7 @@ struct StoryMonsterModalView: View {
                         Spacer()
                             .frame(width:270)
                         Button(action: {
+                                generateHapticFeedback()
                             isPresented = false
                             audioManager.playCancelSound()
                         }) {
@@ -128,6 +129,7 @@ struct StoryMonsterModalView: View {
                             .fontWeight(.bold)
                             .multilineTextAlignment(.center)
                         Button(action: {
+                                generateHapticFeedback()
                             isPresented = false
                             showQuizList = true
                             audioManager.playKetteiSound()
@@ -152,6 +154,7 @@ struct StoryMonsterModalView: View {
 //                        Spacer()
 //                        HStack {
 //                            Button(action: {
+//                                generateHapticFeedback()
 //                                reward.ExAndMoReward()
 //                            }, label: {
 //                                if reward.rewardLoaded{
@@ -199,6 +202,7 @@ struct StoryMonsterModalView: View {
 //                        HStack {
 //                            // 「×」ボタンを右上に配置
 //                            Button(action: {
+//                                generateHapticFeedback()
 //                                isPresented = false
 //                                audioManager.playCancelSound()
 //                            }) {
