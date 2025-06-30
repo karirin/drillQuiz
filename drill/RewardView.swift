@@ -8,11 +8,12 @@
 import SwiftUI
 import GoogleMobileAds
 
-class Reward: NSObject, GADFullScreenContentDelegate, ObservableObject {
+class Reward: NSObject, FullScreenContentDelegate, ObservableObject {
     @Published var rewardLoaded: Bool = false
     @Published var rewardEarned: Bool = false // この行を追加
-    var rewardedAd: GADRewardedAd?
+    var rewardedAd: RewardedAd?
     @ObservedObject var authManager = AuthManager.shared
+    @ObservedObject var viewModel: PositionViewModel = PositionViewModel.shared
 
     override init() {
         super.init()
@@ -21,7 +22,22 @@ class Reward: NSObject, GADFullScreenContentDelegate, ObservableObject {
 
     // リワード広告の読み込み
     func LoadReward() {
-        GADRewardedAd.load(withAdUnitID: "ca-app-pub-4898800212808837/4737585345", request: GADRequest()) { (ad, error) in
+        RewardedAd.load(with: "ca-app-pub-4898800212808837/4737585345", request: Request()) { (ad, error) in
+//        GADRewardedAd.load(withAdUnitID: "ca-app-pub-3940256099942544/1712485313", request: GADRequest()) { (ad, error) in //テスト
+            if let _ = error {
+                print("😭: 読み込みに失敗しました")
+                self.rewardLoaded = false
+                return
+            }
+            print("😍: 読み込みに成功しました LoadReward")
+            self.rewardLoaded = true
+            self.rewardedAd = ad
+            self.rewardedAd?.fullScreenContentDelegate = self
+        }
+    }
+    
+    func LoadStoryReward() {
+        RewardedAd.load(with: "ca-app-pub-4898800212808837/8004927226", request: Request()) { (ad, error) in
 //        GADRewardedAd.load(withAdUnitID: "ca-app-pub-3940256099942544/1712485313", request: GADRequest()) { (ad, error) in //テスト
             if let _ = error {
                 print("😭: 読み込みに失敗しました")
@@ -39,9 +55,25 @@ class Reward: NSObject, GADFullScreenContentDelegate, ObservableObject {
     func ShowReward() {
         if let root = UIApplication.shared.windows.first?.rootViewController {
             if let ad = rewardedAd {
-                ad.present(fromRootViewController: root, userDidEarnRewardHandler: {
+                ad.present(from: root, userDidEarnRewardHandler: {
                     print("😍: 報酬を獲得しました")
                     self.authManager.addMoney(amount: 300)
+                    self.LoadReward()
+                    self.rewardEarned = true
+                })
+            } else {
+                print("😭: 広告の準備ができていませんでした")
+                LoadReward()
+            }
+        }
+    }
+    
+    func ShowSutaminaReward() {
+        if let root = UIApplication.shared.windows.first?.rootViewController {
+            if let ad = rewardedAd {
+                ad.present(from: root, userDidEarnRewardHandler: { [self] in
+                    print("😍: 報酬を獲得しました")
+                    viewModel.recoverStamina(by: 30)
                     self.LoadReward()
                     self.rewardEarned = true
                 })
@@ -56,7 +88,7 @@ class Reward: NSObject, GADFullScreenContentDelegate, ObservableObject {
     func ExAndMoReward() {
         if let root = UIApplication.shared.windows.first?.rootViewController {
             if let ad = rewardedAd {
-                ad.present(fromRootViewController: root, userDidEarnRewardHandler: {
+                ad.present(from: root, userDidEarnRewardHandler: {
                     print("ExAndMoReward 😍: 報酬を獲得しました")
                     self.authManager.updateRewardFlag(userId: self.authManager.currentUserId!, userFlag: 2)
                     let now = Date()
@@ -92,7 +124,7 @@ class Reward: NSObject, GADFullScreenContentDelegate, ObservableObject {
     }
     
     // 広告が閉じられたときに呼ばれるデリゲートメソッド
-    func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+    func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
         print("広告が閉じられました。新しい広告をロードします。")
         self.rewardLoaded = false // 必要に応じて、UIの更新をトリガする
         LoadReward()
@@ -104,6 +136,7 @@ struct RewardView: View {
     @ObservedObject var reward = Reward()
     var body: some View {
         Button(action: {
+            generateHapticFeedback()
             reward.ShowReward()
         }) {
             Text(reward.rewardLoaded ? "リワード広告表示" : "読み込み中...")

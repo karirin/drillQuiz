@@ -44,6 +44,7 @@ struct IllustratedView: View {
     }
     
     let allItems: [Item] = [
+        Item(name: "えんぴ君", attack: 20, probability: 25, health: 20, rarity: .normal),
         Item(name: "ナイト", attack: 20, probability: 25, health: 20, rarity: .normal),
         Item(name: "てーる", attack: 15, probability: 25, health: 15, rarity: .normal),
         Item(name: "ぷりん", attack: 20, probability: 25, health: 10, rarity: .normal),
@@ -226,7 +227,7 @@ Spacer()
         }
         .padding(.top,5)
         .onAppear {
-            self.selectedItem = Item(name: "ナイト", attack: 20, probability: 25, health: 20, rarity: .normal)
+            self.selectedItem = Item(name: "えんぴ君", attack: 20, probability: 25, health: 20, rarity: .normal)
         }
         .background(Color("purple2"))
         .navigationBarBackButtonHidden(true)
@@ -239,13 +240,8 @@ Spacer()
             Text("戻る")
                 .foregroundColor(Color("fontGray"))
         })
-        .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text("おとも図鑑")
-                        .font(.system(size: 20)) // ここでフォントサイズを指定
-                        .foregroundColor(Color("fontGray"))
-                }
-            }
+        .navigationTitle("おとも図鑑")
+        .navigationBarTitleDisplayMode(.inline)
         }
     }
 

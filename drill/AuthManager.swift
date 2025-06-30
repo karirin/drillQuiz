@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Firebase
+import FirebaseAuth
 
 enum QuizLevel {
     case beginner
@@ -289,6 +290,7 @@ class AuthManager: ObservableObject {
     @State private var selectedAvatar: Avatar?
     @Published var loginCount: Int = 0
     @Published var loginBonus: Int = 0
+    @Published var userStoryCsFlag: Int = 0
     
     init() {
         user = Auth.auth().currentUser
@@ -382,6 +384,65 @@ class AuthManager: ObservableObject {
         }
     }
     
+    func fetchUserStoryCsFlag() {
+        guard let userId = user?.uid else { return }
+        
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.observeSingleEvent(of: .value) { (snapshot) in
+            if let data = snapshot.value as? [String: Any] {
+//                print("data:\(data)")
+//                self.experience = data["experience"] as? Int ?? 0
+                self.userStoryCsFlag = data["userStoryCsFlag"] as? Int ?? 0
+            }
+        }
+    }
+    
+    func saveLastActiveTimeToFirebase(completion: @escaping (Bool) -> Void) {
+        guard let userId = currentUserId else {
+            completion(false)
+            return
+        }
+
+        let lastActiveRef = Database.database().reference()
+            .child("storys")
+            .child(userId)
+            .child("lastActiveTime")
+        
+        let currentTime = Date().timeIntervalSince1970 // Unixタイムスタンプ
+
+        lastActiveRef.setValue(currentTime) { error, _ in
+            if let error = error {
+                print("FirebaseへのlastActiveTimeの保存に失敗しました: \(error.localizedDescription)")
+                completion(false)
+            } else {
+                print("FirebaseにlastActiveTimeを保存しました。時刻: \(currentTime)")
+                completion(true)
+            }
+        }
+    }
+    
+    func fetchLastActiveTimeFromFirebase(completion: @escaping (TimeInterval?) -> Void) {
+        guard let userId = currentUserId else {
+            completion(nil)
+            return
+        }
+
+        let lastActiveRef = Database.database().reference()
+            .child("storys")
+            .child(userId)
+            .child("lastActiveTime")
+
+        lastActiveRef.observeSingleEvent(of: .value) { snapshot in
+            if let lastActiveTimestamp = snapshot.value as? TimeInterval {
+                print("FirebaseからlastActiveTimeを取得しました。時刻: \(lastActiveTimestamp)")
+                completion(lastActiveTimestamp)
+            } else {
+                print("FirebaseからlastActiveTimeの取得に失敗しました。デフォルト値を使用します。")
+                completion(nil)
+            }
+        }
+    }
+    
     func deleteUserAccount(completion: @escaping (Bool, Error?) -> Void) {
         guard let userId = Auth.auth().currentUser?.uid else { return }
         let userRef = Database.database().reference().child("users").child(userId)
@@ -459,7 +520,7 @@ class AuthManager: ObservableObject {
         let userRef = Database.database().reference().child("users").child(userId)
         
         // 選択されたアバターの作成
-        let selectedAvatar = Avatar(name: self.selectedAvatar?.name ?? "ナイト", attack: 20, health: 20, usedFlag: 1, count: 1)
+        let selectedAvatar = Avatar(name: self.selectedAvatar?.name ?? "えんぴ君", attack: 20, health: 20, usedFlag: 1, count: 1)
         
         // ユーザーデータを設定（アバターデータは後で設定）
         let userData: [String: Any] = [
@@ -1297,6 +1358,20 @@ class AuthManager: ObservableObject {
                 completion(false)
             } else {
                 print("loginCount を \(newCount) に更新しました。")
+                completion(true)
+            }
+        }
+    }
+    
+    func updateUserStoryCsFlag(userId: String, userCsFlag: Int, completion: @escaping (Bool) -> Void) {
+        let userRef = Database.database().reference().child("users").child(userId)
+        let updates = ["userStoryCsFlag": userCsFlag]
+        print(updates)
+        userRef.updateChildValues(updates) { (error, _) in
+            if let error = error {
+                print("Error updating tutorialNum: \(error)")
+                completion(false)
+            } else {
                 completion(true)
             }
         }

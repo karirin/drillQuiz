@@ -324,12 +324,8 @@ struct QuizResultView: View {
                 Text("戻る")
                     .foregroundColor(Color("fontGray1"))
             })
-            .toolbar {
-                    ToolbarItem(placement: .principal) {
-                        Text("クイズ結果")
-                            .font(.system(size: 20)) // ここでフォントサイズを指定
-                    }
-                }
+            .navigationTitle("結果画面")
+            .navigationBarTitleDisplayMode(.inline)
             if showModal {
                 ExperienceModalView(showModal: $showModal, addedExperience: playerExperience, addedMoney: playerMoney, authManager: authManager)
             }

@@ -67,7 +67,8 @@ struct ContentView: View {
     @State private var loginCount: Int = 0
     @State private var showCoinAlert: Bool = false
     @State private var isSignUpFlag: Bool = true
-    @State private var isPresentingTraining: Bool = true
+    @State private var isPresentingTraining: Bool = false
+    @State private var updateNameFlag: Bool = false
     
     var body: some View {
         NavigationView {
@@ -80,7 +81,7 @@ struct ContentView: View {
                 } else {
                     VStack {
                         if userPreFlag != 1 {
-                            BannerView()
+                            BannerAdView()
                                 .frame(height: 60)
                                 .padding(.bottom, -10)
                         }
@@ -97,6 +98,33 @@ struct ContentView: View {
                                                 .scaledToFit()
                                                 .frame(height:30)
                                             Text("\(userName)").padding(.leading,25)
+                                            if self.userName.isEmpty {
+                                                Color.black.opacity(0.7)
+                                                    .padding(0)
+                                                    .cornerRadius(100)
+                                                    .padding(.vertical,13)
+                                                    .edgesIgnoringSafeArea(.all)
+                                                    .onTapGesture {
+                                                        updateNameFlag = true
+                                                    }
+                                                Text("名前を登録")
+                                                    .fontWeight(.bold)
+                                                    .foregroundStyle(Color(.white))
+                                                    .onTapGesture {
+                                                        updateNameFlag = true
+                                                    }
+                                            }
+                                        }
+                                        .onChange(of: updateNameFlag) { userMoney in
+                                            authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
+                                                self.userName = name ?? ""
+                                                self.avatar = avatar ?? [[String: Any]]()
+                                                self.userMoney = money ?? 0
+                                                self.userHp = hp ?? 100
+                                                self.userAttack = attack ?? 20
+                                                self.tutorialNum = tutorialNum ?? 0
+                                                self.isLoading = false
+                                            }
                                         }
                                         Spacer()
                                         ZStack {
@@ -234,17 +262,6 @@ struct ContentView: View {
                                                             
                                                         }.shadow(radius:10)
                                                             .padding(.leading ,10)
-                                                        
-                                                        Color.black.opacity(0.3)
-                                                            .cornerRadius(10)
-                                                            .padding(.leading , 30)
-                                                            .padding(.trailing , 20)
-                                                            .padding(.vertical,3)
-                                                        Text("準備中です")
-                                                            .font(.system(size: 20))
-                                                            .fontWeight(.bold)
-                                                            .foregroundColor(.white)
-                                                            .padding(.leading,15)
                                                     }
                                                     Button(action: {
                                                         self.isPresentingQuizList = true
@@ -322,6 +339,7 @@ struct ContentView: View {
                                         //                                NavigationLink("", destination: Test(isPresenting: .constant(false), viewModel: QuizBeginnerStoryViewModel()).navigationBarBackButtonHidden(true), isActive: $isPresentingStoryView)
                                         //
                                         NavigationLink("", destination: ContactView(audioManager: AudioManager()).navigationBarBackButtonHidden(true), isActive: $isPresentingSettingView)
+                                        NavigationLink("", destination: StoryView(isReturnActive: .constant(true), isPresented: $isPresentingTraining).navigationBarBackButtonHidden(true), isActive: $isPresentingTraining)
                                         //                                    NavigationLink("", destination:  PentagonView(authManager: authManager).navigationBarBackButtonHidden(true), isActive: $isPresentingPentagonView)
                                         //                                }
                                         
@@ -366,7 +384,11 @@ struct ContentView: View {
                 }
                 
                 if isFlag {
-                    ChangeNameView(isPresented: $isFlag, tutorialNum: $tutorialNum, authManager: authManager)
+                    ChangeNameView(isPresented: $isFlag, tutorialNum: $tutorialNum, isReturnBtn: .constant(false), authManager: authManager)
+                }
+                
+                if updateNameFlag {
+                    ChangeNameView(isPresented: $updateNameFlag, tutorialNum: $tutorialNum, isReturnBtn: .constant(true), authManager: authManager)
                 }
                 
                 if tutorialNum == 1 {
@@ -464,7 +486,6 @@ struct ContentView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                     startFlag = true
                     showCreateButton = true
-                    isFlag = false
                     authManager.saveUserToDatabase(userName: userName) { success in
                         if success {
                             authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
@@ -527,10 +548,6 @@ struct ContentView: View {
                             self.userAttack = attack ?? 20
                             self.tutorialNum = tutorialNum ?? 0
                             self.isLoading = false
-                            
-                            if self.userName.isEmpty {
-                                self.isFlag = true
-                            }
                             
                             authManager.checkAndGrantLoginBonus { granted in
                                 if granted {

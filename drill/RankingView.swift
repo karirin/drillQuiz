@@ -7,6 +7,20 @@
 
 import SwiftUI
 import Firebase
+import FirebaseAuth
+
+struct RankedUser: Identifiable {
+    let id: String
+    let user: User
+    let position: Int
+    var rank: Int?
+
+    init(user: User, position: Int) {
+        self.id = user.id
+        self.user = user
+        self.position = position
+    }
+}
 
 class RankingViewModel: ObservableObject {
     @Published var users = [User]()
@@ -21,7 +35,11 @@ class RankingViewModel: ObservableObject {
     @Published var currentUserAvatarRank: Int?
     @Published var rankedUsers = [User]()
     @Published var currentUserRankRank: Int?
-
+    @Published var currentStoryUser: Int?
+    @Published var currentUserStory: Int?
+//    @Published var rankedUsers = [User]()
+//    @Published var currentUserRankRank: Int?
+//    @Published var rankMatchUsers = [User]()
     
     init() {
         fetchUsers()
@@ -345,6 +363,236 @@ class RankingViewModel: ObservableObject {
         displayedUserCount = 10  // 表示するユーザー数を10に更新
     }
 
+    @Published var storys: [String: Story] = [:]
+     @Published var storyUsers: [RankedUser] = []
+     
+     struct Story: Codable {
+         let lastActiveTime: Double?
+         let position: Int
+         let stamina: Int
+     }
+     
+     func fetchStorys() {
+         Database.database().reference().child("storys").observe(.value) { [weak self] snapshot in
+             var tempStorys: [String: Story] = [:]
+             for child in snapshot.children {
+                 print("fetchStorys1")
+                 if let childSnapshot = child as? DataSnapshot,
+                    let value = childSnapshot.value as? [String: Any],
+                    let position = value["position"] as? Int,
+                    let stamina = value["stamina"] as? Int {
+                     print("fetchStorys2")
+                     let lastActiveTime = value["lastActiveTime"] as? Double
+                     
+                     let story = Story(lastActiveTime: lastActiveTime, position: position, stamina: stamina)
+                     tempStorys[childSnapshot.key] = story
+                 }
+             }
+             DispatchQueue.main.async {
+                 self?.storys = tempStorys
+                 self?.updateRankedUsers() { success in
+                     print("fetchStorys() success1    :\(success)")
+                     if success {
+                         self!.storyUsers = self!.storyUsers.sorted { $0.position > $1.position }
+                         if let currentStoryUserIndex = self!.storyUsers.firstIndex(where: { $0.id == self!.authManager.currentUserId }) {
+                 //            print("currentUserIndex:\(currentUserIndex)")
+                             // 順位はインデックス+1（配列は0から始まるため）
+                             self!.currentStoryUser = currentStoryUserIndex + 1
+                         }
+                         print("fetchStorys() success2    :\(self!.storyUsers)")
+  
+                         self!.assignRanks()
+                     }
+                 }
+             }
+         }
+     }
+     
+     private func assignRanks() {
+         var currentRank = 1
+         var previousPosition: Int? = nil
+         var sameRankCount = 0
+         for (index, user) in storyUsers.enumerated() {
+             if let prevPos = previousPosition {
+                 if user.position == prevPos {
+                     storyUsers[index].rank = currentRank
+                     sameRankCount += 1
+                 } else {
+                     currentRank += sameRankCount + 1
+                     storyUsers[index].rank = currentRank
+                     sameRankCount = 0
+                 }
+             } else {
+                 storyUsers[index].rank = currentRank
+             }
+             previousPosition = user.position
+         }
+     }
+     
+    func updateRankedUsers(completion: @escaping (Bool) -> Void) {
+        let ranked = users.compactMap { user -> RankedUser? in
+            guard let story = storys[user.id] else { return nil }
+            return RankedUser(user: user, position: story.position)
+        }
+        .sorted { $1.position < $0.position } // positionが小さいほど上位
+
+        DispatchQueue.main.async {
+            self.storyUsers = ranked
+            self.updateCurrentUserRank()
+            completion(true)
+        }
+    }
+     
+     func updateCurrentUserRank() {
+         // ここで現在のユーザーIDを取得します。例えば、Firebase Authenticationを使用している場合：
+         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
+         if let index = storyUsers.firstIndex(where: { $0.user.id == currentUserID }) {
+             currentUserLevelRank = index + 1
+         }
+     }
+}
+
+struct StoryRankingView: View {
+    @ObservedObject var viewModel: RankingViewModel
+    @Binding var isReturnFlag: Bool
+    @Environment(\.presentationMode) var presentationMode
+
+    var body: some View {
+        ZStack {
+            if viewModel.storyUsers.isEmpty {
+                ActivityIndicator()
+            } else {
+                VStack {
+                    if isReturnFlag {
+                        HStack{
+                            Button(action: {
+                                self.presentationMode.wrappedValue.dismiss()
+                            }) {
+                                Image(systemName: "chevron.left")
+                                    .foregroundColor(.gray)
+                                
+                                Text("戻る")
+                                    .foregroundColor(Color("fontGray"))
+                            }
+                            .padding(.top)
+                            Spacer()
+                            Text("コマ数ランキング")
+                                .font(.system(size: 20))
+                                .padding(.top)
+                                .foregroundColor(Color("fontGray"))
+                            Spacer()
+                            Button(action: {
+                                self.presentationMode.wrappedValue.dismiss()
+                            }) {
+                                Image(systemName: "chevron.left")
+                                    .foregroundColor(.gray)
+                                
+                                Text("戻る")
+                                    .foregroundColor(Color("fontGray"))
+                            }
+                            .padding(.top)
+                            .opacity(0)
+                        }
+                        .padding(.leading)
+                        .background(.white)
+                    }
+                ScrollView {
+                        ForEach(Array(viewModel.storyUsers.prefix(10).enumerated()), id: \.element.id) { index, rankedUser in
+                            HStack {
+                                HStack {
+                                    if let rank = rankedUser.rank, rank <= 3 {
+                                        Image("\(rank - 1)")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(height: 50)
+                                    } else if let rank = rankedUser.rank {
+                                        Text("\(rank)位")
+                                            .font(.system(size: 40))
+                                    }
+                                }
+                                .padding(.leading, 10)
+
+                                // アバターとユーザー名の表示（左揃え）
+                                HStack {
+                                    ForEach(rankedUser.user.avatars.indices, id: \.self) { index in
+                                        let avatarData = rankedUser.user.avatars[index]
+                                        if let name = avatarData["name"] as? String,
+                                           let usedFlag = avatarData["usedFlag"] as? Int,
+                                           usedFlag == 1 {
+                                            Image(name)
+                                                .resizable()
+                                                .frame(width: 50, height: 50)
+                                        }
+                                    }
+                                    Text(rankedUser.user.userName)
+                                        .font(.system(size: fontSize1(for: rankedUser.user.userName, isIPad: isIPad())))
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+
+                                Spacer()
+
+                                // コマ数の表示
+                                HStack {
+                                    Image("足場1")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 23)
+                                    Text("\(rankedUser.position)コマ")
+                                }
+                                .font(.system(size: 16))
+                            }
+                            .padding(.horizontal)
+                            Divider()
+                        }
+
+                        // 現在のユーザーの順位を表示
+                        if let currentStoryUser = viewModel.currentStoryUser {
+                            Text("あなたの順位: \(currentStoryUser)位")
+                                .font(.headline)
+                                .padding()
+                        }
+                    }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color("Color2"))
+        .foregroundColor(Color("fontGray"))
+        .onAppear {
+            print("viewModel.fetchStorys()")
+            viewModel.fetchStorys()
+        }
+    }
+
+    func fontSize1(for text: String, isIPad: Bool) -> CGFloat {
+        let baseFontSize: CGFloat = isIPad ? 28 : 24 // iPad用のベースフォントサイズを大きくする
+
+        let englishAlphabet = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+        let textCharacterSet = CharacterSet(charactersIn: text)
+
+        if englishAlphabet.isSuperset(of: textCharacterSet) {
+            return baseFontSize
+        } else {
+            if text.count >= 12 {
+                return baseFontSize - 14
+            } else if text.count >= 10 {
+                return baseFontSize - 12
+            } else if text.count >= 8 {
+                return baseFontSize - 10
+            } else if text.count >= 6 {
+                return baseFontSize - 8
+            } else if text.count >= 4 {
+                return baseFontSize
+            } else {
+                return baseFontSize + 4
+            }
+        }
+    }
+
+    // デバイスがiPadかどうかを判定
+    func isIPad() -> Bool {
+        return UIDevice.current.userInterfaceIdiom == .pad
+    }
 }
 
 struct RankRankingView: View {
@@ -786,13 +1034,8 @@ struct RankingView: View {
             Text("戻る")
                 .foregroundColor(Color("fontGray"))
         })
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Text("ランキング")
-                    .font(.system(size: 20))
-                    .foregroundColor(Color("fontGray"))
-            }
-        }
+        .navigationTitle("ランキング")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

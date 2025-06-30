@@ -52,6 +52,7 @@ enum Rarity: Int {
         switch mode {
         case .normal:
             self.items = [
+                Item(name: "えんぴ君", attack: 20, probability: 25, health: 20, rarity: .normal),
                 Item(name: "ナイト", attack: 20, probability: 25, health: 20, rarity: .normal),
                 Item(name: "てーる", attack: 15, probability: 25, health: 15, rarity: .normal),
                 Item(name: "ぷりん", attack: 20, probability: 25, health: 10, rarity: .normal),
@@ -340,7 +341,7 @@ struct GachaView: View {
                     ScrollView{
                         Image("ガチャ")
                             .resizable()
-                            .frame(height: 240)
+                            .scaledToFit()
                             .cornerRadius(10)
                             .padding()
 //                            .frame(width: frameSize().width, height: frameSize().height)

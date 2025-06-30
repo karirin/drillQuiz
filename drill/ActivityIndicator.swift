@@ -212,7 +212,7 @@ struct CustomSpinner5: View {
     var body: some View {
         VStack(spacing: 8) { // 画像と文字間のスペースを調整
             // ライムの画像
-            Image("ナイト")
+            Image("えんぴ君")
                 .resizable()
                 .frame(width: 80, height: 80)
                 .scaleEffect(imageScaled ? 1.0 : 0.5) // 初期ポップイン用のスケール効果

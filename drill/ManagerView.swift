@@ -101,6 +101,8 @@ struct ManagerView: View {
             Text("戻る")
                 .foregroundColor(Color("fontGray"))
         })
+        .navigationTitle("問題一覧")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

@@ -8,6 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		180A9FCF2CE231EA00B35C83 /* StampAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180A9FCE2CE231EA00B35C83 /* StampAnimationView.swift */; };
+		180BEDBE2E11997500F92223 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 180BEDBD2E11997500F92223 /* GoogleMobileAds */; };
+		180BEDC12E1199F300F92223 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 180BEDC02E1199F300F92223 /* FirebaseAnalytics */; };
+		180BEDC32E1199F300F92223 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 180BEDC22E1199F300F92223 /* FirebaseAuth */; };
+		180BEDC52E1199F300F92223 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 180BEDC42E1199F300F92223 /* FirebaseDatabase */; };
+		180BEDC72E119A7300F92223 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 180BEDC62E119A7300F92223 /* FirebaseCore */; };
+		180BEDC92E119D4900F92223 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 180BEDC82E119D4900F92223 /* FirebaseMessaging */; };
 		182534302CC3EB68001CFE16 /* SplashScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1825342F2CC3EB68001CFE16 /* SplashScreenView.swift */; };
 		182899C62CBBC4B0001BD535 /* ReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182899C52CBBC4B0001BD535 /* ReviewView.swift */; };
 		18324D1B2CA11BC300B4043D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 18324D1A2CA11BC300B4043D /* GoogleService-Info.plist */; };
@@ -25,7 +31,23 @@
 		18A44FF42CA7928600907CF6 /* レベルアップ回復.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FE92CA7928600907CF6 /* レベルアップ回復.mp3 */; };
 		18A44FF52CA7928600907CF6 /* ガチャる.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FEA2CA7928600907CF6 /* ガチャる.mp3 */; };
 		18A44FF62CA7928600907CF6 /* 不正解.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FEB2CA7928600907CF6 /* 不正解.mp3 */; };
+		18B2AA082D1525A9009437D3 /* StoryShakaiListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B2AA072D1525A9009437D3 /* StoryShakaiListView.swift */; };
+		18B2AA0A2D1525C7009437D3 /* StoryRikaListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B2AA092D1525C7009437D3 /* StoryRikaListView.swift */; };
 		18C37B172D104FE700326A2E /* ProgressExpBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C37B162D104FE700326A2E /* ProgressExpBar.swift */; };
+		18C37B462D142F3F00326A2E /* InterstitialStory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C37B372D142F3200326A2E /* InterstitialStory.swift */; };
+		18C37B472D142F3F00326A2E /* StoryCoinModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C37B362D142F3100326A2E /* StoryCoinModalView.swift */; };
+		18C37B482D142F3F00326A2E /* StoryQuizResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C37B382D142F3400326A2E /* StoryQuizResultView.swift */; };
+		18C37B492D142F3F00326A2E /* StorySutaminaModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C37B3E2D142F3800326A2E /* StorySutaminaModalView.swift */; };
+		18C37B4A2D142F3F00326A2E /* StorySansuListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C37B3F2D142F3900326A2E /* StorySansuListView.swift */; };
+		18C37B4B2D142F3F00326A2E /* StoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C37B3A2D142F3500326A2E /* StoryView.swift */; };
+		18C37B4C2D142F3F00326A2E /* TutorialStoryModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C37B422D142F3B00326A2E /* TutorialStoryModalView.swift */; };
+		18C37B4D2D142F3F00326A2E /* ProgressStoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C37B412D142F3A00326A2E /* ProgressStoryView.swift */; };
+		18C37B4E2D142F3F00326A2E /* SubModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C37B3C2D142F3700326A2E /* SubModalView.swift */; };
+		18C37B4F2D142F3F00326A2E /* StoryKokugoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C37B402D142F3900326A2E /* StoryKokugoListView.swift */; };
+		18C37B502D142F3F00326A2E /* HelpStoryModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C37B392D142F3500326A2E /* HelpStoryModalView.swift */; };
+		18C37B512D142F3F00326A2E /* StoryMonsterModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C37B3B2D142F3600326A2E /* StoryMonsterModalView.swift */; };
+		18C37B522D142F3F00326A2E /* StoryQuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C37B432D142F3E00326A2E /* StoryQuizView.swift */; };
+		18C37B532D142F3F00326A2E /* RankModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C37B442D142F3F00326A2E /* RankModalView.swift */; };
 		18D090A62CAC12C900F8B8D8 /* BannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D090A52CAC12C900F8B8D8 /* BannerView.swift */; };
 		18FC72572C93128E00A95341 /* drillApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72562C93128E00A95341 /* drillApp.swift */; };
 		18FC72592C93128E00A95341 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72582C93128E00A95341 /* ContentView.swift */; };
@@ -112,9 +134,6 @@
 		18FC73292C9B18BC00A95341 /* ChangeNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC73282C9B18BC00A95341 /* ChangeNameView.swift */; };
 		18FC732B2C9FC58F00A95341 /* ContactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC732A2C9FC58F00A95341 /* ContactView.swift */; };
 		18FC732D2C9FC8D100A95341 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC732C2C9FC8D100A95341 /* RootView.swift */; };
-		D8884DC89308D8D467B10A23 /* Pods_drill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EA68BDB3E5E61F365110C02 /* Pods_drill.framework */; };
-		E1E37089297968A390E906DE /* libPods-drillUITests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 23602D5380A15A6D06914647 /* libPods-drillUITests.a */; };
-		EFBBB6E2268FAFA6AE916187 /* libPods-drillTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A92C1632B8ACF9D8BE952664 /* libPods-drillTests.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -135,7 +154,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0EC3159EEF81CC2ABC5833FC /* Pods-drill-drillUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-drill-drillUITests.debug.xcconfig"; path = "Target Support Files/Pods-drill-drillUITests/Pods-drill-drillUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		180A9FCE2CE231EA00B35C83 /* StampAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StampAnimationView.swift; sourceTree = "<group>"; };
 		1825342F2CC3EB68001CFE16 /* SplashScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenView.swift; sourceTree = "<group>"; };
 		182899C52CBBC4B0001BD535 /* ReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewView.swift; sourceTree = "<group>"; };
@@ -155,7 +173,23 @@
 		18A44FE92CA7928600907CF6 /* レベルアップ回復.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "レベルアップ回復.mp3"; path = "../../DrillQuiz/it/レベルアップ回復.mp3"; sourceTree = "<group>"; };
 		18A44FEA2CA7928600907CF6 /* ガチャる.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ガチャる.mp3"; path = "../../DrillQuiz/it/ガチャる.mp3"; sourceTree = "<group>"; };
 		18A44FEB2CA7928600907CF6 /* 不正解.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "不正解.mp3"; path = "../../DrillQuiz/it/不正解.mp3"; sourceTree = "<group>"; };
+		18B2AA072D1525A9009437D3 /* StoryShakaiListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryShakaiListView.swift; sourceTree = "<group>"; };
+		18B2AA092D1525C7009437D3 /* StoryRikaListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryRikaListView.swift; sourceTree = "<group>"; };
 		18C37B162D104FE700326A2E /* ProgressExpBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressExpBar.swift; sourceTree = "<group>"; };
+		18C37B362D142F3100326A2E /* StoryCoinModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryCoinModalView.swift; sourceTree = "<group>"; };
+		18C37B372D142F3200326A2E /* InterstitialStory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterstitialStory.swift; sourceTree = "<group>"; };
+		18C37B382D142F3400326A2E /* StoryQuizResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryQuizResultView.swift; sourceTree = "<group>"; };
+		18C37B392D142F3500326A2E /* HelpStoryModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpStoryModalView.swift; sourceTree = "<group>"; };
+		18C37B3A2D142F3500326A2E /* StoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryView.swift; sourceTree = "<group>"; };
+		18C37B3B2D142F3600326A2E /* StoryMonsterModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryMonsterModalView.swift; sourceTree = "<group>"; };
+		18C37B3C2D142F3700326A2E /* SubModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubModalView.swift; sourceTree = "<group>"; };
+		18C37B3E2D142F3800326A2E /* StorySutaminaModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorySutaminaModalView.swift; sourceTree = "<group>"; };
+		18C37B3F2D142F3900326A2E /* StorySansuListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorySansuListView.swift; sourceTree = "<group>"; };
+		18C37B402D142F3900326A2E /* StoryKokugoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryKokugoListView.swift; sourceTree = "<group>"; };
+		18C37B412D142F3A00326A2E /* ProgressStoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressStoryView.swift; sourceTree = "<group>"; };
+		18C37B422D142F3B00326A2E /* TutorialStoryModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialStoryModalView.swift; sourceTree = "<group>"; };
+		18C37B432D142F3E00326A2E /* StoryQuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryQuizView.swift; sourceTree = "<group>"; };
+		18C37B442D142F3F00326A2E /* RankModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankModalView.swift; sourceTree = "<group>"; };
 		18D090A52CAC12C900F8B8D8 /* BannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BannerView.swift; sourceTree = "<group>"; };
 		18FC72532C93128E00A95341 /* drill.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = drill.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		18FC72562C93128E00A95341 /* drillApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = drillApp.swift; sourceTree = "<group>"; };
@@ -245,16 +279,6 @@
 		18FC73282C9B18BC00A95341 /* ChangeNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeNameView.swift; sourceTree = "<group>"; };
 		18FC732A2C9FC58F00A95341 /* ContactView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactView.swift; sourceTree = "<group>"; };
 		18FC732C2C9FC8D100A95341 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
-		23602D5380A15A6D06914647 /* libPods-drillUITests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-drillUITests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		397BB9EAAB51C9115E9E7464 /* Pods-drill-drillUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-drill-drillUITests.release.xcconfig"; path = "Target Support Files/Pods-drill-drillUITests/Pods-drill-drillUITests.release.xcconfig"; sourceTree = "<group>"; };
-		7EA68BDB3E5E61F365110C02 /* Pods_drill.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_drill.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		840C7CC917F4CF6937622E8C /* Pods-drillTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-drillTests.release.xcconfig"; path = "Target Support Files/Pods-drillTests/Pods-drillTests.release.xcconfig"; sourceTree = "<group>"; };
-		996F77BDC1352D4877896300 /* Pods-drillTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-drillTests.debug.xcconfig"; path = "Target Support Files/Pods-drillTests/Pods-drillTests.debug.xcconfig"; sourceTree = "<group>"; };
-		A254A73485CFD202128E1AB4 /* Pods-drillUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-drillUITests.release.xcconfig"; path = "Target Support Files/Pods-drillUITests/Pods-drillUITests.release.xcconfig"; sourceTree = "<group>"; };
-		A92C1632B8ACF9D8BE952664 /* libPods-drillTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-drillTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		CA9EDC8234C31775667CA480 /* Pods-drill.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-drill.release.xcconfig"; path = "Target Support Files/Pods-drill/Pods-drill.release.xcconfig"; sourceTree = "<group>"; };
-		CBE7A32A4E68A767A77EB661 /* Pods-drillUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-drillUITests.debug.xcconfig"; path = "Target Support Files/Pods-drillUITests/Pods-drillUITests.debug.xcconfig"; sourceTree = "<group>"; };
-		D6C02C61083ED6FC107BB97F /* Pods-drill.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-drill.debug.xcconfig"; path = "Target Support Files/Pods-drill/Pods-drill.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -262,11 +286,16 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				180BEDC12E1199F300F92223 /* FirebaseAnalytics in Frameworks */,
+				180BEDBE2E11997500F92223 /* GoogleMobileAds in Frameworks */,
+				180BEDC92E119D4900F92223 /* FirebaseMessaging in Frameworks */,
 				18FC72892C93160D00A95341 /* Charts.framework in Frameworks */,
 				18FC72872C93160500A95341 /* AVKit.framework in Frameworks */,
-				D8884DC89308D8D467B10A23 /* Pods_drill.framework in Frameworks */,
 				18FC728E2C9317DE00A95341 /* AppVersionMonitorSwiftUI in Frameworks */,
+				180BEDC72E119A7300F92223 /* FirebaseCore in Frameworks */,
+				180BEDC52E1199F300F92223 /* FirebaseDatabase in Frameworks */,
 				18FC728B2C93162100A95341 /* StoreKit.framework in Frameworks */,
+				180BEDC32E1199F300F92223 /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -274,7 +303,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EFBBB6E2268FAFA6AE916187 /* libPods-drillTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -282,7 +310,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E1E37089297968A390E906DE /* libPods-drillUITests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -400,6 +427,22 @@
 				18FC72932C9319D500A95341 /* AudioManager.swift */,
 				1825342F2CC3EB68001CFE16 /* SplashScreenView.swift */,
 				18C37B162D104FE700326A2E /* ProgressExpBar.swift */,
+				18C37B392D142F3500326A2E /* HelpStoryModalView.swift */,
+				18C37B372D142F3200326A2E /* InterstitialStory.swift */,
+				18C37B412D142F3A00326A2E /* ProgressStoryView.swift */,
+				18C37B442D142F3F00326A2E /* RankModalView.swift */,
+				18C37B362D142F3100326A2E /* StoryCoinModalView.swift */,
+				18C37B3F2D142F3900326A2E /* StorySansuListView.swift */,
+				18B2AA072D1525A9009437D3 /* StoryShakaiListView.swift */,
+				18B2AA092D1525C7009437D3 /* StoryRikaListView.swift */,
+				18C37B402D142F3900326A2E /* StoryKokugoListView.swift */,
+				18C37B3B2D142F3600326A2E /* StoryMonsterModalView.swift */,
+				18C37B382D142F3400326A2E /* StoryQuizResultView.swift */,
+				18C37B432D142F3E00326A2E /* StoryQuizView.swift */,
+				18C37B3E2D142F3800326A2E /* StorySutaminaModalView.swift */,
+				18C37B3A2D142F3500326A2E /* StoryView.swift */,
+				18C37B3C2D142F3700326A2E /* SubModalView.swift */,
+				18C37B422D142F3B00326A2E /* TutorialStoryModalView.swift */,
 				18A44FE62CA7928600907CF6 /* おとも切り替え.mp3 */,
 				18A44FE52CA7928600907CF6 /* カウントダウン.mp3 */,
 				18A44FEA2CA7928600907CF6 /* ガチャる.mp3 */,
@@ -449,9 +492,6 @@
 				18FC728A2C93162100A95341 /* StoreKit.framework */,
 				18FC72882C93160D00A95341 /* Charts.framework */,
 				18FC72862C93160500A95341 /* AVKit.framework */,
-				7EA68BDB3E5E61F365110C02 /* Pods_drill.framework */,
-				A92C1632B8ACF9D8BE952664 /* libPods-drillTests.a */,
-				23602D5380A15A6D06914647 /* libPods-drillUITests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -459,14 +499,6 @@
 		CF4932357EEFB25A32AA00AB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				D6C02C61083ED6FC107BB97F /* Pods-drill.debug.xcconfig */,
-				CA9EDC8234C31775667CA480 /* Pods-drill.release.xcconfig */,
-				0EC3159EEF81CC2ABC5833FC /* Pods-drill-drillUITests.debug.xcconfig */,
-				397BB9EAAB51C9115E9E7464 /* Pods-drill-drillUITests.release.xcconfig */,
-				996F77BDC1352D4877896300 /* Pods-drillTests.debug.xcconfig */,
-				840C7CC917F4CF6937622E8C /* Pods-drillTests.release.xcconfig */,
-				CBE7A32A4E68A767A77EB661 /* Pods-drillUITests.debug.xcconfig */,
-				A254A73485CFD202128E1AB4 /* Pods-drillUITests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -478,12 +510,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 18FC72772C93128F00A95341 /* Build configuration list for PBXNativeTarget "drill" */;
 			buildPhases = (
-				18579C37AFF42F7F9D32EC25 /* [CP] Check Pods Manifest.lock */,
 				18FC724F2C93128E00A95341 /* Sources */,
 				18FC72502C93128E00A95341 /* Frameworks */,
 				18FC72512C93128E00A95341 /* Resources */,
-				D85ED07DE2E06CA6759486EA /* [CP] Embed Pods Frameworks */,
-				5C8E701CDC0F6A0B038069D7 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -492,6 +521,12 @@
 			name = drill;
 			packageProductDependencies = (
 				18FC728D2C9317DE00A95341 /* AppVersionMonitorSwiftUI */,
+				180BEDBD2E11997500F92223 /* GoogleMobileAds */,
+				180BEDC02E1199F300F92223 /* FirebaseAnalytics */,
+				180BEDC22E1199F300F92223 /* FirebaseAuth */,
+				180BEDC42E1199F300F92223 /* FirebaseDatabase */,
+				180BEDC62E119A7300F92223 /* FirebaseCore */,
+				180BEDC82E119D4900F92223 /* FirebaseMessaging */,
 			);
 			productName = drill;
 			productReference = 18FC72532C93128E00A95341 /* drill.app */;
@@ -501,7 +536,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 18FC727A2C93128F00A95341 /* Build configuration list for PBXNativeTarget "drillTests" */;
 			buildPhases = (
-				3979EAF15B8CDD279103695D /* [CP] Check Pods Manifest.lock */,
 				18FC725F2C93128F00A95341 /* Sources */,
 				18FC72602C93128F00A95341 /* Frameworks */,
 				18FC72612C93128F00A95341 /* Resources */,
@@ -520,7 +554,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 18FC727D2C93128F00A95341 /* Build configuration list for PBXNativeTarget "drillUITests" */;
 			buildPhases = (
-				2F26458AE601CC8AE6250C07 /* [CP] Check Pods Manifest.lock */,
 				18FC72692C93128F00A95341 /* Sources */,
 				18FC726A2C93128F00A95341 /* Frameworks */,
 				18FC726B2C93128F00A95341 /* Resources */,
@@ -569,6 +602,8 @@
 			mainGroup = 18FC724A2C93128E00A95341;
 			packageReferences = (
 				18FC728C2C93164600A95341 /* XCRemoteSwiftPackageReference "AppVersionMonitorSwiftUI" */,
+				180BEDBC2E11997500F92223 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+				180BEDBF2E1199F300F92223 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			productRefGroup = 18FC72542C93128E00A95341 /* Products */;
 			projectDirPath = "";
@@ -619,117 +654,17 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		18579C37AFF42F7F9D32EC25 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-drill-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		2F26458AE601CC8AE6250C07 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-drillUITests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		3979EAF15B8CDD279103695D /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-drillTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		5C8E701CDC0F6A0B038069D7 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-drill/Pods-drill-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-drill/Pods-drill-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-drill/Pods-drill-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		D85ED07DE2E06CA6759486EA /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-drill/Pods-drill-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-drill/Pods-drill-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-drill/Pods-drill-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		18FC724F2C93128E00A95341 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				18C37B492D142F3F00326A2E /* StorySutaminaModalView.swift in Sources */,
 				18FC731F2C9822FD00A95341 /* PentagonShakaiView.swift in Sources */,
+				18C37B462D142F3F00326A2E /* InterstitialStory.swift in Sources */,
 				18A44FDE2CA2C73D00907CF6 /* ManagerView.swift in Sources */,
 				18FC72C52C952C7900A95341 /* ModalReturnView.swift in Sources */,
+				18C37B502D142F3F00326A2E /* HelpStoryModalView.swift in Sources */,
 				18FC72C92C95B14F00A95341 /* Sansu3ListView.swift in Sources */,
 				18FC72D92C95B2D000A95341 /* Shakai6ListView.swift in Sources */,
 				18FC72B72C95280100A95341 /* RateManager.swift in Sources */,
@@ -737,11 +672,14 @@
 				18FC72592C93128E00A95341 /* ContentView.swift in Sources */,
 				18FC72F02C95C59800A95341 /* Rika1ListView.swift in Sources */,
 				18FC73092C977D0900A95341 /* SignUp.swift in Sources */,
+				18B2AA0A2D1525C7009437D3 /* StoryRikaListView.swift in Sources */,
 				18FC72B12C95257200A95341 /* Interstitial.swift in Sources */,
 				182534302CC3EB68001CFE16 /* SplashScreenView.swift in Sources */,
 				18FC72942C9319D500A95341 /* AudioManager.swift in Sources */,
 				18FC73012C96CC5900A95341 /* IncorrectShakaiListView.swift in Sources */,
+				18C37B4A2D142F3F00326A2E /* StorySansuListView.swift in Sources */,
 				18FC72E42C95BED600A95341 /* Kokugo4ListView.swift in Sources */,
+				18B2AA082D1525A9009437D3 /* StoryShakaiListView.swift in Sources */,
 				18FC72A42C931D5E00A95341 /* BarChartView.swift in Sources */,
 				18FC72DA2C95B2D000A95341 /* Shakai1ListView.swift in Sources */,
 				18FC73152C97876600A95341 /* GachaAnimationView.swift in Sources */,
@@ -752,10 +690,12 @@
 				18FC72C12C952C0300A95341 /* ModalTitleView.swift in Sources */,
 				18FC72AD2C951D1400A95341 /* SansuListView.swift in Sources */,
 				18FC72B92C952A7800A95341 /* TimerView.swift in Sources */,
+				18C37B522D142F3F00326A2E /* StoryQuizView.swift in Sources */,
 				18FC72982C931AD300A95341 /* PrivacyView.swift in Sources */,
 				18FC73132C97873900A95341 /* GachaView.swift in Sources */,
 				18FC73212C9822FE00A95341 /* PentagonKokugoView.swift in Sources */,
 				18FC730D2C97857E00A95341 /* TittlesView.swift in Sources */,
+				18C37B512D142F3F00326A2E /* StoryMonsterModalView.swift in Sources */,
 				18FC72FB2C95C8D500A95341 /* RikaListView.swift in Sources */,
 				18FC72A02C931D1600A95341 /* AvatarListView.swift in Sources */,
 				18FC732B2C9FC58F00A95341 /* ContactView.swift in Sources */,
@@ -773,6 +713,7 @@
 				18FC72F32C95C59800A95341 /* Rika3ListView.swift in Sources */,
 				18FC72DB2C95B2D000A95341 /* Shakai2ListView.swift in Sources */,
 				18FC72E62C95BED600A95341 /* Kokugo1ListView.swift in Sources */,
+				18C37B4F2D142F3F00326A2E /* StoryKokugoListView.swift in Sources */,
 				18FC72DC2C95B2D000A95341 /* Shakai3ListView.swift in Sources */,
 				18FC72902C93182900A95341 /* SettingView.swift in Sources */,
 				18FC72F52C95C59800A95341 /* Rika6ListView.swift in Sources */,
@@ -791,7 +732,9 @@
 				18FC729A2C931AF800A95341 /* PreView.swift in Sources */,
 				18FC73192C97883B00A95341 /* StoreKitView.swift in Sources */,
 				18FC73292C9B18BC00A95341 /* ChangeNameView.swift in Sources */,
+				18C37B4E2D142F3F00326A2E /* SubModalView.swift in Sources */,
 				18FC73232C9AF75A00A95341 /* TutorialModalView.swift in Sources */,
+				18C37B4C2D142F3F00326A2E /* TutorialStoryModalView.swift in Sources */,
 				18FC729E2C931C1600A95341 /* ManagerTabView.swift in Sources */,
 				18FC72C72C952C9B00A95341 /* ModalView.swift in Sources */,
 				18FC72CD2C95B15300A95341 /* Sansu4ListView.swift in Sources */,
@@ -804,13 +747,18 @@
 				18FC72F22C95C59800A95341 /* Rika2ListView.swift in Sources */,
 				18FC72962C931ABA00A95341 /* TermsOfServiceView.swift in Sources */,
 				18FC72F72C95C8D200A95341 /* KokugoListView.swift in Sources */,
+				18C37B532D142F3F00326A2E /* RankModalView.swift in Sources */,
 				18FC72E72C95BED600A95341 /* Kokugo6ListView.swift in Sources */,
 				18FC72D82C95B2D000A95341 /* Shakai5ListView.swift in Sources */,
+				18C37B482D142F3F00326A2E /* StoryQuizResultView.swift in Sources */,
 				18FC72A82C931DCB00A95341 /* ActivityIndicator.swift in Sources */,
 				18FC731D2C9822FA00A95341 /* PentagonRikaView.swift in Sources */,
 				18FC72AF2C95244200A95341 /* Sansu1ListView.swift in Sources */,
 				18FC72DD2C95B2D000A95341 /* Shakai4ListView.swift in Sources */,
+				18C37B4B2D142F3F00326A2E /* StoryView.swift in Sources */,
 				18FC72CF2C95B15400A95341 /* Sansu5ListView.swift in Sources */,
+				18C37B472D142F3F00326A2E /* StoryCoinModalView.swift in Sources */,
+				18C37B4D2D142F3F00326A2E /* ProgressStoryView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -968,12 +916,11 @@
 		};
 		18FC72782C93128F00A95341 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D6C02C61083ED6FC107BB97F /* Pods-drill.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2.1;
+				CURRENT_PROJECT_VERSION = 2.7;
 				DEVELOPMENT_ASSET_PATHS = "\"drill/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
 				ENABLE_PREVIEWS = YES;
@@ -991,7 +938,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.1;
+				MARKETING_VERSION = 2.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.drillQuiz3948";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1002,12 +949,11 @@
 		};
 		18FC72792C93128F00A95341 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = CA9EDC8234C31775667CA480 /* Pods-drill.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2.1;
+				CURRENT_PROJECT_VERSION = 2.7;
 				DEVELOPMENT_ASSET_PATHS = "\"drill/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
 				ENABLE_PREVIEWS = YES;
@@ -1025,7 +971,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.1;
+				MARKETING_VERSION = 2.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.drillQuiz3948";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1036,7 +982,6 @@
 		};
 		18FC727B2C93128F00A95341 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 996F77BDC1352D4877896300 /* Pods-drillTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -1057,7 +1002,6 @@
 		};
 		18FC727C2C93128F00A95341 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 840C7CC917F4CF6937622E8C /* Pods-drillTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -1078,7 +1022,6 @@
 		};
 		18FC727E2C93128F00A95341 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = CBE7A32A4E68A767A77EB661 /* Pods-drillUITests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -1097,7 +1040,6 @@
 		};
 		18FC727F2C93128F00A95341 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A254A73485CFD202128E1AB4 /* Pods-drillUITests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -1156,6 +1098,22 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		180BEDBC2E11997500F92223 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.6.0;
+			};
+		};
+		180BEDBF2E1199F300F92223 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.15.0;
+			};
+		};
 		18FC728C2C93164600A95341 /* XCRemoteSwiftPackageReference "AppVersionMonitorSwiftUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SNQ-2001/AppVersionMonitorSwiftUI";
@@ -1167,6 +1125,36 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		180BEDBD2E11997500F92223 /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 180BEDBC2E11997500F92223 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
+		};
+		180BEDC02E1199F300F92223 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 180BEDBF2E1199F300F92223 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		180BEDC22E1199F300F92223 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 180BEDBF2E1199F300F92223 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		180BEDC42E1199F300F92223 /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 180BEDBF2E1199F300F92223 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+		180BEDC62E119A7300F92223 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 180BEDBF2E1199F300F92223 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		180BEDC82E119D4900F92223 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 180BEDBF2E1199F300F92223 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
 		18FC728D2C9317DE00A95341 /* AppVersionMonitorSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 18FC728C2C93164600A95341 /* XCRemoteSwiftPackageReference "AppVersionMonitorSwiftUI" */;

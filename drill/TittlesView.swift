@@ -248,13 +248,8 @@ Spacer()
             Text("戻る")
                 .foregroundColor(Color("fontGray"))
         })
-        .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text("称号一覧")
-                        .font(.system(size: 20)) // ここでフォントサイズを指定
-                        .foregroundColor(Color("fontGray"))
-                }
-            }
+        .navigationTitle("称号一覧")
+        .navigationBarTitleDisplayMode(.inline)
         }
     }
 
