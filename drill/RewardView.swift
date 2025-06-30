@@ -37,7 +37,7 @@ class Reward: NSObject, FullScreenContentDelegate, ObservableObject {
     }
     
     func LoadStoryReward() {
-        RewardedAd.load(with: "ca-app-pub-4898800212808837/8004927226", request: Request()) { (ad, error) in
+        RewardedAd.load(with: "ca-app-pub-4898800212808837/7450393451", request: Request()) { (ad, error) in
 //        GADRewardedAd.load(withAdUnitID: "ca-app-pub-3940256099942544/1712485313", request: GADRequest()) { (ad, error) in //テスト
             if let _ = error {
                 print("😭: 読み込みに失敗しました")
