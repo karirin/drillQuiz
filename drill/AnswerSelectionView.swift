@@ -7,6 +7,7 @@
 
 import SwiftUI
 import StoreKit
+import UIKit
 
 // 現在のデバイスがiPadかどうかを判定する関数
 func isIPad() -> Bool {
@@ -17,6 +18,7 @@ struct AnswerSelectionView: View {
     let choices: [String]
     var action: (Int) -> Void
     var correctAnswerIndex: Int? // 正解の選択肢のインデックス
+    @State private var tappedIndex: Int? = nil
 
     init(choices: [String], correctAnswerIndex: Int?, action: @escaping (Int) -> Void) {
         self.choices = choices
@@ -30,8 +32,19 @@ struct AnswerSelectionView: View {
             ForEach(0..<choices.count, id: \.self) { index in
                 Spacer()
                 Button(action: {
-                                generateHapticFeedback()
+                    withAnimation(.spring(response: 0.25, dampingFraction: 0.6)) {
+                        tappedIndex = index
+                    }
+                    if index == correctAnswerIndex {
+                        // 正解の場合、ハプティックフィードバックを生成
+                        let generator = UINotificationFeedbackGenerator()
+                        generator.notificationOccurred(.success)
+                    }
+                    generateHapticFeedback()
                     self.action(index)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                              withAnimation(.spring()) { tappedIndex = nil }
+                    }
                 }) {
                     Text(self.choices[index])
                         .font(.system(size: fontSize(for: self.choices[index], isIPad: isIPad())))
@@ -39,9 +52,10 @@ struct AnswerSelectionView: View {
                         .lineLimit(nil)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(index == correctAnswerIndex ? Color("lightYelleow") : Color.white)
+                    .background(index == correctAnswerIndex ? Color("lightYelleow") : Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .scaleEffect(tappedIndex == index ? 0.95 : 1.0)
                         .foregroundColor(Color("fontGray"))
-                        .cornerRadius(8)
                 }
                 .padding(.horizontal)
                 .padding(.vertical, isIPad() ? 10 : 2) // iPadでは垂直のパディングを増やす
@@ -76,8 +90,9 @@ func fontSize(for text: String, isIPad: Bool) -> CGFloat {
 
 struct AnswerSelectionView_Previews: PreviewProvider {
     static var previews: some View {
-        AnswerSelectionView(choices: ["選択肢1", "選択肢2", "選択肢3"], correctAnswerIndex: 1) { index in
-//            print("選択肢 \(index + 1) がタップされました")
-        }
+//        AnswerSelectionView(choices: ["選択肢1", "選択肢2", "選択肢3"], correctAnswerIndex: 1) { index in
+////            print("選択肢 \(index + 1) がタップされました")
+//        }
+        Sansu3ListView(isPresenting: .constant(false))
     }
 }
