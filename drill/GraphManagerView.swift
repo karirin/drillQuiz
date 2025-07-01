@@ -82,7 +82,7 @@ struct GraphManagerView: View {
                 }
             }
         }
-            .sheet(isPresented: $preFlag) {
+        .fullScreenCover(isPresented: $preFlag) {
                 PreView(audioManager: audioManager)
             }
         .frame(maxWidth:.infinity,maxHeight: .infinity)

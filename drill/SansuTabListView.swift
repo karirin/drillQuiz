@@ -379,7 +379,7 @@ struct SansuTabListView: View {
                     audioPlayerKettei?.volume = 1.0
                 }
             }
-            .sheet(isPresented: $preFlag) {
+            .fullScreenCover(isPresented: $preFlag) {
                 PreView(audioManager: audioManager)
             }
             .navigationBarBackButtonHidden(true)

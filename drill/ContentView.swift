@@ -580,7 +580,7 @@ struct ContentView: View {
                         }
                     }
                 }
-        .sheet(isPresented: $preFlag) {
+        .fullScreenCover(isPresented: $preFlag) {
             PreView(audioManager: audioManager)
         }
         .onChange(of: showCoinAlert) { userMoney in
@@ -667,7 +667,7 @@ struct ContentView: View {
         UserDefaults.standard.set(count, forKey: "launchPreCount")
         
         // 3回に1回の割合で処理を実行
-        if count % 30 == 0 {
+        if count % 10 == 0 {
             preFlag = true
         }
     }
