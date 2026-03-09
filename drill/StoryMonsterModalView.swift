@@ -23,6 +23,8 @@ struct StoryMonsterModalView: View {
     @State private var monsterAttack: Int = 10
     @State private var quizTitle: String = ""
     @State private var slideOut = false
+    @State private var appearAnimation = false
+    @State private var pulseAnimation = false
     @ObservedObject var audioManager: AudioManager
 
     let monsters: [Int: Monster] = [
@@ -62,237 +64,223 @@ struct StoryMonsterModalView: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.6)
+            // 背景オーバーレイ
+            Color.black.opacity(appearAnimation ? 0.7 : 0)
                 .edgesIgnoringSafeArea(.all)
                 .onTapGesture {
-                    isPresented = false
-                    audioManager.playCancelSound()
+                    dismissModal()
                 }
-                ZStack{
-                    VStack {
-                    HStack{
-                        Spacer()
-                            .frame(width:270)
-                        Button(action: {
-                                generateHapticFeedback()
-                            isPresented = false
-                            audioManager.playCancelSound()
-                        }) {
-                            Image(systemName: "xmark.circle.fill")
-                                .resizable()
-                                .frame(width: 60, height: 60)
-                                .foregroundColor(.gray)
-                                .background(.white)
-                                .cornerRadius(50)
-                        }
+            
+            // メインモーダル
+            VStack(spacing: 0) {
+                // 閉じるボタン
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        generateHapticFeedback()
+                        dismissModal()
+                    }) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(.white.opacity(0.8))
+                            .frame(width: 36, height: 36)
+                            .background(
+                                Circle()
+                                    .fill(.ultraThinMaterial)
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                                    )
+                            )
                     }
-                    .padding(.bottom, -50)
-                    Image("\(monsterName)")
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 16)
+                
+                // モンスター画像
+                ZStack {
+                    // グロー効果
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                colors: [Color.red.opacity(0.3), Color.clear],
+                                center: .center,
+                                startRadius: 20,
+                                endRadius: 120
+                            )
+                        )
+                        .frame(width: 240, height: 240)
+                        .scaleEffect(pulseAnimation ? 1.1 : 0.9)
+                    
+                    Image(monsterName)
                         .resizable()
                         .scaledToFit()
-                        .frame(height: 200)
-                        .offset(y: isMovingUp ? -5 : 5)
-                        .onAppear {
-                            withAnimation(Animation.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
-                                isMovingUp.toggle()
-                            }
-                        }
-                    HStack{
-                        HStack{
-                            Image("攻撃マーク")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height:30)
-                            Text("\(monsterHP)")
-                                .font(.system(size: 30))
-                                .foregroundStyle(.white)
-                                .fontWeight(.bold)
-                                .multilineTextAlignment(.center)
-                        }
-                        Spacer()
-                            .frame(width:30)
-                        HStack{
-                            Image("HPマーク")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height:30)
-                            Text("\(monsterAttack)")
-                                .font(.system(size: 30))
-                                .foregroundStyle(.white)
-                                .fontWeight(.bold)
-                                .multilineTextAlignment(.center)
-                        }
-                    }
-                        Text("問題：\(quizTitle)")
-                            .font(.system(size: isSmallDevice() ? 26 : 28))
-                            .foregroundStyle(.white)
-                            .fontWeight(.bold)
-                            .multilineTextAlignment(.center)
-                        Button(action: {
-                                generateHapticFeedback()
-                            isPresented = false
-                            showQuizList = true
-                            audioManager.playKetteiSound()
-                        }) {
-                            Image("たたかう")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height:80)
-                                .foregroundColor(.gray)
-                        }
+                        .frame(height: 180)
+                        .offset(y: isMovingUp ? -8 : 8)
+                        .shadow(color: .black.opacity(0.5), radius: 20, x: 0, y: 10)
                 }
+                .padding(.top, -20)
+                
+                // ステータスカード
+                HStack(spacing: 16) {
+                    // HP
+                    StatBadge(
+                        icon: "heart.fill",
+                        value: monsterHP,
+                        color: Color(red: 0.9, green: 0.3, blue: 0.3),
+                        label: "HP"
+                    )
+                    
+                    // 攻撃力
+                    StatBadge(
+                        icon: "flame.fill",
+                        value: monsterAttack,
+                        color: Color(red: 1.0, green: 0.6, blue: 0.2),
+                        label: "ATK"
+                    )
+                }
+                .padding(.top, 8)
+                
+                // クイズ情報
+                VStack(spacing: 8) {
+                    Text("BATTLE QUIZ")
+                        .font(.system(size: 12, weight: .bold))
+                        .tracking(3)
+                        .foregroundColor(.white.opacity(0.5))
+                    
+                    Text(quizTitle)
+                        .font(.system(size: isSmallDevice() ? 24 : 28, weight: .bold))
+                        .foregroundColor(.white)
+                }
+                .padding(.top, 20)
+                
+                // たたかうボタン
+                Button(action: {
+                    generateHapticFeedback()
+                    isPresented = false
+                    showQuizList = true
+                    audioManager.playKetteiSound()
+                }) {
+                    HStack(spacing: 12) {
+                        Image(systemName: "bolt.fill")
+                            .font(.system(size: 20, weight: .bold))
+                        
+                        Text("たたかう")
+                            .font(.system(size: 20, weight: .bold))
+                    }
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 56)
+                    .background(
+                        LinearGradient(
+                            colors: [
+                                Color(red: 0.9, green: 0.3, blue: 0.2),
+                                Color(red: 0.8, green: 0.2, blue: 0.3)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .shadow(color: Color(red: 0.9, green: 0.3, blue: 0.2).opacity(0.5), radius: 16, x: 0, y: 8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                    )
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 24)
+                .padding(.bottom, 28)
             }
-            
-            .foregroundColor(Color("fontGray"))
-        .shadow(radius: 10)
-//        .overlay(
-//            ZStack {
-//                Spacer()
-//                HStack {
-//                    Spacer()
-//                    VStack{
-//                        Spacer()
-//                        HStack {
-//                            Button(action: {
-//                                generateHapticFeedback()
-//                                reward.ExAndMoReward()
-//                            }, label: {
-//                                if reward.rewardLoaded{
-//                                    Image("倍ボタン")
-//                                        .resizable()
-//                                        .frame(width: 110, height: 110)
-//                                }else{
-//                                    Image("倍ボタン白黒")
-//                                        .resizable()
-//                                        .frame(width: 110, height: 110)
-//                                }
-//                            })
-//                                .shadow(radius: 5)
-//                                .disabled(!reward.rewardLoaded)
-//                                .onChange(of: reward.rewardEarned) { rewardEarned in
-//                                    showAlert = rewardEarned
-//                                    print("onchange reward.rewardEarned:\(showAlert)")
-//                                }
-//                                .alert(isPresented: $showAlert) {
-//                                    Alert(
-//                                        title: Text("報酬獲得！"),
-//                                        message: Text("1時間だけ獲得した経験値とコインが2倍"),
-//                                        dismissButton: .default(Text("OK"), action: {
-//                                            showAlert = false
-//                                            reward.rewardEarned = false
-//                                        })
-//                                    )
-//                                }
-//                                .background(GeometryReader { geometry in
-//                                    Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
-//                                })
-//                                .padding(.bottom)
-//
-//                                Spacer()
-//                        }
-//                    }
-//                }
-//            }
-//        )
-//        .overlay(
-//            ZStack {
-//                HStack {
-//                    Spacer()
-//                    VStack{
-//                        HStack {
-//                            // 「×」ボタンを右上に配置
-//                            Button(action: {
-//                                generateHapticFeedback()
-//                                isPresented = false
-//                                audioManager.playCancelSound()
-//                            }) {
-//                                Image(systemName: "xmark.circle.fill")
-//                                    .resizable()
-//                                    .frame(width: 60, height: 60)
-//                                    .foregroundColor(.gray)
-//                                    .background(.white)
-//                                    .cornerRadius(50)
-//                                    .padding()
-//                            }
-//                        }
-//                        Spacer()
-//                    }
-//                }
-//            }
-//        )
-        .padding(25)
+            .frame(width: min(UIScreen.main.bounds.width - 48, 340))
+            .background(
+                ZStack {
+                    // グラスモーフィズム背景
+                    RoundedRectangle(cornerRadius: 28)
+                        .fill(.ultraThinMaterial)
+                    
+                    // グラデーションオーバーレイ
+                    RoundedRectangle(cornerRadius: 28)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color(red: 0.15, green: 0.1, blue: 0.2).opacity(0.9),
+                                    Color(red: 0.1, green: 0.05, blue: 0.15).opacity(0.95)
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                    
+                    // 装飾パターン
+                    RoundedRectangle(cornerRadius: 28)
+                        .stroke(
+                            LinearGradient(
+                                colors: [
+                                    Color.white.opacity(0.3),
+                                    Color.white.opacity(0.05)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1
+                        )
+                }
+            )
+            .scaleEffect(appearAnimation ? 1 : 0.8)
+            .opacity(appearAnimation ? 1 : 0)
+            .shadow(color: .black.opacity(0.4), radius: 40, x: 0, y: 20)
         }
         .onAppear {
-            // ビューが表示された際にパラメータを設定
-            print("viewModel.userPosition check  :\(viewModel.userPosition)")
-//            switch position {
-//                        case 1...5, 10...15: // 2 3 4 5 14 15 16
-//                            StorySansuListView(
-//                                isPresenting: $viewModel.showMonsterQuizList,
-//                                monsterName: viewModel.monsterName,
-//                                backgroundName: "ダンジョン背景1",
-//                                viewModel: viewModel
-//                            )
-//                        case 6...9, 16...20: // 1 6 7
-//                            StoryKokugoListView(
-//                                isPresenting: $viewModel.showMonsterQuizList,
-//                                monsterName: viewModel.monsterName,
-//                                backgroundName: "ダンジョン背景1",
-//                                viewModel: viewModel
-//                            )
-//                        case 21...25, 30...35:// 8 9 11 12
-//                            StoryRikaListView(
-//                                isPresenting: $viewModel.showMonsterQuizList,
-//                                monsterName: viewModel.monsterName,
-//                                backgroundName: "ダンジョン背景1",
-//                                viewModel: viewModel
-//                            )
-//                        case 26...29, 36...40:// 10 13
-//                            StoryShakaiListView(
-//                                isPresenting: $viewModel.showMonsterQuizList,
-//                                monsterName: viewModel.monsterName,
-//                                backgroundName: "ダンジョン背景1",
-//                                viewModel: viewModel
-//                            )
-//                        default:
-//                            // デフォルトのビュー、またはエラーハンドリング
-//                            StorySansuListView(
-//                                isPresenting: $viewModel.showMonsterQuizList,
-//                                monsterName: viewModel.monsterName,
-//                                backgroundName: "ダンジョン背景1",
-//                                viewModel: viewModel
-//                            )
-//                        }
             setMonsterParameters(monster: monster)
-            switch viewModel.userPosition {
-                case 1...4, 9...14,40...50:
-                    quizTitle = "算数"
-                case 5...8, 15...19:
-                    quizTitle = "国語"
-                case 20...24, 29...34:
-                    quizTitle = "理科"
-                case 25...28, 35...39:
-                    quizTitle = "社会"
-            default:
-                quizTitle = "算数"
+            setQuizTitle()
+            
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                appearAnimation = true
             }
-//            if monster < 8 {
-//                quizTitle = "ITパスポート"
-//            } else if monster == 15 {
-//                quizTitle = "ITパスポート"
-//            } else {
-//                quizTitle = "基本情報技術者試験"
-//            }
+            
+            withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                isMovingUp = true
+            }
+            
+            withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
+                pulseAnimation = true
+            }
         }
-            }
+    }
+    
+    private func dismissModal() {
+        audioManager.playCancelSound()
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+            appearAnimation = false
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            isPresented = false
+        }
+    }
+    
+    private func setQuizTitle() {
+        switch viewModel.userPosition {
+        case 1...4, 9...14, 40...50:
+            quizTitle = "算数"
+        case 5...8, 15...19:
+            quizTitle = "国語"
+        case 20...24, 29...34:
+            quizTitle = "理科"
+        case 25...28, 35...39:
+            quizTitle = "社会"
+        default:
+            quizTitle = "算数"
+        }
+    }
+    
     private func setMonsterParameters(monster: Int) {
-        if let monster = monsters[monster] {
-            monsterName = monster.name
-            monsterHP = monster.monsterHP
-            monsterAttack = monster.monsterAttack
+        if let monsterData = monsters[monster] {
+            monsterName = monsterData.name
+            monsterHP = monsterData.monsterHP
+            monsterAttack = monsterData.monsterAttack
         } else {
-            // 未定義のモンスターの場合のデフォルト値
-                print("未知の宝物")
+            print("未知のモンスター")
         }
     }
     
@@ -301,6 +289,48 @@ struct StoryMonsterModalView: View {
     }
 }
 
+// MARK: - ステータスバッジコンポーネント
+struct StatBadge: View {
+    let icon: String
+    let value: Int
+    let color: Color
+    let label: String
+    
+    var body: some View {
+        VStack(spacing: 6) {
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(color)
+                
+                Text("\(value)")
+                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+            }
+            
+            Text(label)
+                .font(.system(size: 11, weight: .semibold))
+                .tracking(1)
+                .foregroundColor(.white.opacity(0.5))
+        }
+        .frame(width: 110, height: 70)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white.opacity(0.08))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(color.opacity(0.3), lineWidth: 1)
+                )
+        )
+    }
+}
+
 #Preview {
-    StoryMonsterModalView(viewModel: PositionViewModel.shared, monster: .constant(3), isPresented: .constant(true), showQuizList: .constant(false), audioManager: AudioManager())
+    StoryMonsterModalView(
+        viewModel: PositionViewModel.shared,
+        monster: .constant(3),
+        isPresented: .constant(true),
+        showQuizList: .constant(false),
+        audioManager: AudioManager()
+    )
 }

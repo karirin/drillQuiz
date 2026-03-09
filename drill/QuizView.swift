@@ -708,14 +708,20 @@ struct QuizView: View {
                 VStack {
                     HStack{
                         Button(action: {
-                                generateHapticFeedback()
+                        generateHapticFeedback()
                             showHomeModal.toggle()
                             audioManager.playSound()
                         }) {
-                            Image("設定")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height: 50)
+                            ZStack {
+                                Circle()
+                                    .fill(Color.white)
+                                    .frame(width: 52, height: 52)
+                                    .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
+                                
+                                Image(systemName: "gearshape.fill")
+                                    .font(.system(size: 22, weight: .semibold))
+                                    .foregroundColor(Color("fontGray"))
+                            }
                         }
                         .padding(.leading)
                         .foregroundColor(.gray)
@@ -733,36 +739,13 @@ struct QuizView: View {
                     //                    .padding(.top,40)
                     Spacer()
                     VStack{
-                        ZStack {
-                            VStack{
-                                Text(currentQuiz.question)
-                                    .font(.headline)
-                                    .frame(height: tutorialNum == 0 ? 120 : nil)
-                                    .padding(.horizontal)
-                                    .foregroundColor(Color("fontGray"))
-                                
-                            }.frame(maxWidth: .infinity)
-                                .background(Color("Color2"))
-                                .padding(.vertical, 5)
-                                .background(GeometryReader { geometry in
-                                    Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
-                                })
-                            if let selected = selectedAnswerIndex, selected == currentQuiz.correctAnswerIndex {
-                                Circle()
-                                    .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round))
-                                    .opacity(0.7)
-                                    .foregroundColor(.red)
-                                    .frame(width: 70)
-                            }
-                            // 不正解の場合の青いバツマーク
-                            else if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
-                                Image(systemName: "xmark")
-                                    .resizable()
-                                    .opacity(0.7)
-                                    .foregroundColor(.blue)
-                                    .frame(width: 70,height:70)
-                            }
-                        }
+                        QuestionCardView(
+                            question: currentQuiz.question,
+                            selectedAnswerIndex: selectedAnswerIndex,
+                            correctAnswerIndex: currentQuiz.correctAnswerIndex
+                        )
+                        .padding(.horizontal, 16)
+
                         ZStack{
                                         Image("\(quizLevel)Monster\(monsterType)")
                             
@@ -2936,6 +2919,60 @@ struct QuizView: View {
             .navigationBarBackButtonHidden(true)
         }
     }
+
+struct QuestionCardView: View {
+    let question: String
+    let selectedAnswerIndex: Int?
+    let correctAnswerIndex: Int
+    @State private var appearAnimation = false
+    
+    var body: some View {
+        ZStack {
+            // カード背景
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.white)
+                .shadow(color: Color.black.opacity(0.1), radius: 15, x: 0, y: 8)
+            
+            // 問題テキスト
+            VStack(spacing: 0) {
+                Text(question)
+                    .font(.system(size: isSmallDevice() ? 15 : 17, weight: .semibold))
+                    .foregroundColor(Color("fontGray"))
+                    .lineSpacing(4)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 16)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .lineLimit(nil)
+                    .minimumScaleFactor(0.75)
+            }
+            
+            // 正解/不正解マーク
+            if let selected = selectedAnswerIndex {
+                if selected == correctAnswerIndex {
+                    Circle()
+                        .stroke(Color.red, lineWidth: 8)
+                        .frame(width: 80, height: 80)
+                        .opacity(0.8)
+                        .transition(.scale.combined(with: .opacity))
+                } else {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 60, weight: .bold))
+                        .foregroundColor(.blue)
+                        .opacity(0.8)
+                        .transition(.scale.combined(with: .opacity))
+                }
+            }
+        }
+        .scaleEffect(appearAnimation ? 1.0 : 0.95)
+        .opacity(appearAnimation ? 1.0 : 0)
+        .onAppear {
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                appearAnimation = true
+            }
+        }
+    }
+}
 
 
 struct QuizView_Previews: PreviewProvider {

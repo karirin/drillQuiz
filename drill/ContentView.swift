@@ -15,6 +15,242 @@ struct ViewPositionKey: PreferenceKey {
     }
 }
 
+struct ModernUserNameBar: View {
+    let userName: String
+    let onTapRegister: () -> Void
+    
+    var body: some View {
+        HStack(spacing: 8) {
+            // ユーザーアイコン
+            Circle()
+                .fill(
+                    LinearGradient(
+                        colors: [Color.blue.opacity(0.6), Color.purple.opacity(0.6)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: 32, height: 32)
+                .overlay(
+                    Image(systemName: "person.fill")
+                        .foregroundColor(.white)
+                        .font(.system(size: 14, weight: .semibold))
+                )
+            
+            if userName.isEmpty {
+                Button(action: onTapRegister) {
+                    HStack(spacing: 4) {
+                        Text("名前を登録")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(.white)
+                        Image(systemName: "pencil.circle.fill")
+                            .foregroundColor(.white.opacity(0.8))
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(
+                        LinearGradient(
+                            colors: [Color.orange, Color.red.opacity(0.8)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .cornerRadius(16)
+                }
+            } else {
+                Text(userName)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(Color("fontGray"))
+                    .lineLimit(1)
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(.ultraThinMaterial)
+                .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+        )
+    }
+}
+
+struct ModernCoinBar: View {
+    let coins: Int
+    @State private var isAnimating = false
+    
+    var body: some View {
+        HStack(spacing: 6) {
+            // コインアイコン
+            ZStack {
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.yellow, Color.orange],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .frame(width: 24, height: 24)
+                    .shadow(color: .orange.opacity(0.5), radius: 3, x: 0, y: 2)
+                
+                Text("¢")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.white)
+            }
+            .scaleEffect(isAnimating ? 1.1 : 1.0)
+            
+            Text("\(coins)")
+                .font(.system(size: 15, weight: .bold, design: .rounded))
+                .foregroundColor(Color("fontGray"))
+                .contentTransition(.numericText())
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(
+            Capsule()
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    Capsule()
+                        .strokeBorder(
+                            LinearGradient(
+                                colors: [Color.yellow.opacity(0.5), Color.orange.opacity(0.3)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            ),
+                            lineWidth: 1.5
+                        )
+                )
+                .shadow(color: .black.opacity(0.1), radius: 3, x: 0, y: 2)
+        )
+        .onChange(of: coins) { _ in
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                isAnimating = true
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                isAnimating = false
+            }
+        }
+    }
+}
+
+struct ModernHelpButton: View {
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                Image(systemName: "questionmark.circle.fill")
+                    .font(.system(size: 16, weight: .semibold))
+                Text("ヘルプ")
+                    .font(.system(size: 13, weight: .semibold))
+            }
+            .foregroundColor(.white)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+            .background(
+                LinearGradient(
+                    colors: [Color.blue, Color.cyan],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+            .cornerRadius(20)
+            .shadow(color: .blue.opacity(0.3), radius: 4, x: 0, y: 2)
+        }
+    }
+}
+
+struct ModernLevelBar: View {
+    let level: Int
+    let experience: Int
+    let maxExperience: Int
+    
+    private var progress: CGFloat {
+        guard maxExperience > 0 else { return 0 }
+        return CGFloat(experience) / CGFloat(maxExperience)
+    }
+    
+    var body: some View {
+        HStack(spacing: 10) {
+            // レベルバッジ
+            ZStack {
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.purple, Color.blue],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 40, height: 40)
+                    .shadow(color: .purple.opacity(0.4), radius: 4, x: 0, y: 2)
+                
+                VStack(spacing: -2) {
+                    Text("Lv")
+                        .font(.system(size: 9, weight: .medium))
+                        .foregroundColor(.white.opacity(0.8))
+                    Text("\(level)")
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                }
+            }
+            
+            // 経験値バー
+            ProgressExpBar(level: level, experience: experience)
+//            VStack(alignment: .leading, spacing: 4) {
+//                HStack {
+//                    Text("経験値")
+//                        .font(.system(size: 11, weight: .medium))
+//                        .foregroundColor(.secondary)
+//                    Spacer()
+//                    Text("\(experience) / \(maxExperience)")
+//                        .font(.system(size: 11, weight: .semibold, design: .rounded))
+//                        .foregroundColor(Color("fontGray"))
+//                }
+//
+//                GeometryReader { geometry in
+//                    ZStack(alignment: .leading) {
+//                        // 背景
+//                        RoundedRectangle(cornerRadius: 6)
+//                            .fill(Color.gray.opacity(0.2))
+//
+//                        // プログレス
+//                        RoundedRectangle(cornerRadius: 6)
+//                            .fill(
+//                                LinearGradient(
+//                                    colors: [Color.blue, Color.purple],
+//                                    startPoint: .leading,
+//                                    endPoint: .trailing
+//                                )
+//                            )
+//                            .frame(width: geometry.size.width * progress)
+//                            .animation(.spring(response: 0.5, dampingFraction: 0.8), value: progress)
+//
+//                        // シャイン効果
+//                        RoundedRectangle(cornerRadius: 6)
+//                            .fill(
+//                                LinearGradient(
+//                                    colors: [.white.opacity(0.3), .clear],
+//                                    startPoint: .top,
+//                                    endPoint: .center
+//                                )
+//                            )
+//                            .frame(width: geometry.size.width * progress)
+//                    }
+//                }
+//                .frame(height: 12)
+//            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(.ultraThinMaterial)
+                .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
+        )
+    }
+}
+
 struct ContentView: View {
     @ObservedObject var authManager = AuthManager.shared
     @State private var userName: String = ""
@@ -70,6 +306,10 @@ struct ContentView: View {
     @State private var isPresentingTraining: Bool = false
     @State private var updateNameFlag: Bool = false
     
+    private var maxExperience: Int {
+        return 100 // または authManager から取得
+    }
+    
     var body: some View {
         NavigationView {
             ZStack{
@@ -90,76 +330,39 @@ struct ContentView: View {
                                 .resizable()
                                 .edgesIgnoringSafeArea(.all)
                             ScrollView(.vertical, showsIndicators: false) {
-                                VStack(spacing:0) {
+                                VStack(spacing:10) {
                                     HStack{
-                                        ZStack {
-                                            Image("ユーザー名")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(height:30)
-                                            Text("\(userName)").padding(.leading,25)
-                                            if self.userName.isEmpty {
-                                                Color.black.opacity(0.7)
-                                                    .padding(0)
-                                                    .cornerRadius(100)
-                                                    .padding(.vertical,13)
-                                                    .edgesIgnoringSafeArea(.all)
-                                                    .onTapGesture {
-                                                        updateNameFlag = true
-                                                    }
-                                                Text("名前を登録")
-                                                    .fontWeight(.bold)
-                                                    .foregroundStyle(Color(.white))
-                                                    .onTapGesture {
-                                                        updateNameFlag = true
-                                                    }
+                                            ModernUserNameBar(
+                                                userName: userName,
+                                                onTapRegister: {
+                                                    updateNameFlag = true
+                                                }
+                                            )
+                                            .onChange(of: updateNameFlag) { _ in
+                                                authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
+                                                    self.userName = name ?? ""
+                                                    self.avatar = avatar ?? [[String: Any]]()
+                                                    self.userMoney = money ?? 0
+                                                    self.userHp = hp ?? 100
+                                                    self.userAttack = attack ?? 20
+                                                    self.tutorialNum = tutorialNum ?? 0
+                                                    self.isLoading = false
+                                                }
                                             }
-                                        }
-                                        .onChange(of: updateNameFlag) { userMoney in
-                                            authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
-                                                self.userName = name ?? ""
-                                                self.avatar = avatar ?? [[String: Any]]()
-                                                self.userMoney = money ?? 0
-                                                self.userHp = hp ?? 100
-                                                self.userAttack = attack ?? 20
-                                                self.tutorialNum = tutorialNum ?? 0
-                                                self.isLoading = false
-                                            }
-                                        }
+                                        
                                         Spacer()
-                                        ZStack {
-                                            Image("コインバー")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(height:30)
-                                            Text(" \(userMoney)")
-                                                .padding(.leading,25)
-                                                .padding(.top,3)
-                                        }
-                                        Button(action: {
-                                generateHapticFeedback()
-                                            isPresentingSettingView = true
-                                        }) {
-                                            Image("お問い合わせバー")
-                                                .resizable()
-                                                .frame(width:140,height:50)
-                                                .shadow(radius: 1)
+                                        ModernCoinBar(coins: userMoney)
+                                        
+                                        ModernHelpButton {
+                                            generateHapticFeedback()
+                                            helpFlag = true
                                         }
                                     }
-                                    HStack{
-                                        ZStack {
-                                            Image("レベルバー")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(height:30)
-                                                .padding(.bottom,5)
-                                            Text("\(authManager.level)")
-                                                .foregroundColor(Color("fontGray"))
-                                                .padding(.leading,25)
-                                        }
-                                        ProgressExpBar(level: authManager.level, experience: authManager.experience)
-                                            .frame(height: 20)
-                                    }
+                                    ModernLevelBar(
+                                        level: authManager.level,
+                                        experience: authManager.experience,
+                                        maxExperience: maxExperience
+                                    )
                                 }
                                 .padding(.horizontal)
                                 VStack(spacing: 10) {
@@ -337,7 +540,8 @@ struct ContentView: View {
                                         Group{
                                             NavigationLink("", destination: ManagerView().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizList)
                                             //
-                                            NavigationLink("", destination: GachaView(), isActive: $isPresentingGachaView)
+                                            NavigationLink("", destination: GachaView()
+                                                .navigationBarBackButtonHidden(true), isActive: $isPresentingGachaView)
                                             //
                                             NavigationLink("", destination: IllustratedView(isPresenting: .constant(false)).navigationBarBackButtonHidden(true), isActive: $isPresentingIllustratedView)
                                         }
@@ -391,11 +595,11 @@ struct ContentView: View {
                 }
                 
                 if isFlag {
-                    ChangeNameView(isPresented: $isFlag, tutorialNum: $tutorialNum, isReturnBtn: .constant(false), authManager: authManager)
+                    ChangeNameView(isPresented: $isFlag, isReturnBtn: .constant(false), tutorialNum: $tutorialNum, authManager: authManager)
                 }
                 
                 if updateNameFlag {
-                    ChangeNameView(isPresented: $updateNameFlag, tutorialNum: $tutorialNum, isReturnBtn: .constant(true), authManager: authManager)
+                    ChangeNameView(isPresented: $updateNameFlag, isReturnBtn: .constant(true), tutorialNum: $tutorialNum, authManager: authManager)
                 }
                 
                 if tutorialNum == 1 {
@@ -606,7 +810,7 @@ struct ContentView: View {
             .background(Color("purple2").opacity(0.6))  // ここで背景色を設定
             .edgesIgnoringSafeArea(.all)  // 画面の端まで背景色を伸ばす
             }
-    private func fetchUserInfoIfNeeded(isPresenting: Bool) {
+    func fetchUserInfoIfNeeded(isPresenting: Bool) {
         if !isPresenting {
             authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
                 self.userName = name ?? ""
