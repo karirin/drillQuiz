@@ -666,7 +666,6 @@ struct StoryView: View {
                     VStack {
                         if userPreFlag != 1 {
                             BannerStortyView()
-                                .frame(height: 60)
                         }
                         VStack {
                                 HStack{

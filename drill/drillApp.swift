@@ -13,12 +13,39 @@ import UserNotifications
 import GoogleMobileAds
 import AVFoundation
 
+/// DEBUG ビルドで使う Google 公式のテスト用広告ユニット。
+/// 開発中の表示が本番の統計（表示回数・CTR・eCPM）を汚さないようにするためのもの。
+enum AdTestUnitID {
+    static let banner = "ca-app-pub-3940256099942544/2435281174"
+    static let interstitial = "ca-app-pub-3940256099942544/4411468910"
+    static let rewarded = "ca-app-pub-3940256099942544/1712485313"
+}
+
 enum AppAdConfiguration {
+    /// 子ども向け（COPPA / GDPR の16歳未満）扱いにするかどうか。
+    ///
+    /// true の間は広告が非パーソナライズかつ G 指定のみに制限されるため eCPM は構造的に低くなる。
+    /// App Store の Kids カテゴリ登録、または AdMob の「子ども向けとして扱う」設定が有効な場合は
+    /// 法的に必須なので false にしてはいけない。
+    /// false に変更する場合は ATT（NSUserTrackingUsageDescription + requestTrackingAuthorization）の
+    /// 実装をセットで行うこと。
+    static let isChildDirected = true
+
     static func configureForKidsCategory() {
         let requestConfiguration = MobileAds.shared.requestConfiguration
-        requestConfiguration.maxAdContentRating = GADMaxAdContentRating.general
-        requestConfiguration.tagForChildDirectedTreatment = true
-        requestConfiguration.setPublisherFirstPartyIDEnabled(false)
+
+        if isChildDirected {
+            requestConfiguration.maxAdContentRating = GADMaxAdContentRating.general
+            requestConfiguration.tagForChildDirectedTreatment = true
+            // TFCD の GDPR 側の対応。未設定だと EEA/UK 向けリクエストに同意シグナルが乗らない。
+            requestConfiguration.tagForUnderAgeOfConsent = true
+            requestConfiguration.setPublisherFirstPartyIDEnabled(false)
+        }
+
+#if DEBUG
+        // 実機デバッグ時はここに端末の GADSimulatorID / デバイスIDを追加するとテスト広告になる。
+        requestConfiguration.testDeviceIdentifiers = []
+#endif
     }
 
     static func makeRequest() -> Request {

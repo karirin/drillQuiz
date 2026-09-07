@@ -12,8 +12,7 @@ struct BannerAdView: View {
     var body: some View {
         AdaptiveBannerAdView(
             productionAdUnitID: "ca-app-pub-4898800212808837/2226175914",
-            placementName: "ホーム",
-            format: .compact
+            placementName: "ホーム"
         )
     }
 }
@@ -22,30 +21,21 @@ struct BannerStortyView: View {
     var body: some View {
         AdaptiveBannerAdView(
             productionAdUnitID: "ca-app-pub-4898800212808837/8004927226",
-            placementName: "ストーリー",
-            format: .large
+            placementName: "ストーリー"
         )
     }
 }
 
-private enum AnchoredBannerFormat {
-    case compact
-    case large
-
-    func adSize(for width: CGFloat) -> AdSize {
-        switch self {
-        case .compact:
-            return currentOrientationAnchoredAdaptiveBanner(width: width)
-        case .large:
-            return largeAnchoredAdaptiveBanner(width: width)
-        }
-    }
+/// 画面幅いっぱいのアンカー型アダプティブバナー。
+/// 固定 320x50 より単価が高く、SDK 13 系では currentOrientationAnchoredAdaptiveBanner が
+/// 非推奨になりこの形式が推奨されている。
+private func anchoredAdaptiveAdSize(for width: CGFloat) -> AdSize {
+    largeAnchoredAdaptiveBanner(width: width)
 }
 
 private struct AdaptiveBannerAdView: View {
     let productionAdUnitID: String
     let placementName: String
-    let format: AnchoredBannerFormat
 
     @State private var availableWidth: CGFloat = 0
     @State private var adHeight: CGFloat = 0
@@ -64,8 +54,7 @@ private struct AdaptiveBannerAdView: View {
                 AdaptiveBannerContainer(
                     adUnitID: adUnitID,
                     placementName: placementName,
-                    width: availableWidth,
-                    format: format
+                    width: availableWidth
                 ) { newHeight in
                     guard abs(adHeight - newHeight) > 0.5 else { return }
                     adHeight = newHeight
@@ -91,6 +80,7 @@ private struct AdaptiveBannerAdView: View {
     }
 
     private func updateWidth(_ width: CGFloat) {
+        print("DEBUGBANNER \(placementName) updateWidth: \(width)")
         let roundedWidth = floor(width)
         guard roundedWidth > 0, abs(availableWidth - roundedWidth) > 0.5 else { return }
         availableWidth = roundedWidth
@@ -101,11 +91,11 @@ private struct AdaptiveBannerContainer: UIViewRepresentable {
     let adUnitID: String
     let placementName: String
     let width: CGFloat
-    let format: AnchoredBannerFormat
     let onHeightChange: (CGFloat) -> Void
 
     func makeUIView(context: Context) -> BannerView {
-        let adSize = format.adSize(for: width)
+        print("DEBUGBANNER \(placementName) makeUIView width=\(width)")
+        let adSize = anchoredAdaptiveAdSize(for: width)
         let bannerView = BannerView(adSize: adSize)
         bannerView.adUnitID = adUnitID
         bannerView.delegate = context.coordinator
@@ -123,7 +113,7 @@ private struct AdaptiveBannerContainer: UIViewRepresentable {
 
         guard abs(context.coordinator.loadedWidth - width) > 0.5 else { return }
 
-        let adSize = format.adSize(for: width)
+        let adSize = anchoredAdaptiveAdSize(for: width)
         context.coordinator.loadedWidth = width
         bannerView.adSize = adSize
         notifyHeight(for: adSize)

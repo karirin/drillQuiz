@@ -890,8 +890,6 @@ struct ContentView: View {
                     VStack {
                         if userPreFlag != 1 {
                             BannerAdView()
-                                .frame(height: 60)
-                                .padding(.bottom, -10)
                         }
                         ZStack{
                             // LazyVStack内に置くと画面外では未描画のままになり遷移が発火しないため、
@@ -1441,7 +1439,7 @@ struct ContentView: View {
             authManager.fetchPreFlag { preFlag in
                 self.userPreFlag = preFlag
                 if preFlag != 1 {
-                    executeProcessEveryFortyTimes()
+                    showPaywallEveryTenHomeAppearances()
                 }
             }
 
@@ -1535,14 +1533,17 @@ struct ContentView: View {
         }
     }
     
-    func executeProcessEveryFortyTimes() {
+    /// ホーム画面表示10回に1回プレミアム訴求を出す。
+    /// クイズ結果画面側のカウンタとはキーを分けること（同じキーを共有すると
+    /// 結果画面の「広告 or 訴求」の比率が崩れる）。
+    func showPaywallEveryTenHomeAppearances() {
         // UserDefaultsからカウンターを取得
-        let count = UserDefaults.standard.integer(forKey: "launchPreCount") + 1
-        
+        let count = UserDefaults.standard.integer(forKey: "homePaywallCount") + 1
+
         // カウンターを更新
-        UserDefaults.standard.set(count, forKey: "launchPreCount")
-        
-        // 3回に1回の割合で処理を実行
+        UserDefaults.standard.set(count, forKey: "homePaywallCount")
+
+        // 10回に1回の割合で処理を実行
         if count % 10 == 0 {
             preFlag = true
         }

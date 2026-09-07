@@ -19,6 +19,8 @@ struct GuildBossBattleView: View {
     @ObservedObject private var guildManager = GuildManager.shared
     @ObservedObject private var authManager = AuthManager.shared
     @ObservedObject private var audioManager = AudioManager.shared
+    @ObservedObject private var appState = AppState.shared
+    @StateObject private var sharedInterstitial = Interstitial()
     @Environment(\.dismiss) private var dismiss
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Binding var isPresenting: Bool
@@ -172,11 +174,18 @@ struct GuildBossBattleView: View {
                     playerExperience: 0,
                     playerMoney: 0,
                     elapsedTime: 0,
-                    quizLevel: .daily
+                    quizLevel: .daily,
+                    interstitial: sharedInterstitial
                 )
                 .navigationBarBackButtonHidden(true)
             }
-            .onAppear(perform: setupBattle)
+            .onAppear {
+                // 結果画面のインタースティシャルを先読みしておく
+                if !appState.isSubscribed {
+                    sharedInterstitial.preloadIfNeeded()
+                }
+                setupBattle()
+            }
             .onChange(of: guildManager.raid?.bossHP) { newValue in
                 guard phase == .fighting, let hp = newValue, hp <= 0 else { return }
                 handleVictory()

@@ -54,12 +54,17 @@ struct QuizResultView: View {
     @Binding var navigateToQuizResultView: Bool
     @State private var isHidden = false
     @State private var selectedTab = 0 // 0: 結果, 1: 統計
-    @StateObject private var interstitial = Interstitial()
+    @ObservedObject var interstitial: Interstitial
+    @State private var hasRequestedInterstitial = false
+    @State private var hasPresentedInterstitial = false
+    @StateObject private var quizResultRewardAd = QuizResultRewardAd()
+    @State private var hasClaimedRewardedCoinBonus = false
+    @State private var showRewardedCoinAlert = false
     @Environment(\.presentationMode) var presentationMode
     @State private var restart = false
     @State private var showingAllResults = false
 
-    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, navigateToQuizResultView: Binding<Bool>, playerExperience: Int, playerMoney: Int, elapsedTime: TimeInterval, quizLevel: QuizLevel) {
+    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, navigateToQuizResultView: Binding<Bool>, playerExperience: Int, playerMoney: Int, elapsedTime: TimeInterval, quizLevel: QuizLevel, interstitial: Interstitial) {
         _results = State(initialValue: results)
         self.authManager = authManager
         _isPresenting = isPresenting
@@ -68,6 +73,7 @@ struct QuizResultView: View {
         _playerMoney = State(initialValue: playerMoney)
         self.elapsedTime = elapsedTime
         self.quizLevel = quizLevel
+        self.interstitial = interstitial
     }
     
     // 正解率を計算
@@ -101,6 +107,11 @@ struct QuizResultView: View {
                         // 結果サマリーカード
                         resultSummaryCard
                             .padding(.horizontal).padding(.top,5)
+                        if userPreFlag != 1 {
+                            rewardedCoinBonusCard
+                                .padding(.horizontal)
+                                .padding(.top, 12)
+                        }
                         // タブ選択
                         tabSelector
                         
@@ -255,6 +266,105 @@ struct QuizResultView: View {
         }
     }
     
+    // MARK: - Rewarded Coin Bonus
+    private var rewardedCoinBonusAmount: Int {
+        max(playerMoney * authManager.rewardFlag, 1)
+    }
+
+    private var rewardedCoinBonusButtonTitle: String {
+        if hasClaimedRewardedCoinBonus {
+            return "獲得済み"
+        }
+        if quizResultRewardAd.loadFailed {
+            return "広告を再読み込み"
+        }
+        if quizResultRewardAd.isLoaded {
+            return "広告を見て +\(rewardedCoinBonusAmount)コイン"
+        }
+        return "広告を準備中"
+    }
+
+    private var rewardedCoinBonusCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 12) {
+                Image(systemName: "play.rectangle.fill")
+                    .font(.system(size: 28))
+                    .foregroundColor(.orange)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("広告を見てコイン2倍")
+                        .font(.headline)
+                    Text("今回の獲得コインと同額を追加します")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
+
+                Text("+\(rewardedCoinBonusAmount)")
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundColor(.orange)
+            }
+
+            Button(action: handleRewardedCoinBonus) {
+                HStack(spacing: 8) {
+                    if quizResultRewardAd.isLoading {
+                        ProgressView()
+                            .tint(.white)
+                    } else {
+                        Image(systemName: hasClaimedRewardedCoinBonus ? "checkmark.circle.fill" : "play.fill")
+                    }
+
+                    Text(rewardedCoinBonusButtonTitle)
+                        .fontWeight(.semibold)
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(hasClaimedRewardedCoinBonus ? Color.green : Color.orange)
+                )
+            }
+            .disabled(
+                hasClaimedRewardedCoinBonus
+                || quizResultRewardAd.isPresenting
+                || (!quizResultRewardAd.isLoaded && !quizResultRewardAd.loadFailed)
+            )
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.systemBackground))
+                .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 3)
+        )
+        .alert("コインを獲得しました", isPresented: $showRewardedCoinAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("+\(rewardedCoinBonusAmount)コインを追加しました")
+        }
+    }
+
+    private func handleRewardedCoinBonus() {
+        generateHapticFeedback()
+
+        if quizResultRewardAd.loadFailed {
+            quizResultRewardAd.preloadIfNeeded()
+            return
+        }
+
+        quizResultRewardAd.present {
+            DispatchQueue.main.async {
+                guard !hasClaimedRewardedCoinBonus else { return }
+
+                hasClaimedRewardedCoinBonus = true
+                authManager.addMoney(amount: rewardedCoinBonusAmount)
+                showRewardedCoinAlert = true
+            }
+        }
+    }
+
     // MARK: - Tab Selector
     private var tabSelector: some View {
         HStack(spacing: 0) {
@@ -590,7 +700,9 @@ struct QuizResultView: View {
             userPreFlag = preFlag
             guard preFlag != 1 else { return }
 
-            let shouldShowPremiumPrompt = executeProcessEveryFortyTimes()
+            quizResultRewardAd.preloadIfNeeded()
+
+            let shouldShowPremiumPrompt = shouldShowPaywallOnQuizResult()
             if !shouldShowPremiumPrompt {
                 presentInterstitialIfNeeded()
             }
@@ -661,22 +773,23 @@ struct QuizResultView: View {
     }
     
     private func presentInterstitialIfNeeded() {
-        guard userPreFlag != 1, !interstitial.wasAdDismissed else { return }
+        // interstitial はクイズ画面と共有しているため、表示済み判定はこの画面のローカル状態で持つ。
+        guard userPreFlag != 1, !hasRequestedInterstitial else { return }
+        hasRequestedInterstitial = true
 
-        if interstitial.interstitialAdLoaded {
-            interstitial.presentInterstitial()
-            return
-        }
-
-        interstitial.loadInterstitial { isLoaded in
-            guard isLoaded, userPreFlag != 1, !interstitial.wasAdDismissed else { return }
+        // クイズ中に先読み済みならここで即座に表示される。
+        interstitial.preloadIfNeeded { isLoaded in
+            guard isLoaded, userPreFlag != 1, !hasPresentedInterstitial else { return }
+            hasPresentedInterstitial = true
             interstitial.presentInterstitial()
         }
     }
 
-    func executeProcessEveryFortyTimes() -> Bool {
-        let count = UserDefaults.standard.integer(forKey: "launchPreCount") + 1
-        UserDefaults.standard.set(count, forKey: "launchPreCount")
+    /// クイズ結果3回に1回はプレミアム訴求、残り2回はインタースティシャルを出す。
+    /// ホーム画面側のカウンタとはキーを分けること（同じキーだと比率が崩れる）。
+    func shouldShowPaywallOnQuizResult() -> Bool {
+        let count = UserDefaults.standard.integer(forKey: "quizResultPaywallCount") + 1
+        UserDefaults.standard.set(count, forKey: "quizResultPaywallCount")
         if count % 3 == 0 {
             preFlag = true
             return true
@@ -1026,7 +1139,8 @@ struct QuizResultView_Previews: PreviewProvider {
             playerExperience: 25,
             playerMoney: 15,
             elapsedTime: 0,
-            quizLevel: .beginner
+            quizLevel: .beginner,
+            interstitial: Interstitial()
         )
     }
 }

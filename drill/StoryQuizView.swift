@@ -258,7 +258,8 @@ struct StoryQuizView: View {
                 quizLevel: quizLevel,
                 victoryFlag: $victoryFlag,
                 isUserStoryFlag: .constant(true),
-                viewModel: viewModel
+                viewModel: viewModel,
+                interstitial: interstitial
             )
             .navigationBarBackButtonHidden(true),
             isActive: $navigateToQuizResultView
@@ -1109,6 +1110,10 @@ struct StoryQuizView: View {
             navigateToQuizResultView = true
         }
         .onAppear {
+            // 結果画面のインタースティシャルを先読みしておく（表示直前ロードだと表示機会を落とす）
+            if !appState.isSubscribed {
+                interstitial.preloadIfNeeded()
+            }
             if let monster = monsters[monsterName] ?? storyMonstersById[viewModel.monster] {
                 playerExperience = monster.playerExperience
                 playerMoney = monster.playerMoney

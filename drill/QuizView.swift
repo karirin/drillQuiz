@@ -963,7 +963,7 @@ struct QuizView: View {
                     answerInputContent
 
                     if showCompletionMessage {
-                        NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: 0,quizLevel: quizLevel).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+                        NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: 0,quizLevel: quizLevel, interstitial: interstitial).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -974,7 +974,7 @@ struct QuizView: View {
                         answerInputContent
 
                         if showCompletionMessage {
-                            NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: 0,quizLevel: quizLevel).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+                            NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: 0,quizLevel: quizLevel, interstitial: interstitial).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
                         }
                     }
                 }
@@ -1931,6 +1931,10 @@ struct QuizView: View {
                 }
             }
             .onAppear {
+                // 結果画面のインタースティシャルを先読みしておく（表示直前ロードだと表示機会を落とす）
+                if !appState.isSubscribed {
+                    interstitial.preloadIfNeeded()
+                }
                 startCountdown()
                 self.monsterType = 1 // すぐに1に戻す
                 authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in

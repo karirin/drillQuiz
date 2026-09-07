@@ -6705,7 +6705,7 @@ struct StoryRikaListView: View {
         _shuffledQuizList = State(initialValue: quizBeginnerList.shuffled())
     }
     
-    @StateObject var sharedInterstitial = Interstitial()
+    @StateObject var sharedInterstitial = Interstitial.story()
     var body: some View {
         StoryQuizView(viewModel: viewModel, quizzes: shuffledQuizList, quizLevel: .advanced, monsterName: monsterName, backgroundName: backgroundName, authManager: authManager, audioManager: audioManager, isPresenting: $isPresenting, interstitial: sharedInterstitial)
     }
