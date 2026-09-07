@@ -139,6 +139,9 @@
 		18FC732B2C9FC58F00A95341 /* ContactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC732A2C9FC58F00A95341 /* ContactView.swift */; };
 		18FC732D2C9FC8D100A95341 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC732C2C9FC8D100A95341 /* RootView.swift */; };
 		35E1826D8D234DFB80954E27 /* SocialDesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D0D683CFD004828ABD93DC5 /* SocialDesignSystem.swift */; };
+		C86D24932D0F318D06032180 /* ModalDesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E5A7EF598A8A43CC22382A /* ModalDesignTokens.swift */; };
+		CB086468C644F25F60BBDF5F /* QuizDesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E7718CEBF5CD35DE00CAC8 /* QuizDesignSystem.swift */; };
+		1C48AD6AD30D67ADE0220FBA /* UIComponentsUpdated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309D2DE41F39D9768CDFD20C /* UIComponentsUpdated.swift */; };
 		39DA85CB28AD4F4F94F385E3 /* LoginBonusModernView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4812A6EED09B472D8D5FFE7C /* LoginBonusModernView.swift */; };
 		482EF9EBFFB84C419E9C6417 /* SpacedReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518E79B3B2734E888D23F5E6 /* SpacedReviewView.swift */; };
 		4D17C5ADD48F4FB68B32C240 /* GuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567023399291426986FED660 /* GuildView.swift */; };
@@ -321,6 +324,9 @@
 		7A4D1B5E3C0A4D0100000013 /* MissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissionView.swift; sourceTree = "<group>"; };
 		7A4D1B5E3C0A4D0100000014 /* InventoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryView.swift; sourceTree = "<group>"; };
 		7D0D683CFD004828ABD93DC5 /* SocialDesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialDesignSystem.swift; sourceTree = "<group>"; };
+		54E5A7EF598A8A43CC22382A /* ModalDesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalDesignTokens.swift; sourceTree = "<group>"; };
+		D9E7718CEBF5CD35DE00CAC8 /* QuizDesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizDesignSystem.swift; sourceTree = "<group>"; };
+		309D2DE41F39D9768CDFD20C /* UIComponentsUpdated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIComponentsUpdated.swift; sourceTree = "<group>"; };
 		A82D5F8260F640D0B18A0F1A /* ReviewScheduleService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewScheduleService.swift; sourceTree = "<group>"; };
 		B0ADFE2B454742879B3281FC /* GuildBossBattleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuildBossBattleView.swift; sourceTree = "<group>"; };
 		D3D6654F3C5E4BC1A6DF8F0B /* LoginBonusConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginBonusConfig.swift; sourceTree = "<group>"; };
@@ -400,6 +406,9 @@
 				2BC5CBC2355E47A79B88411C /* FriendManager.swift */,
 				2FCF1F57551E4302A665B4B8 /* FriendListView.swift */,
 				7D0D683CFD004828ABD93DC5 /* SocialDesignSystem.swift */,
+				54E5A7EF598A8A43CC22382A /* ModalDesignTokens.swift */,
+				D9E7718CEBF5CD35DE00CAC8 /* QuizDesignSystem.swift */,
+				309D2DE41F39D9768CDFD20C /* UIComponentsUpdated.swift */,
 				18A236DE2F1516050007E444 /* SubjectComponents.swift */,
 				181476082F7785CF007FFCFF /* GachaCatalogView.swift */,
 				7A4D1B5E3C0A4D0100000014 /* InventoryView.swift */,
@@ -742,6 +751,9 @@
 				84B32B8C8B37434ABEC15083 /* FriendManager.swift in Sources */,
 				D9E573F0EEEA4ED5ABC667A2 /* FriendListView.swift in Sources */,
 				35E1826D8D234DFB80954E27 /* SocialDesignSystem.swift in Sources */,
+				C86D24932D0F318D06032180 /* ModalDesignTokens.swift in Sources */,
+				CB086468C644F25F60BBDF5F /* QuizDesignSystem.swift in Sources */,
+				1C48AD6AD30D67ADE0220FBA /* UIComponentsUpdated.swift in Sources */,
 				18C37B492D142F3F00326A2E /* StorySutaminaModalView.swift in Sources */,
 				18FC731F2C9822FD00A95341 /* PentagonShakaiView.swift in Sources */,
 				18C37B462D142F3F00326A2E /* InterstitialStory.swift in Sources */,
