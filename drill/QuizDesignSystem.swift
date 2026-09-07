@@ -13,7 +13,13 @@ struct QuizColors {
     // メインカラー
     static let primaryGradientStart = Color(hex: "667eea")
     static let primaryGradientEnd = Color(hex: "764ba2")
-    
+
+    // グラデーション端点色([Color] で配列として渡す用途向け。下の LinearGradient と同色)
+    static let appliedInfoStart = Color(hex: "fa709a")
+    static let appliedInfoEnd = Color(hex: "fee140")
+    static let reviewStart = Color(hex: "f093fb")
+    static let reviewEnd = Color(hex: "f5576c")
+
     // カテゴリ別カラー
     static let itPassport = LinearGradient(
         colors: [Color(hex: "11998e"), Color(hex: "38ef7d")],

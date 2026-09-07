@@ -1840,7 +1840,7 @@ struct QuizView: View {
                         icon: "doc.text.fill",
                         title: "問題が表示されます",
                         description: "ここに問題文が出るので、まずは内容を読みましょう",
-                        accentColors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+                        accentColors: [QuizColors.primaryGradientStart, QuizColors.primaryGradientEnd],
                         messagePlacement: .below,
                         onSkip: {
                             generateHapticFeedback()
@@ -1874,7 +1874,7 @@ struct QuizView: View {
                         icon: "heart.fill",
                         title: "バトルのルール",
                         description: "正解で敵にダメージ、不正解で自分がダメージ\nHPが0になるとゲームオーバーです",
-                        accentColors: [Color(hex: "fa709a"), Color(hex: "fee140")],
+                        accentColors: [QuizColors.appliedInfoStart, QuizColors.appliedInfoEnd],
                         messagePlacement: .below,
                         onSkip: {
                             generateHapticFeedback()
@@ -1891,7 +1891,7 @@ struct QuizView: View {
                         icon: "timer",
                         title: "制限時間に注意",
                         description: "30秒経つと自分がダメージを受けます",
-                        accentColors: [Color(hex: "f093fb"), Color(hex: "f5576c")],
+                        accentColors: [QuizColors.reviewStart, QuizColors.reviewEnd],
                         messagePlacement: .below,
                         onSkip: {
                             generateHapticFeedback()
@@ -3648,8 +3648,8 @@ struct QuestionCardView: View {
         ZStack {
             // カード背景
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color.white)
-                .shadow(color: Color.black.opacity(0.1), radius: 15, x: 0, y: 8)
+                .fill(SocialPalette.cardOpaque)
+                .shadow(color: SocialPalette.cardShadow, radius: 15, x: 0, y: 8)
             
             // 問題テキスト
             VStack(spacing: 0) {
