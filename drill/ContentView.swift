@@ -349,14 +349,10 @@ struct ModernStatusCard: View {
 
 // MARK: - Compact Home (itQuizと同じデザイン言語のホーム画面コンポーネント)
 
-private enum CompactHomePalette {
-    static let canvas = Color(uiColor: .systemGroupedBackground)
-    static let card = Color(uiColor: .secondarySystemGroupedBackground)
-    static let primaryText = Color(uiColor: .label)
-    static let secondaryText = Color(uiColor: .secondaryLabel)
-    static let divider = Color(uiColor: .separator).opacity(0.28)
-    static let shadow = Color.black.opacity(0.07)
-}
+// 画面地・面・文字は共通トークン(SocialPalette)へ集約済み。
+// canvas → SocialPalette.canvas / card → SocialPalette.cardOpaque /
+// primaryText・secondaryText → SocialPalette.* / divider → SocialPalette.hairline /
+// shadow → SocialPalette.cardShadow
 
 private enum CompactHomeIcon {
     case asset(String)
@@ -370,7 +366,7 @@ private struct CompactHomeSectionHeader: View {
         HStack(spacing: 10) {
             Text(title)
                 .font(.system(size: 15, weight: .bold))
-                .foregroundStyle(CompactHomePalette.primaryText)
+                .foregroundStyle(SocialPalette.primaryText)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 5)
                 .background {
@@ -437,7 +433,7 @@ private struct CompactHomeFeatureCard: View {
                     VStack(alignment: .leading, spacing: 3) {
                         Text(title)
                             .font(.system(size: 14, weight: .bold))
-                            .foregroundStyle(CompactHomePalette.primaryText)
+                            .foregroundStyle(SocialPalette.primaryText)
                             .lineLimit(1)
 
                         if let progress {
@@ -462,7 +458,7 @@ private struct CompactHomeFeatureCard: View {
                         } else {
                             Text(subtitle)
                                 .font(.system(size: 10, weight: .medium))
-                                .foregroundStyle(CompactHomePalette.secondaryText)
+                                .foregroundStyle(SocialPalette.secondaryText)
                                 .lineLimit(1)
                         }
                     }
@@ -654,7 +650,7 @@ private struct CompactHomeProfileCard: View {
                 HStack(spacing: 6) {
                     Text(userName.isEmpty ? "ゲスト" : userName)
                         .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(CompactHomePalette.primaryText)
+                        .foregroundStyle(SocialPalette.primaryText)
                         .lineLimit(1)
 
                     if userName.isEmpty {
@@ -699,7 +695,7 @@ private struct CompactHomeProfileCard: View {
 
                     Text("\(experience) / \(maxExperience)")
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
-                        .foregroundStyle(CompactHomePalette.secondaryText)
+                        .foregroundStyle(SocialPalette.secondaryText)
                         .monospacedDigit()
                 }
 
@@ -889,7 +885,10 @@ struct ContentView: View {
                 } else {
                     VStack {
                         if userPreFlag != 1 {
+                            // 下のZStackの背景画像が .ignoresSafeArea() で上方向にはみ出し、
+                            // バナーを覆って見えなくなるため、描画順を明示的に前面へ上げる。
                             BannerAdView()
+                                .zIndex(1)
                         }
                         ZStack{
                             // LazyVStack内に置くと画面外では未描画のままになり遷移が発火しないため、
@@ -1183,7 +1182,7 @@ struct ContentView: View {
                         let cutoutHeight = max(buttonRect.height, 0)
 
                         RoundedRectangle(cornerRadius: 30, style: .continuous)
-                            .stroke(Color(hex: "667eea"), lineWidth: 3)
+                            .stroke(QuizColors.primaryGradientStart, lineWidth: 3)
                             .frame(width: cutoutWidth, height: cutoutHeight)
                             .position(x: localX, y: localY)
                             .scaleEffect(tutorialPulse ? 1.05 : 1.0)
@@ -1203,7 +1202,7 @@ struct ContentView: View {
                                     .padding(.vertical, 4)
                                     .background(
                                         LinearGradient(
-                                            colors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+                                            colors: [QuizColors.primaryGradientStart, QuizColors.primaryGradientEnd],
                                             startPoint: .leading,
                                             endPoint: .trailing
                                         )
@@ -1215,7 +1214,7 @@ struct ContentView: View {
                                 .font(.system(size: 28))
                                 .foregroundStyle(
                                     LinearGradient(
-                                        colors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+                                        colors: [QuizColors.primaryGradientStart, QuizColors.primaryGradientEnd],
                                         startPoint: .topLeading,
                                         endPoint: .bottomTrailing
                                     )

@@ -256,6 +256,15 @@ enum SocialPalette {
     static let separator = Color(.separator)
 
     static let cardShadow = Color.socialDynamic(light: Color.black.opacity(0.07), dark: Color.black.opacity(0.35))
+
+    // MARK: 画面地・不透明面・文字
+    // 半透明の cardSurface/insetSurface が使えない画面(ソーシャル以外)向けに、
+    // 各画面が私的パレットを持たずに済むよう地色・面・文字色を1か所へ集約する。
+    static let canvas = Color(.systemGroupedBackground)
+    static let cardOpaque = Color(.secondarySystemGroupedBackground)
+    static let primaryText = Color(.label)
+    static let secondaryText = Color(.secondaryLabel)
+    static let hairline = Color(.separator).opacity(0.28)
 }
 
 enum SocialMetrics {
