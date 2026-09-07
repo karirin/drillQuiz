@@ -1594,6 +1594,13 @@ struct QuizView: View {
             .padding()
         } else {
             quizContent
+                .onAppear {
+                    // 結果画面のインタースティシャルを先読みしておく。
+                    // 表示直前にロードすると読み込み待ちで表示機会を落とすため、必ずクイズ開始時に呼ぶ。
+                    if !appState.isSubscribed {
+                        interstitial.preloadIfNeeded()
+                    }
+                }
         }
     }
 
@@ -1931,10 +1938,6 @@ struct QuizView: View {
                 }
             }
             .onAppear {
-                // 結果画面のインタースティシャルを先読みしておく（表示直前ロードだと表示機会を落とす）
-                if !appState.isSubscribed {
-                    interstitial.preloadIfNeeded()
-                }
                 startCountdown()
                 self.monsterType = 1 // すぐに1に戻す
                 authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in

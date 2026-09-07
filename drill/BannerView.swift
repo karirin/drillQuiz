@@ -80,7 +80,6 @@ private struct AdaptiveBannerAdView: View {
     }
 
     private func updateWidth(_ width: CGFloat) {
-        print("DEBUGBANNER \(placementName) updateWidth: \(width)")
         let roundedWidth = floor(width)
         guard roundedWidth > 0, abs(availableWidth - roundedWidth) > 0.5 else { return }
         availableWidth = roundedWidth
@@ -94,7 +93,6 @@ private struct AdaptiveBannerContainer: UIViewRepresentable {
     let onHeightChange: (CGFloat) -> Void
 
     func makeUIView(context: Context) -> BannerView {
-        print("DEBUGBANNER \(placementName) makeUIView width=\(width)")
         let adSize = anchoredAdaptiveAdSize(for: width)
         let bannerView = BannerView(adSize: adSize)
         bannerView.adUnitID = adUnitID
