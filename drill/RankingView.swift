@@ -572,7 +572,7 @@ struct RankingRowCard<Content: View>: View {
         .padding(.vertical, 12)
         .background(
             RoundedRectangle(cornerRadius: 14)
-                .fill(isCurrentUser ? Color("loading").opacity(0.1) : Color.white)
+                .fill(isCurrentUser ? Color("loading").opacity(0.1) : SocialPalette.cardOpaque)
                 .shadow(color: Color.black.opacity(rank <= 3 ? 0.08 : 0.04), radius: rank <= 3 ? 8 : 4, x: 0, y: 2)
         )
         .overlay(
@@ -650,7 +650,7 @@ struct StoryRankingView: View {
                             .padding(.top)
                         }
                         .padding(.horizontal)
-                        .background(Color.white)
+                        .background(SocialPalette.cardOpaque)
                     }
                     ScrollView {
                         LazyVStack(spacing: 8) {
@@ -844,7 +844,7 @@ struct MonthlyAnswersRankingView: View {
                         .padding(.vertical, 12)
                         .background(
                             RoundedRectangle(cornerRadius: 14)
-                                .fill(isMe ? Color("loading").opacity(0.1) : Color.white)
+                                .fill(isMe ? Color("loading").opacity(0.1) : SocialPalette.cardOpaque)
                                 .shadow(color: Color.black.opacity(index < 3 ? 0.08 : 0.04), radius: index < 3 ? 8 : 4, x: 0, y: 2)
                         )
                         .overlay(
@@ -964,7 +964,7 @@ struct AvatarRankingView: View {
                         .padding(.vertical, 12)
                         .background(
                             RoundedRectangle(cornerRadius: 14)
-                                .fill(isMe ? Color("loading").opacity(0.1) : Color.white)
+                                .fill(isMe ? Color("loading").opacity(0.1) : SocialPalette.cardOpaque)
                                 .shadow(color: Color.black.opacity(index < 3 ? 0.08 : 0.04), radius: index < 3 ? 8 : 4, x: 0, y: 2)
                         )
                         .overlay(
@@ -1025,7 +1025,7 @@ struct RankingSegmentedTab: View {
             .padding(4)
             .background(
                 RoundedRectangle(cornerRadius: 14)
-                    .fill(Color.white)
+                    .fill(SocialPalette.cardOpaque)
                     .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 2)
             )
             .padding(.horizontal, 16)

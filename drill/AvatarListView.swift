@@ -123,7 +123,7 @@ struct AvatarListView: View {
             tabButton(title: "持ち物", systemImage: "shippingbox.fill", index: 1)
         }
         .padding(4)
-        .background(Color.white.opacity(0.75))
+        .background(SocialPalette.cardSurface)
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
@@ -171,7 +171,7 @@ struct AvatarListView: View {
                 RoundedRectangle(cornerRadius: 24)
                     .fill(
                         LinearGradient(
-                            colors: [Color.white, Color.white.opacity(0.9)],
+                            colors: [SocialPalette.cardOpaque, SocialPalette.cardOpaque.opacity(0.9)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -379,7 +379,7 @@ struct AvatarListView: View {
             ZStack {
                 // 背景
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.white)
+                    .fill(SocialPalette.cardOpaque)
                     .shadow(
                         color: selectedItem?.name == avatar.name ? Color.blue.opacity(0.3) : Color.black.opacity(0.08),
                         radius: selectedItem?.name == avatar.name ? 8 : 4,
@@ -502,7 +502,7 @@ struct AvatarListView: View {
             .foregroundColor(Color("fontGray"))
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
-            .background(Color.white.opacity(0.8))
+            .background(SocialPalette.cardSurface)
             .cornerRadius(20)
         }
         .buttonStyle(ScaleButtonStyle())

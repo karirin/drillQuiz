@@ -320,7 +320,7 @@ struct TittlesView: View {
                 .padding(16)
                 .background(
                     RoundedRectangle(cornerRadius: 20)
-                        .fill(Color.white)
+                        .fill(SocialPalette.cardOpaque)
                         .shadow(color: .black.opacity(0.06), radius: 12, x: 0, y: 4)
                 )
                 .overlay(
@@ -379,8 +379,8 @@ struct TitleProgressBar: View {
         .padding(12)
         .background(
             RoundedRectangle(cornerRadius: 14)
-                .fill(Color.white)
-                .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 2)
+                .fill(SocialPalette.cardOpaque)
+                .shadow(color: SocialPalette.cardShadow, radius: 6, x: 0, y: 2)
         )
     }
 }
@@ -452,7 +452,7 @@ struct TitleGridCard: View {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(
                             isUnlocked ?
-                            Color.white :
+                            SocialPalette.cardOpaque :
                             Color.gray.opacity(0.08)
                         )
                         .frame(height: 80)
