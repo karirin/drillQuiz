@@ -46,7 +46,7 @@ struct SettingView: View {
     @ObservedObject var authManager = AuthManager.shared
     @State private var showingDeleteAlert = false
     @Environment(\.colorScheme) private var colorScheme
-    var backgroundColor: Color { colorScheme == .dark ? Color(.systemBackground) : Color(.white) }
+    var backgroundColor: Color { SocialPalette.canvas }
 
     var body: some View {
         NavigationView {
@@ -100,10 +100,10 @@ struct SettingView: View {
                             
                             deleteAccountRow
                         }
-                        .background(Color.white)
-                        .cornerRadius(12)
+                        .background(SocialPalette.cardOpaque)
+                        .cornerRadius(DesignTokens.Radius.md)
                     }
-                    .shadow(color: Color.black.opacity(0.1), radius: 5)
+                    .shadow(color: SocialPalette.cardShadow, radius: 5)
                     
                     // おすすめのアプリセクション
                     VStack(spacing: 0) {
@@ -125,10 +125,10 @@ struct SettingView: View {
                                 }
                             }
                         }
-                        .background(Color.white)
-                        .cornerRadius(12)
+                        .background(SocialPalette.cardOpaque)
+                        .cornerRadius(DesignTokens.Radius.md)
                     }
-                    .shadow(color: Color.black.opacity(0.1), radius: 5)
+                    .shadow(color: SocialPalette.cardShadow, radius: 5)
                     Spacer(minLength: 40)
                 }
                 .padding(.horizontal, 16)
@@ -169,7 +169,7 @@ struct SettingView: View {
             
             Text(isSoundOn ? "音声オン" : "音声オフ")
                 .font(.system(size: 16))
-                .foregroundColor(.black)
+                .foregroundColor(.primary)
             
             Spacer()
             
@@ -193,7 +193,7 @@ struct SettingView: View {
             
             Text(title)
                 .font(.system(size: 16))
-                .foregroundColor(.black)
+                .foregroundColor(.primary)
             
             Spacer()
             
@@ -258,12 +258,12 @@ struct SettingView: View {
                     Text(app.name)
                         .font(.system(size: 16, weight: .medium))
                     
-                    .foregroundColor(.black)
+                    .foregroundColor(.primary)
                         .lineLimit(1)
                     
                     Text(app.description2)
                         .font(.system(size: 13))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .lineLimit(5)
                         .multilineTextAlignment(.leading)
                 }
