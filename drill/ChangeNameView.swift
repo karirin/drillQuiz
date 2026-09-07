@@ -13,6 +13,7 @@ struct ChangeNameView: View {
     @Binding var isPresented: Bool
     @Binding var isReturnBtn: Bool
     @Binding var tutorialNum: Int
+    var initialUserName: String = ""
     
     @State private var userName: String = ""
     @State private var showAlert = false
@@ -251,6 +252,9 @@ struct ChangeNameView: View {
             )
         }
         .onAppear {
+            if userName.isEmpty {
+                userName = initialUserName
+            }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 appearAnimation = true
             }
@@ -293,6 +297,7 @@ struct ChangeNameView_Previews: PreviewProvider {
                 isPresented: .constant(true),
                 isReturnBtn: .constant(true),
                 tutorialNum: .constant(0),
+                initialUserName: "テストユーザー",
                 authManager: AuthManager.shared
             )
         }

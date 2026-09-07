@@ -54,9 +54,8 @@ struct QuizResultView: View {
     @Binding var navigateToQuizResultView: Bool
     @State private var isHidden = false
     @State private var selectedTab = 0 // 0: 結果, 1: 統計
-    private let interstitial = Interstitial()
+    @StateObject private var interstitial = Interstitial()
     @Environment(\.presentationMode) var presentationMode
-    private let adViewControllerRepresentable = AdViewControllerRepresentable()
     @State private var restart = false
     @State private var showingAllResults = false
 
@@ -118,13 +117,6 @@ struct QuizResultView: View {
                 .navigationTitle("結果")
                 .navigationBarTitleDisplayMode(.inline)
             }
-            .background {
-                if userPreFlag != 1 {
-                    adViewControllerRepresentable
-                        .frame(width: .zero, height: .zero)
-                }
-            }
-            
             // モーダル類
             modalOverlays
         }
@@ -593,25 +585,14 @@ struct QuizResultView: View {
     }
     
     private func setupOnAppear() {
-        authManager.fetchPreFlag()
         authManager.fetchUserStory()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            userPreFlag = authManager.userPreFlag
-            if userPreFlag != 1 {
-                executeProcessEveryFortyTimes()
-            }
-        }
-        
-        // 広告処理
-        DispatchQueue.main.async {
-            if !interstitial.interstitialAdLoaded && interstitial.wasAdDismissed == false {
-                interstitial.loadInterstitial(completion: { isLoaded in
-                    if isLoaded {
-                        self.interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
-                    }
-                })
-            } else if !interstitial.wasAdDismissed {
-                interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
+        authManager.fetchPreFlag { preFlag in
+            userPreFlag = preFlag
+            guard preFlag != 1 else { return }
+
+            let shouldShowPremiumPrompt = executeProcessEveryFortyTimes()
+            if !shouldShowPremiumPrompt {
+                presentInterstitialIfNeeded()
             }
         }
         
@@ -679,12 +660,28 @@ struct QuizResultView: View {
         }
     }
     
-    func executeProcessEveryFortyTimes() {
+    private func presentInterstitialIfNeeded() {
+        guard userPreFlag != 1, !interstitial.wasAdDismissed else { return }
+
+        if interstitial.interstitialAdLoaded {
+            interstitial.presentInterstitial()
+            return
+        }
+
+        interstitial.loadInterstitial { isLoaded in
+            guard isLoaded, userPreFlag != 1, !interstitial.wasAdDismissed else { return }
+            interstitial.presentInterstitial()
+        }
+    }
+
+    func executeProcessEveryFortyTimes() -> Bool {
         let count = UserDefaults.standard.integer(forKey: "launchPreCount") + 1
         UserDefaults.standard.set(count, forKey: "launchPreCount")
         if count % 3 == 0 {
             preFlag = true
+            return true
         }
+        return false
     }
 }
 

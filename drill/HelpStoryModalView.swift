@@ -29,12 +29,12 @@ struct HelpStoryModalView: View {
                 }
             VStack(spacing: -25) {
                 VStack(alignment: .center){
-                    Text("ダンジョンモードで遊んでいただきありがとうございます！\n\n今後のアップデートのため\n改善点のご意見いただけると\n励みになります")
+                    Text("ダンジョンモードで遊んでいただきありがとうございます！\n\n改善点のご意見に加えて\n不適切な広告や年齢に合わない広告の報告も\nこちらからお送りいただけます")
                         .font(.system(size: isSmallDevice() ? 17 : 18))
                         .multilineTextAlignment(.center)
                         .padding(.top)
                         TextField(
-                            "例）メッセージが送信されない",
+                            "例）年齢に合わない広告が表示された",
                             text: $text,
                             axis: .vertical
                         )
@@ -145,5 +145,4 @@ struct HelpStoryModalView: View {
 #Preview {
     HelpStoryModalView(audioManager: AudioManager(), isPresented: .constant(true))
 }
-
 

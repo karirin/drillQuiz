@@ -13,7 +13,7 @@ struct IncorrectSansuListView: View {
     @State var shuffledQuizList: [QuizQuestion] = []
     @State var isDataLoaded = false // データロード状態の追跡
     
-    private var authManager = AuthManager()
+    @ObservedObject private var authManager = AuthManager.shared
     private var audioManager = AudioManager.shared
     @StateObject var sharedInterstitial = Interstitial()
     
@@ -25,18 +25,37 @@ struct IncorrectSansuListView: View {
     var body: some View {
         VStack{
             if isDataLoaded {
-                // データがロードされたらQuizViewを表示
-                QuizView(quizzes: shuffledQuizList, quizLevel: .incorrectSansuAnswer, authManager: authManager, audioManager: audioManager, isPresenting: $isPresenting, interstitial: sharedInterstitial)
+                if shuffledQuizList.isEmpty {
+                    emptyIncorrectAnswerView
+                } else {
+                    QuizView(quizzes: shuffledQuizList, quizLevel: .incorrectSansuAnswer, authManager: authManager, audioManager: audioManager, isPresenting: $isPresenting, interstitial: sharedInterstitial)
+                }
             } else {
                 ActivityIndicator()
             }
         }
         .onAppear {
-            fetchSansuIncorrectAnswers(userId: authManager.currentUserId!) { quizList in
+            guard let userId = authManager.currentUserId else {
+                isDataLoaded = true
+                return
+            }
+            fetchSansuIncorrectAnswers(userId: userId) { quizList in
                 self.shuffledQuizList = quizList.shuffled()
                 self.isDataLoaded = true
             }
         }
+    }
+
+    private var emptyIncorrectAnswerView: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 52))
+                .foregroundColor(.green)
+            Text("復習する問題はありません")
+                .font(.headline)
+            Button("戻る") { isPresenting = false }
+        }
+        .padding()
     }
 }
     

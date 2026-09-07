@@ -24,6 +24,15 @@ struct ModalExplanationView: View {
         @Binding var userFlag: Int
         var pauseTimer: () -> Void
         var startTimer: () -> Void
+        var advanceToNextQuestion: (() -> Void)? = nil
+
+        private func advanceQuestion() {
+            if let advanceToNextQuestion {
+                advanceToNextQuestion()
+            } else {
+                currentQuizIndex += 1
+            }
+        }
         
         var body: some View {
             ZStack {
@@ -34,7 +43,7 @@ struct ModalExplanationView: View {
                                   
                                   Button(action: {
                                 generateHapticFeedback()
-                                      currentQuizIndex += 1
+                                      advanceQuestion()
       //                                selectedAnswerIndex = nil
     //                                  startTimer()
                                       audioManager.playCancelSound()
@@ -141,7 +150,7 @@ struct ModalExplanationView: View {
                             Spacer()
                             Button(action: {
                                 generateHapticFeedback()
-                                currentQuizIndex += 1
+                                advanceQuestion()
                                 isPresented = false
                                 selectedAnswerIndex = nil
                                 startTimer()

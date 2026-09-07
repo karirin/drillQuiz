@@ -13,6 +13,19 @@ import UserNotifications
 import GoogleMobileAds
 import AVFoundation
 
+enum AppAdConfiguration {
+    static func configureForKidsCategory() {
+        let requestConfiguration = MobileAds.shared.requestConfiguration
+        requestConfiguration.maxAdContentRating = GADMaxAdContentRating.general
+        requestConfiguration.tagForChildDirectedTreatment = true
+        requestConfiguration.setPublisherFirstPartyIDEnabled(false)
+    }
+
+    static func makeRequest() -> Request {
+        Request()
+    }
+}
+
 class AppDelegate: NSObject, UIApplicationDelegate {
     var appState: AppState!
     
@@ -20,8 +33,9 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
     ) -> Bool {
+        AppAdConfiguration.configureForKidsCategory()
         MobileAds.shared.start(completionHandler: nil)
-        self.appState = AppState()
+        self.appState = AppState.shared
         Messaging.messaging().delegate = self
 
         UNUserNotificationCenter.current().delegate = self
@@ -118,7 +132,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 struct drillApp: App {
     @ObservedObject var authManager: AuthManager
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    @StateObject var appState = AppState()
+    @StateObject var appState = AppState.shared
     
     init() {
         FirebaseApp.configure()
@@ -129,16 +143,15 @@ struct drillApp: App {
         WindowGroup {
 //            TopView(authManager: authManager)
             RootView(authManager: authManager)
+                .environmentObject(appState)
                 .onAppear{
-                    if let userId = authManager.currentUserId {
+                    if authManager.currentUserId != nil {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                            if appState.isBannerVisible {
-                                AuthManager.shared.updatePreFlag(userId: AuthManager.shared.currentUserId!, userPreFlag: 0){ success in
-                                }
+                            guard appState.isBannerVisible,
+                                  let userId = AuthManager.shared.currentUserId else { return }
+                            AuthManager.shared.updatePreFlag(userId: userId, userPreFlag: 0){ success in
                             }
                         }
-                    } else {
-                        authManager.anonymousSignIn(){}
                     }
                 }
         }

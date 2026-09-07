@@ -9,28 +9,36 @@ import XCTest
 @testable import drill
 
 final class drillTests: XCTestCase {
+    func testQuizLevelAllCasesContainsEveryElementarySchoolLevel() {
+        let descriptions = Set(QuizLevel.allCases.map(\.description))
+        let expected = Set(
+            ["sansu", "shakai", "rika", "kokugo"].flatMap { subject in
+                (1...6).map { "\(subject)\($0)" }
+            }
+        )
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        XCTAssertTrue(expected.isSubset(of: descriptions))
     }
 
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    func testInventoryRewardMergedCombinesSameTypeAndDropsNonPositiveTotals() {
+        let rewards = [
+            InventoryReward(type: .normalGachaTicket, amount: 2),
+            InventoryReward(type: .normalGachaTicket, amount: 3),
+            InventoryReward(type: .boostTicket, amount: 0),
+            InventoryReward(type: .staminaPotion, amount: -1)
+        ]
+
+        XCTAssertEqual(
+            InventoryReward.merged(rewards),
+            [InventoryReward(type: .normalGachaTicket, amount: 5)]
+        )
     }
 
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
-    }
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
+    func testCoinPurchaseCatalogUsesStableProductIdentifiers() {
+        XCTAssertEqual(CoinPurchaseCatalog.coinAmount(for: "Drill.coin1000"), 1_000)
+        XCTAssertEqual(CoinPurchaseCatalog.coinAmount(for: "Drill.coin4000"), 4_000)
+        XCTAssertEqual(CoinPurchaseCatalog.coinAmount(for: "Drill.coin15000"), 15_000)
+        XCTAssertNil(CoinPurchaseCatalog.coinAmount(for: "unknown.product"))
     }
 
 }

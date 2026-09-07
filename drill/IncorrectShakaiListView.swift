@@ -13,7 +13,7 @@ struct IncorrectShakaiListView: View {
     @State var shuffledQuizList: [QuizQuestion] = []
     @State var isDataLoaded = false // データロード状態の追跡
     
-    private var authManager = AuthManager()
+    @ObservedObject private var authManager = AuthManager.shared
     private var audioManager = AudioManager.shared
     @StateObject var sharedInterstitial = Interstitial()
     
@@ -25,18 +25,37 @@ struct IncorrectShakaiListView: View {
     var body: some View {
         VStack{
             if isDataLoaded {
-                // データがロードされたらQuizViewを表示
-                QuizView(quizzes: shuffledQuizList, quizLevel: .incorrectShakaiAnswer, authManager: authManager, audioManager: audioManager, isPresenting: $isPresenting, interstitial: sharedInterstitial)
+                if shuffledQuizList.isEmpty {
+                    emptyIncorrectAnswerView
+                } else {
+                    QuizView(quizzes: shuffledQuizList, quizLevel: .incorrectShakaiAnswer, authManager: authManager, audioManager: audioManager, isPresenting: $isPresenting, interstitial: sharedInterstitial)
+                }
             } else {
                 ActivityIndicator()
             }
         }
         .onAppear {
-            fetchShakaiIncorrectAnswers(userId: authManager.currentUserId!) { quizList in
+            guard let userId = authManager.currentUserId else {
+                isDataLoaded = true
+                return
+            }
+            fetchShakaiIncorrectAnswers(userId: userId) { quizList in
                 self.shuffledQuizList = quizList.shuffled()
                 self.isDataLoaded = true
             }
         }
+    }
+
+    private var emptyIncorrectAnswerView: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 52))
+                .foregroundColor(.green)
+            Text("復習する問題はありません")
+                .font(.headline)
+            Button("戻る") { isPresenting = false }
+        }
+        .padding()
     }
 }
     
@@ -48,12 +67,7 @@ func fetchShakaiIncorrectAnswers(userId: String, completion: @escaping ([QuizQue
         for child in snapshot.children {
             if let childSnapshot = child as? DataSnapshot,
                let dict = childSnapshot.value as? [String: Any],
-               let question = dict["quizQuestion"] as? String,
-               let choices = dict["choices"] as? [String],
-               let correctAnswerIndex = dict["correctAnswerIndex"] as? Int,
-               let explanation = dict["explanation"] as? String {
-                let quizId = childSnapshot.key // クイズIDを取得
-                let quiz = QuizQuestion(id: quizId, question: question, choices: choices, correctAnswerIndex: correctAnswerIndex, explanation: explanation)
+               let quiz = quizQuestion(fromIncorrectAnswerDict: dict, quizId: childSnapshot.key) {
                 quizList.append(quiz)
             }
         }

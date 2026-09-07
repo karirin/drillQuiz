@@ -9,7 +9,161 @@ import SwiftUI
 import Firebase
 import FirebaseAuth
 
-enum QuizLevel {
+enum InventoryItemType: String, Codable, CaseIterable {
+    case normalGachaTicket
+    case rareGachaTicket
+    case mekaGachaTicket
+    case godGachaTicket
+    case constellationGachaTicket
+    case staminaPotion
+    case boostTicket
+
+    var displayName: String {
+        switch self {
+        case .normalGachaTicket:
+            return "レギュラーガチャチケット"
+        case .rareGachaTicket:
+            return "幸福ガチャチケット"
+        case .mekaGachaTicket:
+            return "メカガチャチケット"
+        case .godGachaTicket:
+            return "神ガチャチケット"
+        case .constellationGachaTicket:
+            return "星座ガチャチケット"
+        case .staminaPotion:
+            return "スタミナ回復薬"
+        case .boostTicket:
+            return "ブースト薬"
+        }
+    }
+
+    var shortName: String {
+        switch self {
+        case .normalGachaTicket:
+            return "レギュラー"
+        case .rareGachaTicket:
+            return "幸福"
+        case .mekaGachaTicket:
+            return "メカ"
+        case .godGachaTicket:
+            return "神"
+        case .constellationGachaTicket:
+            return "星座"
+        case .staminaPotion:
+            return "回復薬"
+        case .boostTicket:
+            return "ブースト薬"
+        }
+    }
+
+    var systemImageName: String {
+        switch self {
+        case .normalGachaTicket:
+            return "ticket.fill"
+        case .rareGachaTicket:
+            return "giftcard.fill"
+        case .mekaGachaTicket:
+            return "cpu.fill"
+        case .godGachaTicket:
+            return "sparkles.rectangle.stack.fill"
+        case .constellationGachaTicket:
+            return "moon.stars.fill"
+        case .staminaPotion:
+            return "cross.case.fill"
+        case .boostTicket:
+            return "bolt.circle.fill"
+        }
+    }
+
+    var assetImageName: String? {
+        switch self {
+        case .staminaPotion:
+            return "スタミナ回復薬"
+        case .boostTicket:
+            return "ブースト薬"
+        default:
+            return nil
+        }
+    }
+
+    var accentColor: Color {
+        switch self {
+        case .normalGachaTicket:
+            return Color(red: 1.0, green: 0.72, blue: 0.24)
+        case .rareGachaTicket:
+            return Color(red: 1.0, green: 0.42, blue: 0.36)
+        case .mekaGachaTicket:
+            return Color(red: 0.43, green: 0.49, blue: 0.92)
+        case .godGachaTicket:
+            return Color(red: 1.0, green: 0.84, blue: 0.22)
+        case .constellationGachaTicket:
+            return Color(hex: "6A2CFF")
+        case .staminaPotion:
+            return Color(red: 0.24, green: 0.74, blue: 0.48)
+        case .boostTicket:
+            return Color(red: 1.0, green: 0.45, blue: 0.24)
+        }
+    }
+
+    var userFieldKey: String {
+        rawValue
+    }
+}
+
+struct InventoryReward: Codable, Hashable {
+    let type: InventoryItemType
+    let amount: Int
+
+    var displayText: String {
+        "\(type.displayName) x\(amount)"
+    }
+}
+
+extension InventoryReward {
+    static func merged(_ rewards: [InventoryReward]) -> [InventoryReward] {
+        let totals = rewards.reduce(into: [InventoryItemType: Int]()) { partialResult, reward in
+            partialResult[reward.type, default: 0] += reward.amount
+        }
+
+        return InventoryItemType.allCases.compactMap { type in
+            guard let amount = totals[type], amount > 0 else { return nil }
+            return InventoryReward(type: type, amount: amount)
+        }
+    }
+}
+
+struct InventoryItemArtworkView: View {
+    let type: InventoryItemType
+    let width: CGFloat
+    let height: CGFloat
+    var cornerRadius: CGFloat = 12
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .fill(type.accentColor.opacity(0.12))
+
+            if let assetImageName = type.assetImageName {
+                Image(assetImageName)
+                    .resizable()
+                    .scaledToFit()
+                    .padding(6)
+            } else {
+                Image(systemName: type.systemImageName)
+                    .font(.system(size: min(width, height) * 0.42, weight: .bold))
+                    .foregroundColor(type.accentColor)
+            }
+        }
+        .frame(width: width, height: height)
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .stroke(type.accentColor.opacity(0.25), lineWidth: 1)
+        )
+    }
+}
+
+enum QuizLevel: CaseIterable {
     case beginner
     case beginnerStory1
     case beginnerStory2
@@ -224,13 +378,6 @@ enum QuizLevel {
     }
 }
 
-extension QuizLevel: CaseIterable {
-    static var allCases: [QuizLevel] {
-        return [.sansu1]
-        // 除外したいケースをここで除外
-    }
-}
-
 struct Avatar: Equatable {
     var name: String
     var attack: Int
@@ -252,8 +399,9 @@ class User: Identifiable {
     var adminFlag: Int
     var rankMatchPoint: Int
     var rank: Int
+    var loginCount: Int
 
-    init(id: String, userName: String, level: Int, experience: Int, avatars: [[String: Any]], userMoney: Int, userHp: Int, userAttack: Int, userFlag: Int, adminFlag: Int,rankMatchPoint: Int,rank: Int) {
+    init(id: String, userName: String, level: Int, experience: Int, avatars: [[String: Any]], userMoney: Int, userHp: Int, userAttack: Int, userFlag: Int, adminFlag: Int,rankMatchPoint: Int,rank: Int, loginCount: Int = 0) {
         self.id = id
         self.userName = userName
         self.level = level
@@ -266,6 +414,7 @@ class User: Identifiable {
         self.adminFlag = adminFlag
         self.rankMatchPoint = rankMatchPoint
         self.rank = rank
+        self.loginCount = loginCount
     }
 }
 
@@ -291,12 +440,54 @@ class AuthManager: ObservableObject {
     @Published var loginCount: Int = 0
     @Published var loginBonus: Int = 0
     @Published var userStoryCsFlag: Int = 0
+    @Published var normalGachaTicketCount: Int = 0
+    @Published var rareGachaTicketCount: Int = 0
+    @Published var mekaGachaTicketCount: Int = 0
+    @Published var godGachaTicketCount: Int = 0
+    @Published var constellationGachaTicketCount: Int = 0
+    @Published var staminaPotionCount: Int = 0
+    @Published var boostTicketCount: Int = 0
+    @Published var usedAvatars: [Avatar] = []
+    private var authStateListenerHandle: AuthStateDidChangeListenerHandle?
+    private let rewardBoostDuration: TimeInterval = 3600
+    private let rewardBoostDateKey = "rewardAcquiredDate"
+    private let rewardBoostActivatedAtKey = "rewardBoostActivatedAt"
+    private var rewardBoostResetWorkItem: DispatchWorkItem?
+    private let lightweightFetchCooldown: TimeInterval = 12
+    private let loginCountFetchCooldown: TimeInterval = 20
+    private let avatarFetchCooldown: TimeInterval = 20
+    private var hasFetchedExperienceAndLevel = false
+    private var lastExperienceFetchAt: Date?
+    private var isFetchingExperienceAndLevel = false
+    private var pendingExperienceFetchCompletions: [() -> Void] = []
+    private var hasFetchedInventory = false
+    private var lastInventoryFetchAt: Date?
+    private var isFetchingInventory = false
+    private var pendingInventoryFetchCompletions: [(Bool) -> Void] = []
+    private var hasFetchedRewardFlag = false
+    private var lastRewardFlagFetchAt: Date?
+    private var isFetchingRewardFlag = false
+    private var pendingRewardFlagFetchCompletions: [(Int) -> Void] = []
+    private var hasFetchedLoginCount = false
+    private var lastLoginCountFetchAt: Date?
+    private var isFetchingLoginCount = false
+    private var pendingLoginCountFetchCompletions: [(Int) -> Void] = []
+    private var hasFetchedAvatars = false
+    private var lastAvatarFetchAt: Date?
+    private var isFetchingAvatars = false
+    private var pendingAvatarFetchCompletions: [() -> Void] = []
     
     init() {
         user = Auth.auth().currentUser
-//        if user == nil {
-//            anonymousSignIn(){}
-//        }
+        authStateListenerHandle = Auth.auth().addStateDidChangeListener { [weak self] _, user in
+            DispatchQueue.main.async {
+                let previousUserId = self?.user?.uid
+                self?.user = user
+                if previousUserId != user?.uid, user != nil {
+                    self?.onLoginCompleted?()
+                }
+            }
+        }
     }
     
     static let shared: AuthManager = {
@@ -307,6 +498,12 @@ class AuthManager: ObservableObject {
     var onLoginCompleted: (() -> Void)?
     var currentUserId: String? {
         return user?.uid
+    }
+    
+    deinit {
+        if let authStateListenerHandle {
+            Auth.auth().removeStateDidChangeListener(authStateListenerHandle)
+        }
     }
     
     func addAvatarToUser(avatar: Avatar, completion: @escaping (Bool) -> Void) {
@@ -347,8 +544,17 @@ class AuthManager: ObservableObject {
                     count += 1
                     currentData.value = count
                     return TransactionResult.success(withValue: currentData)
+                } andCompletionBlock: { error, committed, _ in
+                    DispatchQueue.main.async {
+                        guard error == nil, committed else {
+                            completion(false)
+                            return
+                        }
+                        self.hasFetchedAvatars = false
+                        self.lastAvatarFetchAt = nil
+                        completion(true)
+                    }
                 }
-                completion(true) // トランザクションが完了した場合、trueを返す
             } else {
                 // 新しいアバターをデータベースに追加
                 let avatarRef = avatarsRef.childByAutoId()
@@ -366,20 +572,108 @@ class AuthManager: ObservableObject {
                         return
                     }
                     print("Successfully added avatar to database.")
+                    self.hasFetchedAvatars = false
+                    self.lastAvatarFetchAt = nil
                     completion(true) // 保存に成功した場合、trueを返す
                 }
             }
         }
+    }
+
+    /// ガチャの支払いとアバター付与を一つの transaction で確定する。
+    /// coinCost == 0 かつ ticketType == nil は開発者モードなどの無料抽選。
+    func commitGachaResult(
+        avatar: Avatar,
+        coinCost: Int = 0,
+        ticketType: InventoryItemType? = nil,
+        completion: @escaping (Bool) -> Void
+    ) {
+        guard coinCost >= 0, let userId = currentUserId else {
+            completion(false)
+            return
+        }
+
+        let userRef = Database.database().reference().child("users").child(userId)
+        let newAvatarKey = userRef.child("avatars").childByAutoId().key ?? UUID().uuidString
+
+        userRef.observeSingleEvent(of: .value, with: { snapshot in
+            guard snapshot.exists() else {
+                DispatchQueue.main.async { completion(false) }
+                return
+            }
+
+            userRef.runTransactionBlock { currentData in
+                guard var userData = currentData.value as? [String: Any] else {
+                    return TransactionResult.abort()
+                }
+
+                if coinCost > 0 {
+                    let currentMoney = self.intValue(from: userData["userMoney"])
+                    guard currentMoney >= coinCost else { return TransactionResult.abort() }
+                    userData["userMoney"] = currentMoney - coinCost
+                }
+
+                if let ticketType {
+                    let currentCount = self.intValue(from: userData[ticketType.userFieldKey])
+                    guard currentCount > 0 else { return TransactionResult.abort() }
+                    userData[ticketType.userFieldKey] = currentCount - 1
+                }
+
+                var avatars = userData["avatars"] as? [String: Any] ?? [:]
+                if let existingEntry = avatars.first(where: { _, value in
+                    (value as? [String: Any])?["name"] as? String == avatar.name
+                }), var existingAvatar = existingEntry.value as? [String: Any] {
+                    existingAvatar["count"] = self.intValue(from: existingAvatar["count"]) + 1
+                    avatars[existingEntry.key] = existingAvatar
+                } else {
+                    avatars[newAvatarKey] = [
+                        "name": avatar.name,
+                        "attack": avatar.attack,
+                        "health": avatar.health,
+                        "usedFlag": avatar.usedFlag,
+                        "count": 1
+                    ]
+                }
+                userData["avatars"] = avatars
+                currentData.value = userData
+                return TransactionResult.success(withValue: currentData)
+            } andCompletionBlock: { error, committed, snapshot in
+                DispatchQueue.main.async {
+                    guard error == nil,
+                          committed,
+                          let userData = snapshot?.value as? [String: Any] else {
+                        completion(false)
+                        return
+                    }
+
+                    self.money = self.intValue(from: userData["userMoney"])
+                    if let ticketType {
+                        self.setInventoryCount(self.intValue(from: userData[ticketType.userFieldKey]), for: ticketType)
+                    }
+                    self.hasFetchedAvatars = false
+                    self.lastAvatarFetchAt = nil
+                    completion(true)
+                }
+            }
+        }, withCancel: { _ in
+            DispatchQueue.main.async { completion(false) }
+        })
     }
     
     func anonymousSignIn(completion: @escaping () -> Void) {
         Auth.auth().signInAnonymously { result, error in
             if let error = error {
                 print("Error: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    completion()
+                }
             } else if let result = result {
                 print("Signed in anonymously with user ID: \(result.user.uid)")
                 self.user = result.user
                 self.onLoginCompleted?()
+                DispatchQueue.main.async {
+                    completion()
+                }
             }
         }
     }
@@ -529,7 +823,15 @@ class AuthManager: ObservableObject {
             "userHp": 100,
             "userAttack": 20,
             "tutorialNum": 0,
-            "userFlag": 0
+            "userFlag": 0,
+            "loginCount": 0,
+            InventoryItemType.normalGachaTicket.userFieldKey: 0,
+            InventoryItemType.rareGachaTicket.userFieldKey: 0,
+            InventoryItemType.mekaGachaTicket.userFieldKey: 0,
+            InventoryItemType.godGachaTicket.userFieldKey: 0,
+            InventoryItemType.constellationGachaTicket.userFieldKey: 0,
+            InventoryItemType.staminaPotion.userFieldKey: 0,
+            InventoryItemType.boostTicket.userFieldKey: 0
         ]
 
         // ユーザーデータを保存
@@ -564,35 +866,35 @@ class AuthManager: ObservableObject {
     }
 
     func fetchUserInfo(completion: @escaping (String?, [[String: Any]]?, Int?, Int?, Int?, Int?) -> Void) {
-        print("fetchUserInfo0")
-            guard let userId = user?.uid else {
-                print("fetchUserInfo1")
-                completion(nil, nil, nil, nil, nil, nil)
+        guard let userId = user?.uid else {
+            completion(nil, nil, nil, nil, nil, nil)
+            return
+        }
+
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.observeSingleEvent(of: .value) { snapshot in
+            guard
+                let data = snapshot.value as? [String: Any],
+                let userName = data["userName"] as? String,
+                let avatarsData = data["avatars"] as? [String: [String: Any]],
+                let userMoney = data["userMoney"] as? Int,
+                let userHp = data["userHp"] as? Int,
+                let userAttack = data["userAttack"] as? Int,
+                let tutorialNum = data["tutorialNum"] as? Int
+            else {
+                DispatchQueue.main.async {
+                    completion(nil, nil, nil, nil, nil, nil)
+                }
                 return
             }
-            let userRef = Database.database().reference().child("users").child(userId)
-            userRef.observeSingleEvent(of: .value) { (snapshot) in
-                if let data = snapshot.value as? [String: Any],
-                   let userName = data["userName"] as? String,
-                   let avatarsData = data["avatars"] as? [String:[String: Any]],
-                   let userMoney = data["userMoney"] as? Int,
-                   let userHp = data["userHp"] as? Int,
-                   let userAttack = data["userAttack"] as? Int,
-                   let tutorialNum = data["tutorialNum"] as? Int {  // 追加
-                    var filteredAvatars: [[String: Any]] = []
-                    for (_, avatarData) in avatarsData {
-                        if avatarData["usedFlag"] as? Int == 1 {
-                            print("fetchUserInfo2   :\(data)")
-                            filteredAvatars.append(avatarData)
-                        }
-                    }
-                    print("fetchUserInfo userName1:\(userName)")
-                    completion(userName, filteredAvatars, userMoney, userHp, userAttack, tutorialNum)  // 追加
-                } else {
-                    completion(nil, nil, nil, nil, nil, nil)  // 追加
-                }
+
+            let filteredAvatars = avatarsData.values.filter { $0["usedFlag"] as? Int == 1 }
+
+            DispatchQueue.main.async {
+                completion(userName, filteredAvatars, userMoney, userHp, userAttack, tutorialNum)
             }
         }
+    }
     
     func fetchCurrentUserAdminFlag() {
         guard let userId = user?.uid else {
@@ -665,14 +967,19 @@ class AuthManager: ObservableObject {
         }
     }
     
-    func fetchPreFlag() {
-        guard let userId = user?.uid else { return }
+    func fetchPreFlag(completion: ((Int) -> Void)? = nil) {
+        guard let userId = user?.uid else {
+            completion?(0)
+            return
+        }
         
         let userRef = Database.database().reference().child("users").child(userId)
         userRef.observeSingleEvent(of: .value) { (snapshot) in
             if let data = snapshot.value as? [String: Any] {
                 self.userPreFlag = data["userPreFlag"] as? Int ?? 0
-                print("self.userPreFlag:\(self.userPreFlag)")
+            }
+            DispatchQueue.main.async {
+                completion?(self.userPreFlag)
             }
         }
     }
@@ -709,8 +1016,23 @@ class AuthManager: ObservableObject {
         }
     }
     
-    func fetchAvatars(completion: @escaping () -> Void) {
-        guard let userId = user?.uid else { return }
+    func fetchAvatars(force: Bool = false, completion: @escaping () -> Void) {
+        guard let userId = user?.uid else {
+            completion()
+            return
+        }
+
+        if !force, shouldUseCachedFetch(lastFetchedAt: lastAvatarFetchAt, hasFetched: hasFetchedAvatars, cooldown: avatarFetchCooldown) {
+            completion()
+            return
+        }
+
+        pendingAvatarFetchCompletions.append(completion)
+        if isFetchingAvatars {
+            return
+        }
+
+        isFetchingAvatars = true
         let userRef = Database.database().reference().child("users").child(userId).child("avatars")
         userRef.observeSingleEvent(of: .value) { (snapshot: DataSnapshot) in
             var newAvatars: [Avatar] = []
@@ -728,9 +1050,10 @@ class AuthManager: ObservableObject {
             }
             DispatchQueue.main.async {
                 self.avatars = newAvatars
+                self.hasFetchedAvatars = true
+                self.lastAvatarFetchAt = Date()
+                self.finishAvatarFetch()
             }
-
-            completion() // データがフェッチされた後にクロージャを呼び出す
         }
     }
     
@@ -770,7 +1093,9 @@ class AuthManager: ObservableObject {
                         completion(false) // 更新に失敗したので、falseを返します。
                     } else {
                         print("Successfully updated avatar.")
-                        self.fetchAvatars {
+                        self.hasFetchedAvatars = false
+                        self.lastAvatarFetchAt = nil
+                        self.fetchAvatars(force: true) {
                             completion(true) // 更新に成功したので、trueを返します。
                         }
                     }
@@ -950,6 +1275,7 @@ class AuthManager: ObservableObject {
                 var currentLevel = data["level"] as? Int ?? 1
 
                 currentExperience += points
+                GuildManager.shared.recordExperience(points)
 
                 while currentExperience >= currentLevel * 100 {
                     currentExperience -= currentLevel * 100
@@ -1008,19 +1334,85 @@ class AuthManager: ObservableObject {
             }
         }
     }
+
+    private func shouldUseCachedFetch(lastFetchedAt: Date?, hasFetched: Bool, cooldown: TimeInterval) -> Bool {
+        guard hasFetched, let lastFetchedAt else { return false }
+        return Date().timeIntervalSince(lastFetchedAt) < cooldown
+    }
+
+    private func finishExperienceFetch() {
+        isFetchingExperienceAndLevel = false
+        let completions = pendingExperienceFetchCompletions
+        pendingExperienceFetchCompletions.removeAll()
+        completions.forEach { $0() }
+    }
+
+    private func finishInventoryFetch(success: Bool) {
+        isFetchingInventory = false
+        let completions = pendingInventoryFetchCompletions
+        pendingInventoryFetchCompletions.removeAll()
+        completions.forEach { $0(success) }
+    }
+
+    private func finishRewardFlagFetch() {
+        isFetchingRewardFlag = false
+        let completions = pendingRewardFlagFetchCompletions
+        pendingRewardFlagFetchCompletions.removeAll()
+        completions.forEach { $0(rewardFlag) }
+    }
+
+    private func finishLoginCountFetch(count: Int) {
+        isFetchingLoginCount = false
+        let completions = pendingLoginCountFetchCompletions
+        pendingLoginCountFetchCompletions.removeAll()
+        completions.forEach { $0(count) }
+    }
+
+    private func finishAvatarFetch() {
+        isFetchingAvatars = false
+        let completions = pendingAvatarFetchCompletions
+        pendingAvatarFetchCompletions.removeAll()
+        completions.forEach { $0() }
+    }
     
     func calculateLevel(experience: Int) -> Int {
         return experience / 100 + 1
     }
 
-    func fetchUserExperienceAndLevel() {
-        guard let userId = user?.uid else { return }
-        
+    func fetchUserExperienceAndLevel(force: Bool = false, completion: (() -> Void)? = nil) {
+        guard let userId = user?.uid else {
+            completion?()
+            return
+        }
+
+        if !force, shouldUseCachedFetch(lastFetchedAt: lastExperienceFetchAt, hasFetched: hasFetchedExperienceAndLevel, cooldown: lightweightFetchCooldown) {
+            completion?()
+            return
+        }
+
+        if let completion {
+            pendingExperienceFetchCompletions.append(completion)
+        }
+
+        if isFetchingExperienceAndLevel {
+            return
+        }
+
+        isFetchingExperienceAndLevel = true
         let userRef = Database.database().reference().child("users").child(userId)
         userRef.observeSingleEvent(of: .value) { (snapshot) in
-            if let data = snapshot.value as? [String: Any] {
-                self.experience = data["experience"] as? Int ?? 0
-                self.level = data["level"] as? Int ?? 1
+            let data = snapshot.value as? [String: Any]
+            DispatchQueue.main.async {
+                if let data {
+                    self.experience = data["experience"] as? Int ?? 0
+                    self.level = data["level"] as? Int ?? 1
+                } else {
+                    self.experience = 0
+                    self.level = 1
+                }
+                self.hasFetchedExperienceAndLevel = true
+                self.lastExperienceFetchAt = Date()
+                self.finishExperienceFetch()
             }
         }
     }
@@ -1055,15 +1447,523 @@ class AuthManager: ObservableObject {
     }
 
     
-    func fetchUserRewardFlag() {
-        guard let userId = user?.uid else { return }
-        
+    func fetchUserRewardFlag(force: Bool = false, completion: ((Int) -> Void)? = nil) {
+        guard let userId = user?.uid else {
+            completion?(1)
+            return
+        }
+
+        if !force, shouldUseCachedFetch(lastFetchedAt: lastRewardFlagFetchAt, hasFetched: hasFetchedRewardFlag, cooldown: lightweightFetchCooldown) {
+            completion?(rewardFlag)
+            return
+        }
+
+        if let completion {
+            pendingRewardFlagFetchCompletions.append(completion)
+        }
+
+        if isFetchingRewardFlag {
+            return
+        }
+
+        isFetchingRewardFlag = true
         let userRef = Database.database().reference().child("users").child(userId)
         userRef.observeSingleEvent(of: .value) { (snapshot) in
-            if let data = snapshot.value as? [String: Any] {
-                self.rewardFlag = data["rewardFlag"] as? Int ?? 1
+            DispatchQueue.main.async {
+                if let data = snapshot.value as? [String: Any] {
+                    self.rewardFlag = data["rewardFlag"] as? Int ?? 1
+                } else {
+                    self.rewardFlag = 1
+                }
+                self.hasFetchedRewardFlag = true
+                self.lastRewardFlagFetchAt = Date()
+                self.finishRewardFlagFetch()
             }
         }
+    }
+
+    func inventoryCount(for type: InventoryItemType) -> Int {
+        switch type {
+        case .normalGachaTicket:
+            return normalGachaTicketCount
+        case .rareGachaTicket:
+            return rareGachaTicketCount
+        case .mekaGachaTicket:
+            return mekaGachaTicketCount
+        case .godGachaTicket:
+            return godGachaTicketCount
+        case .constellationGachaTicket:
+            return constellationGachaTicketCount
+        case .staminaPotion:
+            return staminaPotionCount
+        case .boostTicket:
+            return boostTicketCount
+        }
+    }
+
+    private func setInventoryCount(_ count: Int, for type: InventoryItemType) {
+        let safeCount = max(0, count)
+        switch type {
+        case .normalGachaTicket:
+            normalGachaTicketCount = safeCount
+        case .rareGachaTicket:
+            rareGachaTicketCount = safeCount
+        case .mekaGachaTicket:
+            mekaGachaTicketCount = safeCount
+        case .godGachaTicket:
+            godGachaTicketCount = safeCount
+        case .constellationGachaTicket:
+            constellationGachaTicketCount = safeCount
+        case .staminaPotion:
+            staminaPotionCount = safeCount
+        case .boostTicket:
+            boostTicketCount = safeCount
+        }
+        hasFetchedInventory = true
+        lastInventoryFetchAt = Date()
+    }
+
+    private func intValue(from value: Any?) -> Int {
+        if let intValue = value as? Int {
+            return intValue
+        }
+        if let numberValue = value as? NSNumber {
+            return numberValue.intValue
+        }
+        if let doubleValue = value as? Double {
+            return Int(doubleValue)
+        }
+        if let stringValue = value as? String, let intValue = Int(stringValue) {
+            return intValue
+        }
+        return 0
+    }
+
+    private func timeIntervalValue(from value: Any?) -> TimeInterval? {
+        if let doubleValue = value as? Double {
+            return doubleValue
+        }
+        if let intValue = value as? Int {
+            return TimeInterval(intValue)
+        }
+        if let numberValue = value as? NSNumber {
+            return numberValue.doubleValue
+        }
+        if let stringValue = value as? String, let doubleValue = Double(stringValue) {
+            return doubleValue
+        }
+        return nil
+    }
+
+    func fetchInventory(force: Bool = false, completion: ((Bool) -> Void)? = nil) {
+        guard let userId = currentUserId else {
+            completion?(false)
+            return
+        }
+
+        if !force, shouldUseCachedFetch(lastFetchedAt: lastInventoryFetchAt, hasFetched: hasFetchedInventory, cooldown: lightweightFetchCooldown) {
+            completion?(true)
+            return
+        }
+
+        if let completion {
+            pendingInventoryFetchCompletions.append(completion)
+        }
+
+        if isFetchingInventory {
+            return
+        }
+
+        isFetchingInventory = true
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.observeSingleEvent(of: .value) { snapshot in
+            let data = snapshot.value as? [String: Any] ?? [:]
+            DispatchQueue.main.async {
+                self.normalGachaTicketCount = self.intValue(from: data[InventoryItemType.normalGachaTicket.userFieldKey])
+                self.rareGachaTicketCount = self.intValue(from: data[InventoryItemType.rareGachaTicket.userFieldKey])
+                self.mekaGachaTicketCount = self.intValue(from: data[InventoryItemType.mekaGachaTicket.userFieldKey])
+                self.godGachaTicketCount = self.intValue(from: data[InventoryItemType.godGachaTicket.userFieldKey])
+                self.constellationGachaTicketCount = self.intValue(from: data[InventoryItemType.constellationGachaTicket.userFieldKey])
+                self.staminaPotionCount = self.intValue(from: data[InventoryItemType.staminaPotion.userFieldKey])
+                self.boostTicketCount = self.intValue(from: data[InventoryItemType.boostTicket.userFieldKey])
+                self.hasFetchedInventory = true
+                self.lastInventoryFetchAt = Date()
+                self.finishInventoryFetch(success: true)
+            }
+        }
+    }
+
+    func addItem(_ type: InventoryItemType, amount: Int = 1, completion: ((Bool) -> Void)? = nil) {
+        guard amount > 0 else {
+            completion?(false)
+            return
+        }
+        guard let userId = currentUserId else {
+            completion?(false)
+            return
+        }
+
+        let itemRef = Database.database().reference()
+            .child("users")
+            .child(userId)
+            .child(type.userFieldKey)
+
+        itemRef.runTransactionBlock { currentData in
+            let current = self.intValue(from: currentData.value)
+            currentData.value = current + amount
+            return TransactionResult.success(withValue: currentData)
+        } andCompletionBlock: { error, committed, snapshot in
+            guard error == nil, committed else {
+                DispatchQueue.main.async {
+                    completion?(false)
+                }
+                return
+            }
+            DispatchQueue.main.async {
+                self.setInventoryCount(self.intValue(from: snapshot?.value), for: type)
+                completion?(true)
+            }
+        }
+    }
+
+    func addItems(_ rewards: [InventoryReward], completion: ((Bool) -> Void)? = nil) {
+        let validRewards = InventoryReward.merged(rewards.filter { $0.amount > 0 })
+        guard !validRewards.isEmpty else {
+            completion?(true)
+            return
+        }
+
+        var grantedRewards: [InventoryReward] = []
+        var nextIndex = 0
+
+        func rollbackAndComplete() {
+            guard !grantedRewards.isEmpty else {
+                completion?(false)
+                return
+            }
+
+            let group = DispatchGroup()
+            for reward in grantedRewards {
+                group.enter()
+                consumeItem(reward.type, amount: reward.amount) { _ in
+                    group.leave()
+                }
+            }
+
+            group.notify(queue: .main) {
+                completion?(false)
+            }
+        }
+
+        func addNextReward() {
+            guard nextIndex < validRewards.count else {
+                completion?(true)
+                return
+            }
+
+            let reward = validRewards[nextIndex]
+            nextIndex += 1
+            addItem(reward.type, amount: reward.amount) { success in
+                guard success else {
+                    rollbackAndComplete()
+                    return
+                }
+
+                grantedRewards.append(reward)
+                addNextReward()
+            }
+        }
+
+        addNextReward()
+    }
+
+    func fetchUsedAvatars(completion: @escaping ([Avatar]) -> Void) {
+        guard let userId = currentUserId else {
+            DispatchQueue.main.async {
+                self.usedAvatars = []
+            }
+            completion([])
+            return
+        }
+
+        let avatarsRef = Database.database().reference()
+            .child("users")
+            .child(userId)
+            .child("avatars")
+
+        avatarsRef.observeSingleEvent(of: .value) { snapshot in
+            var fetchedUsedAvatars: [Avatar] = []
+
+            for child in snapshot.children {
+                guard
+                    let childSnapshot = child as? DataSnapshot,
+                    let avatarData = childSnapshot.value as? [String: Any],
+                    let name = avatarData["name"] as? String,
+                    let attack = avatarData["attack"] as? Int,
+                    let health = avatarData["health"] as? Int,
+                    let usedFlag = avatarData["usedFlag"] as? Int,
+                    let count = avatarData["count"] as? Int
+                else {
+                    continue
+                }
+
+                let avatar = Avatar(name: name, attack: attack, health: health, usedFlag: usedFlag, count: count)
+                if usedFlag == 1 {
+                    fetchedUsedAvatars.append(avatar)
+                }
+            }
+
+            DispatchQueue.main.async {
+                self.usedAvatars = fetchedUsedAvatars
+            }
+            completion(fetchedUsedAvatars)
+        }
+    }
+
+    func consumeItem(_ type: InventoryItemType, amount: Int = 1, completion: @escaping (Bool) -> Void) {
+        guard amount > 0 else {
+            completion(false)
+            return
+        }
+        guard let userId = currentUserId else {
+            completion(false)
+            return
+        }
+
+        let itemRef = Database.database().reference()
+            .child("users")
+            .child(userId)
+            .child(type.userFieldKey)
+
+        itemRef.runTransactionBlock { currentData in
+            let current = self.intValue(from: currentData.value)
+            guard current >= amount else {
+                return TransactionResult.abort()
+            }
+            currentData.value = current - amount
+            return TransactionResult.success(withValue: currentData)
+        } andCompletionBlock: { error, committed, snapshot in
+            DispatchQueue.main.async {
+                guard error == nil, committed else {
+                    completion(false)
+                    return
+                }
+                self.setInventoryCount(self.intValue(from: snapshot?.value), for: type)
+                completion(true)
+            }
+        }
+    }
+
+    func useStaminaPotion(recoveryAmount: Int = 30, completion: @escaping (Bool) -> Void) {
+        guard !PositionViewModel.shared.isStaminaUnlimited else {
+            completion(false)
+            return
+        }
+        guard PositionViewModel.shared.stamina < PositionViewModel.Constants.maxStamina else {
+            completion(false)
+            return
+        }
+
+        consumeItem(.staminaPotion) { success in
+            guard success else {
+                completion(false)
+                return
+            }
+            PositionViewModel.shared.recoverStamina(by: recoveryAmount) { recoverySuccess in
+                guard recoverySuccess else {
+                    self.addItem(.staminaPotion) { _ in
+                        completion(false)
+                    }
+                    return
+                }
+                completion(true)
+            }
+        }
+    }
+
+    func useBoostTicket(completion: @escaping (Bool) -> Void) {
+        resolveRewardBoostState { isActive in
+            guard !isActive else {
+                completion(false)
+                return
+            }
+
+            self.consumeItem(.boostTicket) { success in
+                guard success else {
+                    completion(false)
+                    return
+                }
+
+                self.activateOneHourBoost { boostSuccess in
+                    guard boostSuccess else {
+                        self.addItem(.boostTicket) { _ in
+                            completion(false)
+                        }
+                        return
+                    }
+                    completion(true)
+                }
+            }
+        }
+    }
+
+    func activateOneHourBoost(completion: @escaping (Bool) -> Void) {
+        guard let userId = currentUserId else {
+            completion(false)
+            return
+        }
+
+        let activatedAt = Date()
+        let userRef = Database.database().reference().child("users").child(userId)
+
+        let updates: [String: Any] = [
+            "rewardFlag": 2,
+            rewardBoostActivatedAtKey: activatedAt.timeIntervalSince1970
+        ]
+
+        userRef.updateChildValues(updates) { error, _ in
+            DispatchQueue.main.async {
+                guard error == nil else {
+                    completion(false)
+                    return
+                }
+
+                self.rewardFlag = 2
+                self.hasFetchedRewardFlag = true
+                self.lastRewardFlagFetchAt = Date()
+                UserDefaults.standard.set(activatedAt, forKey: self.rewardBoostDateKey)
+                self.scheduleRewardBoostReset(from: activatedAt)
+                completion(true)
+            }
+        }
+    }
+
+    func syncRewardBoostState() {
+        guard currentUserId != nil else {
+            syncLocalRewardBoostState()
+            return
+        }
+
+        resolveRewardBoostState { _ in }
+    }
+
+    private func syncLocalRewardBoostState() {
+        guard let activatedAt = UserDefaults.standard.object(forKey: rewardBoostDateKey) as? Date else {
+            rewardBoostResetWorkItem?.cancel()
+            return
+        }
+
+        let elapsed = Date().timeIntervalSince(activatedAt)
+        guard elapsed < rewardBoostDuration else {
+            rewardBoostResetWorkItem?.cancel()
+            rewardBoostResetWorkItem = nil
+            UserDefaults.standard.removeObject(forKey: rewardBoostDateKey)
+            if let userId = currentUserId, rewardFlag != 1 {
+                updateRewardFlag(userId: userId, userFlag: 1)
+            }
+            DispatchQueue.main.async {
+                self.rewardFlag = 1
+                self.hasFetchedRewardFlag = true
+                self.lastRewardFlagFetchAt = Date()
+            }
+            return
+        }
+
+        DispatchQueue.main.async {
+            self.rewardFlag = max(self.rewardFlag, 2)
+            self.hasFetchedRewardFlag = true
+            self.lastRewardFlagFetchAt = Date()
+        }
+        scheduleRewardBoostReset(from: activatedAt)
+    }
+
+    private func resolveRewardBoostState(completion: @escaping (Bool) -> Void) {
+        guard let userId = currentUserId else {
+            syncLocalRewardBoostState()
+            completion(rewardFlag >= 2)
+            return
+        }
+
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.observeSingleEvent(of: .value) { snapshot in
+            let data = snapshot.value as? [String: Any] ?? [:]
+            let fetchedRewardFlag = self.intValue(from: data["rewardFlag"])
+            let remoteActivatedAt = self.timeIntervalValue(from: data[self.rewardBoostActivatedAtKey]).map {
+                Date(timeIntervalSince1970: $0)
+            }
+            let localActivatedAt = UserDefaults.standard.object(forKey: self.rewardBoostDateKey) as? Date
+            let activatedAt = remoteActivatedAt ?? localActivatedAt
+
+            DispatchQueue.main.async {
+                self.rewardFlag = fetchedRewardFlag >= 2 ? 2 : 1
+                self.hasFetchedRewardFlag = true
+                self.lastRewardFlagFetchAt = Date()
+
+                guard fetchedRewardFlag >= 2 else {
+                    self.rewardBoostResetWorkItem?.cancel()
+                    self.rewardBoostResetWorkItem = nil
+                    UserDefaults.standard.removeObject(forKey: self.rewardBoostDateKey)
+                    completion(false)
+                    return
+                }
+
+                guard let activatedAt else {
+                    self.expireRewardBoost(userRef: userRef)
+                    completion(false)
+                    return
+                }
+
+                let elapsed = Date().timeIntervalSince(activatedAt)
+                guard elapsed < self.rewardBoostDuration else {
+                    self.expireRewardBoost(userRef: userRef)
+                    completion(false)
+                    return
+                }
+
+                UserDefaults.standard.set(activatedAt, forKey: self.rewardBoostDateKey)
+                self.rewardFlag = 2
+                self.scheduleRewardBoostReset(from: activatedAt)
+                completion(true)
+            }
+        }
+    }
+
+    private func expireRewardBoost(userRef: DatabaseReference) {
+        rewardBoostResetWorkItem?.cancel()
+        rewardBoostResetWorkItem = nil
+        rewardFlag = 1
+        hasFetchedRewardFlag = true
+        lastRewardFlagFetchAt = Date()
+        UserDefaults.standard.removeObject(forKey: rewardBoostDateKey)
+        userRef.updateChildValues([
+            "rewardFlag": 1,
+            rewardBoostActivatedAtKey: NSNull()
+        ])
+    }
+
+    private func scheduleRewardBoostReset(from activatedAt: Date) {
+        rewardBoostResetWorkItem?.cancel()
+
+        let remaining = max(0, rewardBoostDuration - Date().timeIntervalSince(activatedAt))
+        let workItem = DispatchWorkItem { [weak self] in
+            guard let self = self else { return }
+            UserDefaults.standard.removeObject(forKey: self.rewardBoostDateKey)
+            if let userId = self.currentUserId {
+                let userRef = Database.database().reference().child("users").child(userId)
+                userRef.updateChildValues([
+                    "rewardFlag": 1,
+                    self.rewardBoostActivatedAtKey: NSNull()
+                ])
+            }
+            DispatchQueue.main.async {
+                self.rewardFlag = 1
+                self.hasFetchedRewardFlag = true
+                self.lastRewardFlagFetchAt = Date()
+            }
+        }
+
+        rewardBoostResetWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + remaining, execute: workItem)
     }
     
     func fetchUserFlag() {
@@ -1080,40 +1980,186 @@ class AuthManager: ObservableObject {
         }
     }
     
-    func fetchUserCsFlag() {
-        guard let userId = user?.uid else { return }
+    func fetchUserCsFlag(completion: ((Int) -> Void)? = nil) {
+        guard let userId = user?.uid else {
+            completion?(0)
+            return
+        }
         
         let userRef = Database.database().reference().child("users").child(userId)
         userRef.observeSingleEvent(of: .value) { (snapshot) in
             if let data = snapshot.value as? [String: Any] {
-//                print("data:\(data)")
-//                self.experience = data["experience"] as? Int ?? 0
                 self.userCsFlag = data["userCsFlag"] as? Int ?? 0
+            }
+            DispatchQueue.main.async {
+                completion?(self.userCsFlag)
             }
         }
     }
     
-    func addMoney(amount: Int) {
-            guard let userId = user?.uid else { return }
-            
-            let userRef = Database.database().reference().child("users").child(userId)
-            
-            // 現在の所持金を取得
-            userRef.observeSingleEvent(of: .value) { (snapshot) in
-                if let data = snapshot.value as? [String: Any] {
-                    let currentMoney = data["userMoney"] as? Int ?? 0
-                    
-                    // 新しく獲得するお金を加える
-                    let newMoney = currentMoney + amount
-                    
-                    self.money = newMoney
-                    
-                    // 更新された所持金をデータベースに保存
-                    let userData: [String: Any] = ["userMoney": self.money]
-                    userRef.updateChildValues(userData)
+    func addMoney(amount: Int, completion: ((Bool) -> Void)? = nil) {
+        guard amount != 0 else {
+            completion?(true)
+            return
+        }
+        guard let userId = currentUserId else {
+            completion?(false)
+            return
+        }
+
+        let moneyRef = Database.database().reference()
+            .child("users")
+            .child(userId)
+            .child("userMoney")
+
+        moneyRef.runTransactionBlock { currentData in
+            let currentMoney = self.intValue(from: currentData.value)
+            currentData.value = max(0, currentMoney + amount)
+            return TransactionResult.success(withValue: currentData)
+        } andCompletionBlock: { error, committed, snapshot in
+            DispatchQueue.main.async {
+                guard error == nil, committed else {
+                    completion?(false)
+                    return
                 }
+                self.money = self.intValue(from: snapshot?.value)
+                completion?(true)
             }
         }
+    }
+
+    /// StoreKit の消耗型購入を、トランザクションID単位で一度だけ反映する。
+    /// コイン残高と処理済みIDを同じ Firebase transaction で更新するため、
+    /// アプリ中断や Transaction.updates からの再配信でも二重付与されない。
+    func grantPurchasedCoins(
+        transactionId: UInt64,
+        productId: String,
+        amount: Int,
+        completion: @escaping (Bool) -> Void
+    ) {
+        guard amount > 0, let userId = currentUserId else {
+            completion(false)
+            return
+        }
+
+        let userRef = Database.database().reference().child("users").child(userId)
+        let receiptKey = firebaseSafeKey(String(transactionId))
+
+        // Realtime Database transaction が空のローカルキャッシュから始まって
+        // 既存ユーザーデータを上書きしないよう、先にユーザーノードを取得する。
+        userRef.observeSingleEvent(of: .value, with: { snapshot in
+            guard snapshot.exists() else {
+                DispatchQueue.main.async { completion(false) }
+                return
+            }
+
+            userRef.runTransactionBlock { currentData in
+                guard var userData = currentData.value as? [String: Any] else {
+                    return TransactionResult.abort()
+                }
+
+                var receipts = userData["processedCoinTransactions"] as? [String: Any] ?? [:]
+                if receipts[receiptKey] != nil {
+                    return TransactionResult.success(withValue: currentData)
+                }
+
+                let currentMoney = self.intValue(from: userData["userMoney"])
+                userData["userMoney"] = currentMoney + amount
+                receipts[receiptKey] = [
+                    "productId": productId,
+                    "amount": amount,
+                    "processedAt": Int64(Date().timeIntervalSince1970 * 1_000)
+                ]
+                userData["processedCoinTransactions"] = receipts
+                currentData.value = userData
+                return TransactionResult.success(withValue: currentData)
+            } andCompletionBlock: { error, committed, snapshot in
+                DispatchQueue.main.async {
+                    guard error == nil,
+                          committed,
+                          let userData = snapshot?.value as? [String: Any] else {
+                        completion(false)
+                        return
+                    }
+                    self.money = self.intValue(from: userData["userMoney"])
+                    completion(true)
+                }
+            }
+        }, withCancel: { _ in
+            DispatchQueue.main.async { completion(false) }
+        })
+    }
+
+    /// 複数種類のゲーム内報酬を、idempotencyKey ごとに一度だけ付与する。
+    func grantRewardBundle(
+        idempotencyKey: String,
+        coinAmount: Int,
+        itemRewards: [InventoryReward],
+        completion: @escaping (Bool) -> Void
+    ) {
+        guard coinAmount >= 0, let userId = currentUserId else {
+            completion(false)
+            return
+        }
+
+        let rewards = InventoryReward.merged(itemRewards.filter { $0.amount > 0 })
+        let userRef = Database.database().reference().child("users").child(userId)
+        let receiptKey = firebaseSafeKey(idempotencyKey)
+
+        userRef.observeSingleEvent(of: .value, with: { snapshot in
+            guard snapshot.exists() else {
+                DispatchQueue.main.async { completion(false) }
+                return
+            }
+
+            userRef.runTransactionBlock { currentData in
+                guard var userData = currentData.value as? [String: Any] else {
+                    return TransactionResult.abort()
+                }
+
+                var receipts = userData["rewardGrantReceipts"] as? [String: Any] ?? [:]
+                if receipts[receiptKey] != nil {
+                    return TransactionResult.success(withValue: currentData)
+                }
+
+                userData["userMoney"] = self.intValue(from: userData["userMoney"]) + coinAmount
+                for reward in rewards {
+                    userData[reward.type.userFieldKey] = self.intValue(from: userData[reward.type.userFieldKey]) + reward.amount
+                }
+                receipts[receiptKey] = [
+                    "coinAmount": coinAmount,
+                    "processedAt": Int64(Date().timeIntervalSince1970 * 1_000)
+                ]
+                userData["rewardGrantReceipts"] = receipts
+                currentData.value = userData
+                return TransactionResult.success(withValue: currentData)
+            } andCompletionBlock: { error, committed, snapshot in
+                DispatchQueue.main.async {
+                    guard error == nil,
+                          committed,
+                          let userData = snapshot?.value as? [String: Any] else {
+                        completion(false)
+                        return
+                    }
+                    self.money = self.intValue(from: userData["userMoney"])
+                    for reward in rewards {
+                        self.setInventoryCount(self.intValue(from: userData[reward.type.userFieldKey]), for: reward.type)
+                    }
+                    completion(true)
+                }
+            }
+        }, withCancel: { _ in
+            DispatchQueue.main.async { completion(false) }
+        })
+    }
+
+    private func firebaseSafeKey(_ value: String) -> String {
+        Data(value.utf8)
+            .base64EncodedString()
+            .replacingOccurrences(of: "/", with: "_")
+            .replacingOccurrences(of: "+", with: "-")
+            .replacingOccurrences(of: "=", with: "")
+    }
     
     func saveLastClickedDate(userId: String, completion: @escaping (Bool) -> Void) {
             let ref = Database.database().reference().child("users").child(userId)
@@ -1210,61 +2256,34 @@ class AuthManager: ObservableObject {
     }
 
     /// ログインボーナスをユーザーに付与する
-    func grantLoginBonus(amount: Int, completion: @escaping (Bool) -> Void) {
-        addLoginMoney(amount: amount) { success in
-            if success {
-                print("ログインボーナスを付与: +\(amount) コイン")
-                self.saveLastLoginDate { saveSuccess in
-                    if saveSuccess {
-                        completion(true)
-                    } else {
-                        completion(false)
-                    }
-                }
-            } else {
+    func grantLoginBonus(amount: Int, itemRewards: [InventoryReward] = [], completion: @escaping (Bool) -> Void) {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = .current
+        formatter.dateFormat = "yyyy-MM-dd"
+        let grantKey = "loginBonus:\(formatter.string(from: Date()))"
+
+        grantRewardBundle(
+            idempotencyKey: grantKey,
+            coinAmount: amount,
+            itemRewards: itemRewards
+        ) { success in
+            guard success else {
                 completion(false)
+                return
             }
+
+            let bonusSummary = itemRewards.isEmpty
+                ? "\(amount)コイン"
+                : "\(amount)コイン, \(itemRewards.map { $0.displayText }.joined(separator: ", "))"
+            print("ログインボーナスを付与: +\(bonusSummary)")
+            completion(true)
         }
     }
     
     func addLoginMoney(amount: Int, completion: @escaping (Bool) -> Void) {
-        guard let userId = user?.uid else {
-            completion(false)
-            return
-        }
-
-        let userRef = Database.database().reference().child("users").child(userId)
-        
-        // 現在の所持金を取得
-        userRef.observeSingleEvent(of: .value) { (snapshot) in
-            if let data = snapshot.value as? [String: Any],
-               var currentMoney = data["userMoney"] as? Int {
-                // 新しい金額を計算
-                currentMoney += amount
-                
-                // データベースを更新
-                userRef.updateChildValues(["userMoney": currentMoney]) { error, _ in
-                    if let error = error {
-                        print("所持金の更新に失敗: \(error.localizedDescription)")
-                        completion(false)
-                    } else {
-                        print("所持金を正常に更新しました。新しい金額: \(currentMoney)")
-                        completion(true)
-                    }
-                }
-            } else {
-                // userMoney が存在しない場合、新しく設定
-                userRef.updateChildValues(["userMoney": amount]) { error, _ in
-                    if let error = error {
-                        print("所持金の初期設定に失敗: \(error.localizedDescription)")
-                        completion(false)
-                    } else {
-                        print("所持金を初期設定しました。金額: \(amount)")
-                        completion(true)
-                    }
-                }
-            }
-        }
+        addMoney(amount: amount, completion: completion)
     }
 
     /// loginCount を取得する
@@ -1276,8 +2295,47 @@ class AuthManager: ObservableObject {
         let loginCountRef = Database.database().reference().child("users").child(userId).child("loginCount")
         loginCountRef.observeSingleEvent(of: .value) { snapshot in
             let count = snapshot.value as? Int ?? 0
+            DispatchQueue.main.async {
+                self.loginCount = count
+                self.hasFetchedLoginCount = true
+                self.lastLoginCountFetchAt = Date()
+            }
             completion(count)
         }
+    }
+
+    func fetchLoginCount500(force: Bool = false, completion: @escaping (Int) -> Void) {
+        guard let userId = currentUserId else {
+            completion(0)
+            return
+        }
+
+        if !force, shouldUseCachedFetch(lastFetchedAt: lastLoginCountFetchAt, hasFetched: hasFetchedLoginCount, cooldown: loginCountFetchCooldown) {
+            completion(loginCount)
+            return
+        }
+
+        pendingLoginCountFetchCompletions.append(completion)
+        if isFetchingLoginCount {
+            return
+        }
+
+        isFetchingLoginCount = true
+        let ref = Database.database().reference().child("users").child(userId).child("loginCount")
+        ref.observeSingleEvent(of: .value) { snapshot in
+            let count = snapshot.value as? Int ?? 0
+            DispatchQueue.main.async {
+                self.loginCount = count
+                self.hasFetchedLoginCount = true
+                self.lastLoginCountFetchAt = Date()
+                self.finishLoginCountFetch(count: count)
+            }
+            self.awardLoginStreakTitles(for: userId, streakCount: count)
+        }
+    }
+
+    func fetchCurrentLoginStreak(force: Bool = false, completion: @escaping (Int) -> Void) {
+        fetchLoginCount500(force: force, completion: completion)
     }
     /// loginCount をインクリメントする
     func incrementLoginCount(completion: @escaping (Bool) -> Void) {
@@ -1299,6 +2357,8 @@ class AuthManager: ObservableObject {
                 let updatedCount = snapshot?.value as? Int ?? 1
                 DispatchQueue.main.async {
                     self.loginCount = updatedCount
+                    self.hasFetchedLoginCount = true
+                    self.lastLoginCountFetchAt = Date()
                 }
                 print("loginCount を更新しました。新しい値: \(updatedCount)")
                 completion(true)
@@ -1357,9 +2417,51 @@ class AuthManager: ObservableObject {
                 print("loginCount の更新に失敗: \(error.localizedDescription)")
                 completion(false)
             } else {
+                DispatchQueue.main.async {
+                    self.loginCount = newCount
+                    self.hasFetchedLoginCount = true
+                    self.lastLoginCountFetchAt = Date()
+                }
                 print("loginCount を \(newCount) に更新しました。")
                 completion(true)
             }
+        }
+    }
+
+    func updateLoginCount500(to newCount: Int, completion: @escaping (Bool) -> Void) {
+        guard let userId = currentUserId else {
+            completion(false)
+            return
+        }
+
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.updateChildValues(["loginCount": newCount]) { error, _ in
+            if let error = error {
+                print("loginCount の更新に失敗: \(error.localizedDescription)")
+                completion(false)
+            } else {
+                DispatchQueue.main.async {
+                    self.loginCount = newCount
+                    self.hasFetchedLoginCount = true
+                    self.lastLoginCountFetchAt = Date()
+                }
+                self.awardLoginStreakTitles(for: userId, streakCount: newCount)
+                MissionManager.shared.updateMissionProgressWithValue(type: .login, currentValue: newCount) { _ in }
+                print("loginCount を \(newCount) に更新しました。")
+                completion(true)
+            }
+        }
+    }
+
+    func awardLoginStreakTitles(for userId: String, streakCount: Int) {
+        let thresholds: [(Int, String)] = [
+            (7, "連続ログイン7日"),
+            (30, "連続ログイン30日"),
+            (100, "連続ログイン100日"),
+        ]
+
+        for (threshold, title) in thresholds where streakCount >= threshold {
+            saveTitleForUser(userId: userId, title: title)
         }
     }
     
@@ -1377,104 +2479,71 @@ class AuthManager: ObservableObject {
         }
     }
     
-    /// ログインボーナスをチェックし、付与する
     func checkAndGrantLoginBonus(completion: @escaping (Bool) -> Void) {
+        checkAndGrantLoginBonus500(completion: completion)
+    }
+
+    /// ログインボーナスをチェックし、付与する（500日対応）
+    func checkAndGrantLoginBonus500(completion: @escaping (Bool) -> Void) {
         fetchLastLoginDate { lastLoginDate in
             let now = Date()
+
             if let lastLogin = lastLoginDate {
                 let days = self.daysBetween(lastLogin, now)
-                var newLoginCount = 1
-                if days == 1 {
-                    // 連続ログイン
-                    self.fetchLoginCount { currentCount in
-                        newLoginCount = currentCount + 1
-                        // 必要に応じて最大値を設定（例: 5日目まで）
-                        if newLoginCount > 5 {
-                            newLoginCount = 1
-                        }
-                        self.loginCount = newLoginCount
-                        let bonus = self.getBonusAmount(for: newLoginCount)
-                        self.loginBonus = bonus
-                        // ボーナスを付与
-                        self.grantLoginBonus(amount: bonus) { success in
-                            if success {
-                                // 最終ログイン日時を保存
-                                self.saveLastLoginDate { saveSuccess in
-                                    if saveSuccess {
-                                        // loginCount をデータベースに更新
-                                        self.updateLoginCount(to: newLoginCount) { updateSuccess in
-                                            if updateSuccess {
-                                                completion(true)
-                                            } else {
-                                                completion(false)
-                                            }
-                                        }
-                                    } else {
-                                        completion(false)
-                                    }
-                                }
-                            } else {
-                                completion(false)
-                            }
-                        }
-                    }
-                } else if days > 1 {
-                    // 連続していないログイン（リセット）
-                    newLoginCount = 1
-                    self.loginCount = newLoginCount
-                    let bonus = self.getBonusAmount(for: newLoginCount)
-                    self.loginBonus = bonus
-                    // ボーナスを付与
-                    self.grantLoginBonus(amount: bonus) { success in
-                        if success {
-                            // 最終ログイン日時を保存
-                            self.saveLastLoginDate { saveSuccess in
-                                if saveSuccess {
-                                    // loginCount をデータベースに更新
-                                    self.updateLoginCount(to: newLoginCount) { updateSuccess in
-                                        if updateSuccess {
-                                            completion(true)
-                                        } else {
-                                            completion(false)
-                                        }
-                                    }
-                                } else {
-                                    completion(false)
-                                }
-                            }
-                        } else {
-                            completion(false)
-                        }
-                    }
-                } else {
-                    // 同日に複数回ログインした場合はボーナスを付与しない
+                guard days != 0 else {
                     completion(false)
+                    return
+                }
+
+                self.fetchLoginCount500 { currentCount in
+                    let newCount = days == 1 ? min(currentCount + 1, LoginBonusConfig.maxDay) : 1
+                    let bonus = LoginBonusConfig.coinAmount(for: newCount)
+                    let itemRewards = LoginBonusConfig.itemRewards(for: newCount)
+
+                    DispatchQueue.main.async {
+                        self.loginCount = newCount
+                        self.loginBonus = bonus
+                    }
+
+                    self.grantLoginBonus(amount: bonus, itemRewards: itemRewards) { success in
+                        guard success else {
+                            completion(false)
+                            return
+                        }
+
+                        self.saveLastLoginDate { saveSuccess in
+                            guard saveSuccess else {
+                                completion(false)
+                                return
+                            }
+
+                            self.updateLoginCount500(to: newCount, completion: completion)
+                        }
+                    }
                 }
             } else {
-                // 初回ログイン
-                let newLoginCount = 1
-                self.loginCount = newLoginCount
-                let bonus = self.getBonusAmount(for: newLoginCount)
-                self.loginBonus = bonus
-                self.grantLoginBonus(amount: bonus) { success in
-                    if success {
-                        // 最終ログイン日時を保存
-                        self.saveLastLoginDate { saveSuccess in
-                            if saveSuccess {
-                                // loginCount をデータベースに更新
-                                self.updateLoginCount(to: newLoginCount) { updateSuccess in
-                                    if updateSuccess {
-                                        completion(true)
-                                    } else {
-                                        completion(false)
-                                    }
-                                }
-                            } else {
-                                completion(false)
-                            }
-                        }
-                    } else {
+                let newCount = 1
+                let bonus = LoginBonusConfig.coinAmount(for: newCount)
+                let itemRewards = LoginBonusConfig.itemRewards(for: newCount)
+
+                DispatchQueue.main.async {
+                    self.loginCount = newCount
+                    self.loginBonus = bonus
+                }
+
+                self.grantLoginBonus(amount: bonus, itemRewards: itemRewards) { success in
+                    guard success else {
                         completion(false)
+                        return
+                    }
+
+                    self.saveLastLoginDate { saveSuccess in
+                        guard saveSuccess else {
+                            completion(false)
+                            return
+                        }
+
+                        self.updateLoginCount500(to: newCount, completion: completion)
                     }
                 }
             }
@@ -1488,72 +2557,134 @@ class AuthManager: ObservableObject {
     }
     
     func decreaseUserMoney(by amount: Int = 300, completion: @escaping (Bool) -> Void) {
-        guard let userId = user?.uid else { return }
-        
-        let userRef = Database.database().reference().child("users").child(userId)
-        
-        // 現在のuserMoneyを取得
-        userRef.observeSingleEvent(of: .value) { (snapshot) in
-            if let data = snapshot.value as? [String: Any] {
-                var currentMoney = data["userMoney"] as? Int ?? 0
-                
-                // userMoneyからamountを引く
-                currentMoney -= amount
-                
-                // 新しいuserMoneyの値をデータベースに保存
-                let userData: [String: Any] = ["userMoney": currentMoney]
-                userRef.updateChildValues(userData) { (error, ref) in
-                    if let error = error {
-                        print("Failed to update userMoney:", error.localizedDescription)
-                        completion(false)
-                    } else {
-                        print("Successfully updated userMoney.")
-                        completion(true)
-                    }
-                }
-            }
-        }
+        changeMoney(by: -amount, allowNegative: false, completion: completion)
     }
     
     func decreaseRareUserMoney(by amount: Int = 600, completion: @escaping (Bool) -> Void) {
-        guard let userId = user?.uid else { return }
-        
-        let userRef = Database.database().reference().child("users").child(userId)
-        
-        // 現在のuserMoneyを取得
-        userRef.observeSingleEvent(of: .value) { (snapshot) in
-            if let data = snapshot.value as? [String: Any] {
-                var currentMoney = data["userMoney"] as? Int ?? 0
-                
-                // userMoneyからamountを引く
-                currentMoney -= amount
-                
-                // 新しいuserMoneyの値をデータベースに保存
-                let userData: [String: Any] = ["userMoney": currentMoney]
-                userRef.updateChildValues(userData) { (error, ref) in
-                    if let error = error {
-                        print("Failed to update userMoney:", error.localizedDescription)
+        changeMoney(by: -amount, allowNegative: false, completion: completion)
+    }
+
+    private func changeMoney(by amount: Int, allowNegative: Bool, completion: @escaping (Bool) -> Void) {
+        guard let userId = currentUserId else {
+            completion(false)
+            return
+        }
+
+        let moneyRef = Database.database().reference()
+            .child("users")
+            .child(userId)
+            .child("userMoney")
+
+        // Realtime Database transactions may invoke the update block with a nil
+        // local cache before the server value has been downloaded. Treating that
+        // nil as zero would abort a valid purchase even when the user has enough
+        // coins. Prime the exact child first for protected withdrawals, then keep
+        // the transaction check below to handle concurrent balance changes.
+        if amount < 0, !allowNegative {
+            moneyRef.observeSingleEvent(of: .value, with: { snapshot in
+                let currentMoney = self.intValue(from: snapshot.value)
+                guard currentMoney + amount >= 0 else {
+                    DispatchQueue.main.async {
+                        self.money = currentMoney
                         completion(false)
-                    } else {
-                        print("Successfully updated userMoney.")
-                        completion(true)
                     }
+                    return
                 }
+
+                self.runMoneyTransaction(
+                    at: moneyRef,
+                    amount: amount,
+                    allowNegative: allowNegative,
+                    fallbackMoney: currentMoney,
+                    completion: completion
+                )
+            }, withCancel: { _ in
+                DispatchQueue.main.async {
+                    completion(false)
+                }
+            })
+            return
+        }
+
+        runMoneyTransaction(
+            at: moneyRef,
+            amount: amount,
+            allowNegative: allowNegative,
+            fallbackMoney: nil,
+            completion: completion
+        )
+    }
+
+    private func runMoneyTransaction(
+        at moneyRef: DatabaseReference,
+        amount: Int,
+        allowNegative: Bool,
+        fallbackMoney: Int?,
+        completion: @escaping (Bool) -> Void
+    ) {
+        var hasUsedFallback = false
+        moneyRef.runTransactionBlock { currentData in
+            let currentMoney: Int
+            if let value = currentData.value, !(value is NSNull) {
+                currentMoney = self.intValue(from: value)
+            } else if let fallbackMoney, !hasUsedFallback {
+                // A transaction can start before its local cache contains this
+                // child. Seed only that first attempt with the server value read
+                // immediately above. Firebase will compare it with the current
+                // server state and retry with the authoritative value if needed.
+                currentMoney = fallbackMoney
+                hasUsedFallback = true
+            } else if amount >= 0 || allowNegative {
+                currentMoney = 0
+            } else {
+                return TransactionResult.abort()
+            }
+
+            let nextMoney = currentMoney + amount
+            guard allowNegative || nextMoney >= 0 else {
+                return TransactionResult.abort()
+            }
+            currentData.value = nextMoney
+            return TransactionResult.success(withValue: currentData)
+        } andCompletionBlock: { error, committed, snapshot in
+            DispatchQueue.main.async {
+                guard error == nil,
+                      committed,
+                      let committedValue = snapshot?.value,
+                      !(committedValue is NSNull) else {
+                    completion(false)
+                    return
+                }
+                self.money = self.intValue(from: committedValue)
+                completion(true)
             }
         }
     }
     
     func getUserMoney(completion: @escaping (Int) -> Void) {
-        guard let userId = user?.uid else { return }
-        
-        let userRef = Database.database().reference().child("users").child(userId)
-        
-        userRef.observeSingleEvent(of: .value) { (snapshot) in
-            if let data = snapshot.value as? [String: Any] {
-                let currentMoney = data["userMoney"] as? Int ?? 0
+        guard let userId = currentUserId else {
+            DispatchQueue.main.async {
+                completion(0)
+            }
+            return
+        }
+
+        let moneyRef = Database.database().reference()
+            .child("users")
+            .child(userId)
+            .child("userMoney")
+
+        moneyRef.observeSingleEvent(of: .value, with: { snapshot in
+            let currentMoney = self.intValue(from: snapshot.value)
+            DispatchQueue.main.async {
+                self.money = currentMoney
                 completion(currentMoney)
             }
-        }
+        }, withCancel: { _ in
+            DispatchQueue.main.async {
+                completion(self.money)
+            }
+        })
     }
     
     func updateUserFlag(userId: String, userFlag: Int) {
@@ -1667,4 +2798,3 @@ struct AuthManager_Previews: PreviewProvider {
         AuthManager1()
     }
 }
-

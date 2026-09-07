@@ -224,7 +224,7 @@ struct PentagonShakaiView: View {
             .padding(.top)
             
             .foregroundColor(Color("fontGray"))
-        }.background(Color("Color2"))
+        }.background(Color.clear)
         .onAppear {
 //            print("currentuser:\(authManager.currentUserId)")
             RateManager.shared.fetchShakaiQuizData(userId: authManager.currentUserId!) { data in

@@ -1,0 +1,479 @@
+//
+//  LoginBonusListView.swift
+//  drill
+//
+//  ログインボーナス全報酬一覧（500日）
+//
+
+import SwiftUI
+
+struct LoginBonusListView: View {
+    let currentDay: Int
+    @Environment(\.dismiss) private var dismiss
+    @State private var selectedRewardDay: LBRewardDay? = nil
+
+    private var totalAllCoins: Int {
+        LoginBonusConfig.totalCoins(upTo: LoginBonusConfig.maxDay)
+    }
+
+    private var totalEarnedCoins: Int {
+        LoginBonusConfig.totalCoins(upTo: currentDay)
+    }
+
+    // 50日区切りのセクション（10セクション）
+    private var sections: [LBRewardSection] {
+        (0..<10).map { sectionIndex in
+            let start = sectionIndex * 50 + 1
+            let end = min(start + 49, LoginBonusConfig.maxDay)
+            let days = (start...end).map { day in
+                LBRewardDay(
+                    day: day,
+                    coins: LoginBonusConfig.coinAmount(for: day),
+                    itemRewards: LoginBonusConfig.itemRewards(for: day),
+                    milestone: LoginBonusConfig.milestoneRank(day: day),
+                    isCollected: day < currentDay,
+                    isToday: day == currentDay
+                )
+            }
+            let sectionTotal = days.reduce(0) { $0 + $1.coins }
+            return LBRewardSection(id: sectionIndex, title: "Day \(start) - \(end)", days: days, sectionTotal: sectionTotal)
+        }
+    }
+
+    var body: some View {
+        NavigationView {
+            ZStack {
+                Color(red: 0.07, green: 0.07, blue: 0.12).ignoresSafeArea()
+
+                VStack(spacing: 0) {
+                    summaryHeader
+                    Divider().background(Color.white.opacity(0.1))
+
+                    ScrollViewReader { proxy in
+                        List {
+                            ForEach(sections) { section in
+                                Section {
+                                    ForEach(section.days) { day in
+                                        LBRewardRowView(day: day) {
+                                            guard !day.itemRewards.isEmpty else { return }
+                                            selectedRewardDay = day
+                                        }
+                                            .id(day.day)
+                                            .listRowBackground(day.isToday ? Color.yellow.opacity(0.1) : Color.clear)
+                                    }
+                                } header: {
+                                    sectionHeader(section)
+                                }
+                            }
+                        }
+                        .listStyle(.plain)
+                        .scrollContentBackground(.hidden)
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                withAnimation { proxy.scrollTo(currentDay, anchor: .center) }
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("報酬一覧")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("閉じる") { dismiss() }.foregroundColor(.yellow)
+                }
+            }
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbarBackground(Color(red: 0.07, green: 0.07, blue: 0.12), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+        }
+        .sheet(item: $selectedRewardDay) { day in
+            LoginBonusRewardDetailModal(day: day)
+        }
+        .preferredColorScheme(.dark)
+    }
+
+    private var summaryHeader: some View {
+        VStack(spacing: 16) {
+            HStack(spacing: 20) {
+                VStack(spacing: 4) {
+                    Text("現在")
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundColor(.white.opacity(0.5))
+                    Text("\(currentDay)日目")
+                        .font(.system(size: 22, weight: .bold, design: .rounded))
+                        .foregroundColor(.yellow)
+                }
+
+                Rectangle().fill(Color.white.opacity(0.15)).frame(width: 1, height: 40)
+
+                VStack(spacing: 4) {
+                    Text("獲得済み")
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundColor(.white.opacity(0.5))
+                    Text("\(formatNumber(totalEarnedCoins))コイン")
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .foregroundColor(.orange)
+                }
+
+                Rectangle().fill(Color.white.opacity(0.15)).frame(width: 1, height: 40)
+
+                VStack(spacing: 4) {
+                    Text("全報酬合計")
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundColor(.white.opacity(0.5))
+                    Text("\(formatNumber(totalAllCoins))")
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                        .foregroundColor(.white.opacity(0.7))
+                }
+            }
+
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule().fill(Color.white.opacity(0.1)).frame(height: 8)
+                    Capsule()
+                        .fill(LinearGradient(colors: [.yellow, .orange], startPoint: .leading, endPoint: .trailing))
+                        .frame(width: geo.size.width * CGFloat(currentDay) / CGFloat(LoginBonusConfig.maxDay), height: 8)
+                }
+            }
+            .frame(height: 8)
+
+            Text("\(LoginBonusConfig.maxDay)日中 \(currentDay)日達成（\(Int(Double(currentDay) / Double(LoginBonusConfig.maxDay) * 100))%）")
+                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .foregroundColor(.white.opacity(0.4))
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 16)
+        .background(Color.white.opacity(0.03))
+    }
+
+    private func sectionHeader(_ section: LBRewardSection) -> some View {
+        HStack {
+            Text(section.title)
+                .font(.system(size: 14, weight: .bold, design: .rounded))
+                .foregroundColor(.white.opacity(0.7))
+            Spacer()
+            Text("合計 \(formatNumber(section.sectionTotal))コイン")
+                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .foregroundColor(.orange.opacity(0.7))
+        }
+        .padding(.vertical, 4)
+        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 4, trailing: 16))
+    }
+
+    private func formatNumber(_ n: Int) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        return formatter.string(from: NSNumber(value: n)) ?? "\(n)"
+    }
+}
+
+// MARK: - Data Models
+struct LBRewardSection: Identifiable {
+    let id: Int
+    let title: String
+    let days: [LBRewardDay]
+    let sectionTotal: Int
+}
+
+struct LBRewardDay: Identifiable {
+    var id: Int { day }
+    let day: Int
+    let coins: Int
+    let itemRewards: [InventoryReward]
+    let milestone: LoginBonusConfig.MilestoneRank
+    let isCollected: Bool
+    let isToday: Bool
+}
+
+// MARK: - Row View
+struct LBRewardRowView: View {
+    let day: LBRewardDay
+    var onTap: (() -> Void)? = nil
+
+    private var accentColor: Color { LoginBonusConfig.color(for: day.day) }
+    private var icon: String { LoginBonusConfig.icon(for: day.day) }
+    private var isInteractive: Bool { !day.itemRewards.isEmpty && onTap != nil }
+
+    var body: some View {
+        HStack(spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(
+                        day.isCollected || day.isToday
+                        ? LinearGradient(colors: [accentColor, accentColor.opacity(0.6)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                        : LinearGradient(colors: [Color.white.opacity(0.08), Color.white.opacity(0.04)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                    )
+                    .frame(width: 38, height: 38)
+
+                if day.isCollected {
+                    Image(systemName: "checkmark").font(.system(size: 16, weight: .bold)).foregroundColor(.white)
+                } else {
+                    Image(systemName: icon).font(.system(size: 16, weight: .bold))
+                        .foregroundColor(day.isToday ? .white : .white.opacity(0.3))
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 6) {
+                    Text("Day \(day.day)")
+                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .foregroundColor(day.isToday ? .yellow : .white)
+
+                    if day.isToday {
+                        Text("← 今日")
+                            .font(.system(size: 10, weight: .bold, design: .rounded))
+                            .foregroundColor(.yellow)
+                            .padding(.horizontal, 6).padding(.vertical, 2)
+                            .background(Color.yellow.opacity(0.2))
+                            .clipShape(Capsule())
+                    }
+
+                    milestoneBadge
+                }
+
+                if day.milestone != .none {
+                    Text(milestoneDescription)
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundColor(accentColor.opacity(0.8))
+                }
+
+                if !day.itemRewards.isEmpty {
+                    HStack(spacing: 6) {
+                        ForEach(Array(day.itemRewards.enumerated()), id: \.offset) { entry in
+                            let reward = entry.element
+                            HStack(spacing: 4) {
+                                InventoryItemArtworkView(type: reward.type, width: 20, height: 20, cornerRadius: 5)
+                                Text("x\(reward.amount)")
+                                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                                    .foregroundColor(.white.opacity(0.75))
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer()
+
+            HStack(spacing: 3) {
+                Text("¢").font(.system(size: 12, weight: .bold)).foregroundColor(.orange)
+                Text(formatCoin(day.coins))
+                    .font(.system(size: day.milestone != .none ? 17 : 15, weight: .bold, design: .rounded))
+                    .foregroundColor(
+                        day.milestone == .ultra ? Color(red: 1, green: 0.84, blue: 0) :
+                        day.milestone == .super_ ? Color(red: 0.7, green: 0.5, blue: 1) :
+                        day.milestone == .normal ? Color(red: 1, green: 0.6, blue: 0.2) :
+                        day.isCollected ? .white.opacity(0.7) : .white.opacity(0.4)
+                    )
+            }
+
+            if isInteractive {
+                Image(systemName: "chevron.right.circle.fill")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.white.opacity(0.35))
+            }
+        }
+        .padding(.vertical, 4)
+        .opacity(day.isCollected ? 0.7 : 1.0)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onTap?()
+        }
+        .listRowBackground(
+            day.isToday ? Color.yellow.opacity(0.08) :
+            day.milestone == .ultra ? Color(red: 1, green: 0.84, blue: 0).opacity(0.05) :
+            day.milestone == .super_ ? Color(red: 0.6, green: 0.3, blue: 1).opacity(0.05) :
+            Color.clear
+        )
+        .listRowSeparatorTint(Color.white.opacity(0.06))
+    }
+
+    @ViewBuilder
+    private var milestoneBadge: some View {
+        switch day.milestone {
+        case .ultra:
+            Text("👑 超特別")
+                .font(.system(size: 9, weight: .bold, design: .rounded))
+                .foregroundColor(Color(red: 1, green: 0.84, blue: 0))
+                .padding(.horizontal, 6).padding(.vertical, 2)
+                .background(Color(red: 1, green: 0.84, blue: 0).opacity(0.15))
+                .clipShape(Capsule())
+        case .super_:
+            Text("💎 特大")
+                .font(.system(size: 9, weight: .bold, design: .rounded))
+                .foregroundColor(Color(red: 0.7, green: 0.5, blue: 1))
+                .padding(.horizontal, 6).padding(.vertical, 2)
+                .background(Color(red: 0.6, green: 0.3, blue: 1).opacity(0.15))
+                .clipShape(Capsule())
+        case .normal:
+            Text("⭐ ボーナス")
+                .font(.system(size: 9, weight: .bold, design: .rounded))
+                .foregroundColor(Color(red: 1, green: 0.6, blue: 0.2))
+                .padding(.horizontal, 6).padding(.vertical, 2)
+                .background(Color(red: 1, green: 0.5, blue: 0.2).opacity(0.15))
+                .clipShape(Capsule())
+        case .none:
+            EmptyView()
+        }
+    }
+
+    private var milestoneDescription: String {
+        switch day.milestone {
+        case .ultra:  return "\(day.day)日達成記念！報酬5倍！"
+        case .super_: return "\(day.day)日達成記念！報酬3倍！"
+        case .normal: return "5日区切りボーナス！報酬2倍！"
+        case .none:   return ""
+        }
+    }
+
+    private func formatCoin(_ amount: Int) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        return formatter.string(from: NSNumber(value: amount)) ?? "\(amount)"
+    }
+}
+
+struct LoginBonusRewardDetailModal: View {
+    let day: LBRewardDay
+    @Environment(\.dismiss) private var dismiss
+
+    private var accentColor: Color {
+        LoginBonusConfig.color(for: day.day)
+    }
+
+    private var milestoneText: String? {
+        switch day.milestone {
+        case .ultra:
+            return "超特別ボーナス"
+        case .super_:
+            return "特大ボーナス"
+        case .normal:
+            return "ボーナスデー"
+        case .none:
+            return nil
+        }
+    }
+
+    var body: some View {
+        NavigationView {
+            ZStack {
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.08, green: 0.08, blue: 0.13),
+                        Color(red: 0.12, green: 0.08, blue: 0.18)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
+
+                VStack(spacing: 18) {
+                    VStack(spacing: 10) {
+                        Text("Day \(day.day)")
+                            .font(.system(size: 28, weight: .bold, design: .rounded))
+                            .foregroundColor(.white)
+
+                        if let milestoneText {
+                            Text(milestoneText)
+                                .font(.system(size: 12, weight: .bold, design: .rounded))
+                                .foregroundColor(accentColor)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 5)
+                                .background(accentColor.opacity(0.18))
+                                .clipShape(Capsule())
+                        }
+                    }
+
+                    VStack(spacing: 12) {
+                        rewardDetailRow(
+                            iconView: AnyView(
+                                ZStack {
+                                    Circle()
+                                        .fill(LinearGradient(colors: [.yellow, .orange], startPoint: .top, endPoint: .bottom))
+                                        .frame(width: 34, height: 34)
+                                    Text("¢")
+                                        .font(.system(size: 16, weight: .bold))
+                                        .foregroundColor(.white)
+                                }
+                            ),
+                            title: "コイン",
+                            value: "\(day.coins)"
+                        )
+
+                        ForEach(Array(day.itemRewards.enumerated()), id: \.offset) { entry in
+                            let reward = entry.element
+                            rewardDetailRow(
+                                iconView: AnyView(
+                                    InventoryItemArtworkView(type: reward.type, width: 40, height: 40, cornerRadius: 12)
+                                ),
+                                title: reward.type.displayName,
+                                value: "x\(reward.amount)"
+                            )
+                        }
+                    }
+                    .padding(18)
+                    .background(
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(Color.white.opacity(0.08))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                            )
+                    )
+
+                    Text("この日に受け取れるアイテム報酬です。")
+                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                        .foregroundColor(.white.opacity(0.6))
+
+                    Spacer()
+                }
+                .padding(20)
+            }
+            .navigationTitle("報酬詳細")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("閉じる") {
+                        dismiss()
+                    }
+                    .foregroundColor(.yellow)
+                }
+            }
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbarBackground(Color(red: 0.08, green: 0.08, blue: 0.13), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+        }
+        .preferredColorScheme(.dark)
+    }
+
+    private func rewardDetailRow(iconView: AnyView, title: String, value: String) -> some View {
+        HStack(spacing: 12) {
+            iconView
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .foregroundColor(.white)
+                Text("獲得報酬")
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundColor(.white.opacity(0.45))
+            }
+
+            Spacer()
+
+            Text(value)
+                .font(.system(size: 22, weight: .bold, design: .rounded))
+                .foregroundColor(accentColor)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white.opacity(0.06))
+        )
+    }
+}
+
+#Preview {
+    LoginBonusListView(currentDay: 7)
+}

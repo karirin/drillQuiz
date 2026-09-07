@@ -525,7 +525,7 @@ struct StoryShakaiListView: View {
                        "秋",
                        "冬"
                    ],
-                   correctAnswerIndex: 3,
+                   correctAnswerIndex: 0,
                    explanation: "卒業式は通常、春に行われますが、四季の流れを学びながら記憶します。"
                ),
                QuizQuestion(

@@ -14,7 +14,6 @@ struct SansuListView: View {
     // MARK: - Properties
     @ObservedObject var authManager = AuthManager.shared
     @ObservedObject var audioManager = AudioManager.shared
-    @StateObject var reward = Reward()
     @Environment(\.presentationMode) var presentationMode
     @Binding var isPresenting: Bool
     
@@ -35,6 +34,7 @@ struct SansuListView: View {
     @State private var tutorialNum: Int = 0
     @State private var buttonRect: CGRect = .zero
     @State private var bubbleHeight: CGFloat = 0.0
+    @State private var tutorialPulse: Bool = false
     
     private let theme = SubjectTheme.sansu
     
@@ -108,6 +108,15 @@ struct SansuListView: View {
         .onChange(of: isPresentingQuizSecurity) { _ in refreshIncorrectAnswers() }
         .onChange(of: isPresentingQuizGod) { _ in refreshIncorrectAnswers() }
         .onChange(of: isPresentingQuizIncorrectAnswer) { _ in refreshIncorrectAnswers() }
+        .onChange(of: tutorialNum) { num in
+            if num == 2 {
+                withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                    tutorialPulse = true
+                }
+            } else {
+                tutorialPulse = false
+            }
+        }
         .navigationBarBackButtonHidden(true)
         .navigationViewStyle(StackNavigationViewStyle())
     }
@@ -163,49 +172,113 @@ struct SansuListView: View {
     
     // MARK: - Tutorial Overlay
     private var tutorialOverlay: some View {
-        ZStack {
-            // Dimmed background with cutout
-            GeometryReader { geometry in
-                Color.black.opacity(0.5)
+        GeometryReader { geometry in
+            let origin = geometry.frame(in: .global).origin
+            let localX = buttonRect.midX - origin.x
+            let localY = buttonRect.midY - origin.y
+            let cutoutWidth = max(buttonRect.width, 0)
+            let cutoutHeight = max(buttonRect.height, 0)
+
+            ZStack {
+                Color.black.opacity(0.6)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .frame(width: buttonRect.width, height: buttonRect.height)
-                            .position(x: buttonRect.midX, y: isSmallDevice() ? buttonRect.midY - 130 : buttonRect.midY - 165)
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .frame(width: cutoutWidth, height: cutoutHeight)
+                            .position(x: localX, y: localY)
                             .blendMode(.destinationOut)
                     )
-                    .ignoresSafeArea()
                     .compositingGroup()
-            }
-            
-            // Tutorial Message
-            VStack {
-                Spacer()
-                    .frame(height: isSmallDevice() ? buttonRect.minY + bubbleHeight - 110 : buttonRect.minY + bubbleHeight - 140)
-                
-                TutorialBubble(message: "「【１年生】足し算、引き算」をクリックしてください。")
-                    .background(GeometryReader { geometry in
-                        Path { _ in
-                            DispatchQueue.main.async {
-                                self.bubbleHeight = geometry.size.height
-                            }
+
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .stroke(Color(hex: "667eea"), lineWidth: 3)
+                    .frame(width: cutoutWidth, height: cutoutHeight)
+                    .position(x: localX, y: localY)
+                    .scaleEffect(tutorialPulse ? 1.05 : 1.0)
+                    .opacity(tutorialPulse ? 0.6 : 1.0)
+
+                VStack {
+                    Spacer()
+                        .frame(height: localY + cutoutHeight / 2 + 16)
+
+                    VStack(spacing: 10) {
+                        HStack(spacing: 4) {
+                            Text("STEP 2")
+                                .font(.system(size: 11, weight: .bold, design: .rounded))
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 4)
+                                .background(
+                                    LinearGradient(
+                                        colors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .clipShape(Capsule())
                         }
-                    })
-                
-                Spacer()
-            }
-            
-            // Skip Button
-            VStack {
-                HStack {
-                    SkipTutorialButton {
-                        tutorialNum = 0
-                        authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { _ in }
+
+                        Image(systemName: "hand.tap.fill")
+                            .font(.system(size: 28))
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+
+                        Text("「1年生 足し算・引き算」をタップ")
+                            .font(.system(size: 17, weight: .bold))
+                            .foregroundColor(Color("fontGray"))
+
+                        Text("まずは最初の学年から始めてみましょう")
+                            .font(.system(size: 13))
+                            .foregroundColor(.secondary)
                     }
+                    .padding(.horizontal, 28)
+                    .padding(.vertical, 22)
+                    .background(Color("Color2"))
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .shadow(color: .black.opacity(0.2), radius: 15, y: 8)
+                    .background(GeometryReader { messageGeometry in
+                        Color.clear
+                            .onAppear {
+                                bubbleHeight = messageGeometry.size.height
+                            }
+                    })
+
                     Spacer()
                 }
-                .padding(.top, 20)
-                Spacer()
+                .padding(.horizontal, 20)
+
+                VStack {
+                    Spacer()
+                    HStack {
+                        Button(action: {
+                            generateHapticFeedback()
+                            tutorialNum = 0
+                            authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { _ in }
+                        }) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "forward.fill")
+                                    .font(.system(size: 12))
+                                Text("スキップ")
+                                    .font(.system(size: 14, weight: .semibold))
+                            }
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 12)
+                            .background(Color.white.opacity(0.2))
+                            .clipShape(Capsule())
+                        }
+                        .padding(.leading, 20)
+                        .padding(.bottom, 40)
+
+                        Spacer()
+                    }
+                }
             }
+            .ignoresSafeArea()
         }
         .onTapGesture {
             audioManager.playSound()
@@ -216,7 +289,6 @@ struct SansuListView: View {
     
     // MARK: - Helper Methods
     private func setupView() {
-        reward.LoadReward()
         fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { _ in
             authManager.fetchPreFlag()
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {

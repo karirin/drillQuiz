@@ -14,7 +14,6 @@ struct ShakaiListView: View {
     // MARK: - Properties
     @ObservedObject var authManager = AuthManager.shared
     @ObservedObject var audioManager = AudioManager.shared
-    @StateObject var reward = Reward()
     @Environment(\.presentationMode) var presentationMode
     @Binding var isPresenting: Bool
     
@@ -148,7 +147,6 @@ struct ShakaiListView: View {
     
     // MARK: - Helper Methods
     private func setupView() {
-        reward.LoadReward()
         fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { _ in
             authManager.fetchPreFlag()
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {

@@ -25,7 +25,6 @@ struct StoryQuizResultView: View {
     @State private var isShow: Bool = true
     @State private var flag: Bool = false
     @State private var preFlag: Bool = false
-    @State private var showSubFlag: Bool = false
     @State private var level3flag: Bool = false
     @State private var level5flag: Bool = false
     @State private var level10flag: Bool = false
@@ -39,11 +38,11 @@ struct StoryQuizResultView: View {
     @Binding var navigateToQuizResultView: Bool
     @State private var isHidden = false
     @State private var selectedTab = 0 // 0: 結果, 1: 統計
-    private let interstitial = Interstitial()
+    @StateObject private var interstitial = Interstitial()
     @Environment(\.presentationMode) var presentationMode
-    private let adViewControllerRepresentable = AdViewControllerRepresentable()
     @Binding var victoryFlag: Bool
     @Binding var isUserStoryFlag: Bool
+    @State private var hasAppliedStoryProgress = false
     @ObservedObject var viewModel: PositionViewModel
 
     init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, navigateToQuizResultView: Binding<Bool>, playerExperience: Int, playerMoney: Int, elapsedTime: TimeInterval, quizLevel: QuizLevel, victoryFlag: Binding<Bool>, isUserStoryFlag: Binding<Bool>, viewModel: PositionViewModel) {
@@ -83,37 +82,28 @@ struct StoryQuizResultView: View {
             )
             .ignoresSafeArea()
             
-            NavigationView {
-                VStack(spacing: 0) {
-                    // ヘッダー部分
-                    headerView
-                    ScrollView{
-                        // 結果サマリーカード
-                        resultSummaryCard
-                            .padding(.horizontal).padding(.top,5)
-                        // タブ選択
-                        tabSelector
-                        
-                        // コンテンツ
-                        if selectedTab == 0 {
-                            resultsContent
-                        } else {
-                            statisticsContent
-                        }
+            VStack(spacing: 0) {
+                // ヘッダー部分
+                headerView
+                ScrollView{
+                    // 結果サマリーカード
+                    resultSummaryCard
+                        .padding(.horizontal).padding(.top,5)
+                    // タブ選択
+                    tabSelector
+
+                    // コンテンツ
+                    if selectedTab == 0 {
+                        resultsContent
+                    } else {
+                        statisticsContent
                     }
                 }
-                .navigationBarBackButtonHidden(true)
-                .navigationBarItems(leading: backButton)
-                .navigationTitle("ストーリー結果")
-                .navigationBarTitleDisplayMode(.inline)
             }
-            .background {
-                if userPreFlag != 1 {
-                    adViewControllerRepresentable
-                        .frame(width: .zero, height: .zero)
-                }
-            }
-            
+            .navigationBarBackButtonHidden(true)
+            .navigationBarItems(leading: backButton)
+            .navigationTitle("ストーリー結果")
+            .navigationBarTitleDisplayMode(.inline)
             // モーダル類
             modalOverlays
         }
@@ -152,6 +142,9 @@ struct StoryQuizResultView: View {
             }
         }
         .onDisappear {
+            guard !hasAppliedStoryProgress else { return }
+            hasAppliedStoryProgress = true
+
             if victoryFlag {
                 if isUserStoryFlag {
                     viewModel.incrementUserPosition()
@@ -180,9 +173,6 @@ struct StoryQuizResultView: View {
                         .frame(width: 240, height: 70)
                 }
                 .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 2)
-                .fullScreenCover(isPresented: $showSubFlag) {
-                    SubscriptionView(audioManager: audioManager)
-                }
                 Spacer()
             }
         }
@@ -611,25 +601,14 @@ struct StoryQuizResultView: View {
     }
     
     private func setupOnAppear() {
-        authManager.fetchPreFlag()
         authManager.fetchUserStory()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            userPreFlag = authManager.userPreFlag
-            if userPreFlag != 1 {
-                executeProcessEveryFortyTimes()
-            }
-        }
-        
-        // 広告処理
-        DispatchQueue.main.async {
-            if !interstitial.interstitialAdLoaded && interstitial.wasAdDismissed == false {
-                interstitial.loadInterstitial(completion: { isLoaded in
-                    if isLoaded {
-                        self.interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
-                    }
-                })
-            } else if !interstitial.wasAdDismissed {
-                interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
+        authManager.fetchPreFlag { preFlag in
+            userPreFlag = preFlag
+            guard preFlag != 1 else { return }
+
+            let shouldShowPremiumPrompt = executeProcessEveryFortyTimes()
+            if !shouldShowPremiumPrompt {
+                presentInterstitialIfNeeded()
             }
         }
         
@@ -697,12 +676,28 @@ struct StoryQuizResultView: View {
         }
     }
     
-    func executeProcessEveryFortyTimes() {
+    private func presentInterstitialIfNeeded() {
+        guard userPreFlag != 1, !interstitial.wasAdDismissed else { return }
+
+        if interstitial.interstitialAdLoaded {
+            interstitial.presentInterstitial()
+            return
+        }
+
+        interstitial.loadInterstitial { isLoaded in
+            guard isLoaded, userPreFlag != 1, !interstitial.wasAdDismissed else { return }
+            interstitial.presentInterstitial()
+        }
+    }
+
+    func executeProcessEveryFortyTimes() -> Bool {
         let count = UserDefaults.standard.integer(forKey: "launchPreCount") + 1
         UserDefaults.standard.set(count, forKey: "launchPreCount")
         if count % 3 == 0 {
             preFlag = true
+            return true
         }
+        return false
     }
 }
 

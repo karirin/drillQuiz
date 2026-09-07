@@ -17,6 +17,20 @@ struct OtherApp: Identifiable {
 }
 
 extension OtherApp {
+    static let chugakuQuest = OtherApp(
+        name: "中学クエスト",
+        description: "ゲーム感覚で中学5教科を学べる学習アプリ。アバターと一緒にダンジョンを冒険しながら、数学・国語・社会・理科・英語を楽しく勉強できます。",
+        description2: "ゲーム感覚で中学5教科を学べる学習アプリ。アバターと一緒にダンジョンを冒険しながら、数学・国語・社会・理科・英語を楽しく勉強できます。",
+        appStoreLink: "https://apps.apple.com/us/app/%E4%B8%AD%E5%AD%A6%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88-%E4%B8%AD%E5%AD%A6%E7%94%9F%E3%81%AE%E5%AD%A6%E7%BF%92%E3%82%A2%E3%83%97%E3%83%AA/id6748610717"
+    )
+
+    static let koukouQuest = OtherApp(
+        name: "高校クエスト",
+        description: "ゲーム感覚で高校5教科を学べる学習アプリ。数学・国語・社会・理科・英語を分野ごとのクイズで学びながら、バトルやダンジョンで楽しく続けられます。",
+        description2: "ゲーム感覚で高校5教科を学べる学習アプリ。数学・国語・社会・理科・英語を分野ごとのクイズで学びながら、バトルやダンジョンで楽しく続けられます。",
+        appStoreLink: "https://apps.apple.com/us/app/%E9%AB%98%E6%A0%A1%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88-%E9%AB%98%E6%A0%A15%E6%95%99%E7%A7%91%E3%82%92%E6%A5%BD%E3%81%97%E3%81%8F%E5%AD%A6%E3%81%B9%E3%82%8B%E3%82%AF%E3%82%A4%E3%82%BA%E3%82%A2%E3%83%97%E3%83%AA/id6761913492"
+    )
+
     static let allApps = [
         OtherApp(name: "簿記クエスト", description: "ゲーム感覚で簿記の資格が学べるアプリ。４級〜１級の階級ごとに、「基礎知識と仕訳」「帳簿と帳簿組織」「決算と財務諸表」「原価計算と管理会計」「税務と法務」の分野別に問題を解くことができます。", description2: "ゲーム感覚で簿記の資格が学べるアプリ。４級〜１級の階級ごとに、「基礎知識と仕訳」「帳簿と帳簿組織」「決算と財務諸表」「原価計算と管理会計」「税務と法務」の分野別に問題を解くことができます。", appStoreLink: "https://apps.apple.com/us/app/%E7%B0%BF%E8%A8%98%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88-%E7%B0%BF%E8%A8%98%E3%81%AE%E8%B3%87%E6%A0%BC%E3%81%AB%E5%90%88%E6%A0%BC%E3%81%A7%E3%81%8D%E3%82%8B%E3%82%A2%E3%83%97%E3%83%AA/id6740277636"),
         OtherApp(name: "FPクエスト", description: "ゲーム感覚でFPの資格が学べるアプリ。３〜１級の階級別に「資産計画」「リスク管理」「金融資産運用」「タックスプランニング」「不動産」「相続・事業継承」で分野別に問題を解くことができます。", description2: "ゲーム感覚でFPの資格が学べるアプリ。３〜１級の階級別に「資産計画」「リスク管理」「金融資産運用」「タックスプランニング」「不動産」「相続・事業継承」で分野別に問題を解くことができます。", appStoreLink: "https://apps.apple.com/us/app/%E3%81%8A%E9%87%91%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88/id6476828253"),
@@ -29,7 +43,7 @@ struct SettingView: View {
     @ObservedObject var audioManager = AudioManager.shared
     @Environment(\.presentationMode) var presentationMode
     @State private var isSoundOn: Bool = true
-    @ObservedObject var authManager = AuthManager()
+    @ObservedObject var authManager = AuthManager.shared
     @State private var showingDeleteAlert = false
     @Environment(\.colorScheme) private var colorScheme
     var backgroundColor: Color { colorScheme == .dark ? Color(.systemBackground) : Color(.white) }
@@ -52,6 +66,12 @@ struct SettingView: View {
                         
                         VStack(spacing: 0) {
                             soundToggleRow
+                            Divider().padding(.leading, 56)
+
+                            NavigationLink(destination: InventoryView()) {
+                                settingRow(icon: "shippingbox.fill", iconColor: .teal, title: "持ち物")
+                            }
+                            .buttonStyle(PlainButtonStyle())
                             Divider().padding(.leading, 56)
                             
                             NavigationLink(destination: TermsOfServiceView()) {

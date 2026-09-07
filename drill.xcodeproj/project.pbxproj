@@ -7,30 +7,33 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		18037ED12F77CB48006547BC /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 18037ED02F77CB48006547BC /* FirebaseAnalytics */; };
+		18037ED32F77CB48006547BC /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 18037ED22F77CB48006547BC /* FirebaseAuth */; };
+		18037ED52F77CB48006547BC /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 18037ED42F77CB48006547BC /* FirebaseDatabase */; };
+		18037EDB2F77CD1F006547BC /* AppVersionMonitorSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 18037EDA2F77CD1F006547BC /* AppVersionMonitorSwiftUI */; };
 		180A9FCF2CE231EA00B35C83 /* StampAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180A9FCE2CE231EA00B35C83 /* StampAnimationView.swift */; };
-		180BEDBE2E11997500F92223 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 180BEDBD2E11997500F92223 /* GoogleMobileAds */; };
-		180BEDC12E1199F300F92223 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 180BEDC02E1199F300F92223 /* FirebaseAnalytics */; };
-		180BEDC32E1199F300F92223 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 180BEDC22E1199F300F92223 /* FirebaseAuth */; };
-		180BEDC52E1199F300F92223 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 180BEDC42E1199F300F92223 /* FirebaseDatabase */; };
-		180BEDC72E119A7300F92223 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 180BEDC62E119A7300F92223 /* FirebaseCore */; };
-		180BEDC92E119D4900F92223 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 180BEDC82E119D4900F92223 /* FirebaseMessaging */; };
+		181476092F7785CF007FFCFF /* GachaCatalogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181476082F7785CF007FFCFF /* GachaCatalogView.swift */; };
 		182534302CC3EB68001CFE16 /* SplashScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1825342F2CC3EB68001CFE16 /* SplashScreenView.swift */; };
 		182899C62CBBC4B0001BD535 /* ReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182899C52CBBC4B0001BD535 /* ReviewView.swift */; };
 		18324D1B2CA11BC300B4043D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 18324D1A2CA11BC300B4043D /* GoogleService-Info.plist */; };
 		183A77872CB40E180000B839 /* HelpModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183A77862CB40E180000B839 /* HelpModalView.swift */; };
+		183FA98F2F754D37006B346C /* GachaManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183FA98E2F754D37006B346C /* GachaManagerView.swift */; };
+		18A233D12F13F8D60007E444 /* ゲームクリア.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A233C82F13F8D60007E444 /* ゲームクリア.mp3 */; };
+		18A233D22F13F8D60007E444 /* カウントダウン.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A233C52F13F8D60007E444 /* カウントダウン.mp3 */; };
+		18A233D32F13F8D60007E444 /* おとも切り替え.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A233C42F13F8D60007E444 /* おとも切り替え.mp3 */; };
+		18A233D42F13F8D60007E444 /* 敵攻撃.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A233CD2F13F8D60007E444 /* 敵攻撃.mp3 */; };
+		18A233D52F13F8D60007E444 /* 正解.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A233CC2F13F8D60007E444 /* 正解.mp3 */; };
+		18A233D62F13F8D60007E444 /* 不正解.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A233CF2F13F8D60007E444 /* 不正解.mp3 */; };
+		18A233D72F13F8D60007E444 /* ホームに戻る.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A233C92F13F8D60007E444 /* ホームに戻る.mp3 */; };
+		18A233D82F13F8D60007E444 /* レベルアップ.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A233CA2F13F8D60007E444 /* レベルアップ.mp3 */; };
+		18A233D92F13F8D60007E444 /* ゲームオーバー.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A233C72F13F8D60007E444 /* ゲームオーバー.mp3 */; };
+		18A233DA2F13F8D60007E444 /* 倒れる.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A233CE2F13F8D60007E444 /* 倒れる.mp3 */; };
+		18A233DB2F13F8D60007E444 /* キャンセル.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A233C62F13F8D60007E444 /* キャンセル.mp3 */; };
+		18A233DC2F13F8D60007E444 /* 称号.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A233CB2F13F8D60007E444 /* 称号.mp3 */; };
+		18A233DD2F13F8D60007E444 /* 味方攻撃.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A233D02F13F8D60007E444 /* 味方攻撃.mp3 */; };
+		18A236DF2F1516080007E444 /* SubjectComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A236DE2F1516050007E444 /* SubjectComponents.swift */; };
 		18A44FDE2CA2C73D00907CF6 /* ManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A44FDD2CA2C73D00907CF6 /* ManagerView.swift */; };
 		18A44FE02CA2E18000907CF6 /* SansuTabListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A44FDF2CA2E18000907CF6 /* SansuTabListView.swift */; };
-		18A44FEC2CA7928600907CF6 /* 倒した.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FE12CA7928600907CF6 /* 倒した.mp3 */; };
-		18A44FED2CA7928600907CF6 /* 正解.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FE22CA7928600907CF6 /* 正解.mp3 */; };
-		18A44FEE2CA7928600907CF6 /* 敵攻撃.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FE32CA7928600907CF6 /* 敵攻撃.mp3 */; };
-		18A44FEF2CA7928600907CF6 /* 味方攻撃.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FE42CA7928600907CF6 /* 味方攻撃.mp3 */; };
-		18A44FF02CA7928600907CF6 /* カウントダウン.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FE52CA7928600907CF6 /* カウントダウン.mp3 */; };
-		18A44FF12CA7928600907CF6 /* おとも切り替え.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FE62CA7928600907CF6 /* おとも切り替え.mp3 */; };
-		18A44FF22CA7928600907CF6 /* ホームに戻る.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FE72CA7928600907CF6 /* ホームに戻る.mp3 */; };
-		18A44FF32CA7928600907CF6 /* キャンセル.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FE82CA7928600907CF6 /* キャンセル.mp3 */; };
-		18A44FF42CA7928600907CF6 /* レベルアップ回復.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FE92CA7928600907CF6 /* レベルアップ回復.mp3 */; };
-		18A44FF52CA7928600907CF6 /* ガチャる.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FEA2CA7928600907CF6 /* ガチャる.mp3 */; };
-		18A44FF62CA7928600907CF6 /* 不正解.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18A44FEB2CA7928600907CF6 /* 不正解.mp3 */; };
 		18B2AA082D1525A9009437D3 /* StoryShakaiListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B2AA072D1525A9009437D3 /* StoryShakaiListView.swift */; };
 		18B2AA0A2D1525C7009437D3 /* StoryRikaListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B2AA092D1525C7009437D3 /* StoryRikaListView.swift */; };
 		18C37B172D104FE700326A2E /* ProgressExpBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C37B162D104FE700326A2E /* ProgressExpBar.swift */; };
@@ -49,6 +52,8 @@
 		18C37B522D142F3F00326A2E /* StoryQuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C37B432D142F3E00326A2E /* StoryQuizView.swift */; };
 		18C37B532D142F3F00326A2E /* RankModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C37B442D142F3F00326A2E /* RankModalView.swift */; };
 		18D090A62CAC12C900F8B8D8 /* BannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D090A52CAC12C900F8B8D8 /* BannerView.swift */; };
+		18FA86A82F77D09700FA0BBD /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 18FA86A72F77D09700FA0BBD /* GoogleMobileAds */; };
+		18FA86AA2F77D10900FA0BBD /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 18FA86A92F77D10900FA0BBD /* FirebaseMessaging */; };
 		18FC72572C93128E00A95341 /* drillApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72562C93128E00A95341 /* drillApp.swift */; };
 		18FC72592C93128E00A95341 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72582C93128E00A95341 /* ContentView.swift */; };
 		18FC725B2C93128F00A95341 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 18FC725A2C93128F00A95341 /* Assets.xcassets */; };
@@ -60,7 +65,6 @@
 		18FC72872C93160500A95341 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18FC72862C93160500A95341 /* AVKit.framework */; };
 		18FC72892C93160D00A95341 /* Charts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18FC72882C93160D00A95341 /* Charts.framework */; };
 		18FC728B2C93162100A95341 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18FC728A2C93162100A95341 /* StoreKit.framework */; };
-		18FC728E2C9317DE00A95341 /* AppVersionMonitorSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 18FC728D2C9317DE00A95341 /* AppVersionMonitorSwiftUI */; };
 		18FC72902C93182900A95341 /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC728F2C93182900A95341 /* SettingView.swift */; };
 		18FC72922C93184E00A95341 /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72912C93184E00A95341 /* AuthManager.swift */; };
 		18FC72942C9319D500A95341 /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72932C9319D500A95341 /* AudioManager.swift */; };
@@ -134,6 +138,25 @@
 		18FC73292C9B18BC00A95341 /* ChangeNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC73282C9B18BC00A95341 /* ChangeNameView.swift */; };
 		18FC732B2C9FC58F00A95341 /* ContactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC732A2C9FC58F00A95341 /* ContactView.swift */; };
 		18FC732D2C9FC8D100A95341 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC732C2C9FC8D100A95341 /* RootView.swift */; };
+		35E1826D8D234DFB80954E27 /* SocialDesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D0D683CFD004828ABD93DC5 /* SocialDesignSystem.swift */; };
+		39DA85CB28AD4F4F94F385E3 /* LoginBonusModernView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4812A6EED09B472D8D5FFE7C /* LoginBonusModernView.swift */; };
+		482EF9EBFFB84C419E9C6417 /* SpacedReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518E79B3B2734E888D23F5E6 /* SpacedReviewView.swift */; };
+		4D17C5ADD48F4FB68B32C240 /* GuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567023399291426986FED660 /* GuildView.swift */; };
+		5A0F41686FAE4D728422AEC4 /* LoginBonusListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFAB049C599C480C85E51CAF /* LoginBonusListView.swift */; };
+		6FD74ACBE2844AEEBD561F79 /* WeeklyLeagueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 210C954A797248CDAF8C4377 /* WeeklyLeagueView.swift */; };
+		793507BF55304AA68AB27480 /* GuildBossBattleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0ADFE2B454742879B3281FC /* GuildBossBattleView.swift */; };
+		7A4D1B5E3C0A4D0100000001 /* Mission.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4D1B5E3C0A4D0100000011 /* Mission.swift */; };
+		7A4D1B5E3C0A4D0100000002 /* MissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4D1B5E3C0A4D0100000012 /* MissionManager.swift */; };
+		7A4D1B5E3C0A4D0100000003 /* MissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4D1B5E3C0A4D0100000013 /* MissionView.swift */; };
+		7A4D1B5E3C0A4D0100000004 /* InventoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4D1B5E3C0A4D0100000014 /* InventoryView.swift */; };
+		84B32B8C8B37434ABEC15083 /* FriendManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC5CBC2355E47A79B88411C /* FriendManager.swift */; };
+		870852FFD37E4C859F568CB5 /* WeeklyLeagueService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F614D0A46FCC4090B489E966 /* WeeklyLeagueService.swift */; };
+		88174CBB4D7D4ED48E57F03F /* GuildManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06845309774145F7A09D3807 /* GuildManager.swift */; };
+		9741990A691842DC8683B189 /* BattleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3466558560F740D29FE39DBB /* BattleManager.swift */; };
+		C68C442C45C64B08B0FF6E95 /* BattleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E00A471925341778310DCA8 /* BattleView.swift */; };
+		D9E573F0EEEA4ED5ABC667A2 /* FriendListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FCF1F57551E4302A665B4B8 /* FriendListView.swift */; };
+		F4F91B72505A4182B46BD3CA /* ReviewScheduleService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82D5F8260F640D0B18A0F1A /* ReviewScheduleService.swift */; };
+		F80587DB7AC4473FBA8E442B /* LoginBonusConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D6654F3C5E4BC1A6DF8F0B /* LoginBonusConfig.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -154,25 +177,32 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		06845309774145F7A09D3807 /* GuildManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuildManager.swift; sourceTree = "<group>"; };
+		0E00A471925341778310DCA8 /* BattleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattleView.swift; sourceTree = "<group>"; };
 		180A9FCE2CE231EA00B35C83 /* StampAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StampAnimationView.swift; sourceTree = "<group>"; };
+		181476082F7785CF007FFCFF /* GachaCatalogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GachaCatalogView.swift; sourceTree = "<group>"; };
 		1825342F2CC3EB68001CFE16 /* SplashScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenView.swift; sourceTree = "<group>"; };
 		182899C52CBBC4B0001BD535 /* ReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewView.swift; sourceTree = "<group>"; };
 		18324D192CA1132A00B4043D /* StoreKit.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = StoreKit.storekit; sourceTree = "<group>"; };
 		18324D1A2CA11BC300B4043D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		183A77862CB40E180000B839 /* HelpModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpModalView.swift; sourceTree = "<group>"; };
+		183FA98E2F754D37006B346C /* GachaManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GachaManagerView.swift; sourceTree = "<group>"; };
+		18A233C42F13F8D60007E444 /* おとも切り替え.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "おとも切り替え.mp3"; sourceTree = "<group>"; };
+		18A233C52F13F8D60007E444 /* カウントダウン.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "カウントダウン.mp3"; sourceTree = "<group>"; };
+		18A233C62F13F8D60007E444 /* キャンセル.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "キャンセル.mp3"; sourceTree = "<group>"; };
+		18A233C72F13F8D60007E444 /* ゲームオーバー.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "ゲームオーバー.mp3"; sourceTree = "<group>"; };
+		18A233C82F13F8D60007E444 /* ゲームクリア.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "ゲームクリア.mp3"; sourceTree = "<group>"; };
+		18A233C92F13F8D60007E444 /* ホームに戻る.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "ホームに戻る.mp3"; sourceTree = "<group>"; };
+		18A233CA2F13F8D60007E444 /* レベルアップ.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "レベルアップ.mp3"; sourceTree = "<group>"; };
+		18A233CB2F13F8D60007E444 /* 称号.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "称号.mp3"; sourceTree = "<group>"; };
+		18A233CC2F13F8D60007E444 /* 正解.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "正解.mp3"; sourceTree = "<group>"; };
+		18A233CD2F13F8D60007E444 /* 敵攻撃.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "敵攻撃.mp3"; sourceTree = "<group>"; };
+		18A233CE2F13F8D60007E444 /* 倒れる.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "倒れる.mp3"; sourceTree = "<group>"; };
+		18A233CF2F13F8D60007E444 /* 不正解.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "不正解.mp3"; sourceTree = "<group>"; };
+		18A233D02F13F8D60007E444 /* 味方攻撃.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "味方攻撃.mp3"; sourceTree = "<group>"; };
+		18A236DE2F1516050007E444 /* SubjectComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectComponents.swift; sourceTree = "<group>"; };
 		18A44FDD2CA2C73D00907CF6 /* ManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagerView.swift; sourceTree = "<group>"; };
 		18A44FDF2CA2E18000907CF6 /* SansuTabListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SansuTabListView.swift; sourceTree = "<group>"; };
-		18A44FE12CA7928600907CF6 /* 倒した.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "倒した.mp3"; path = "../../DrillQuiz/it/倒した.mp3"; sourceTree = "<group>"; };
-		18A44FE22CA7928600907CF6 /* 正解.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "正解.mp3"; path = "../../DrillQuiz/it/正解.mp3"; sourceTree = "<group>"; };
-		18A44FE32CA7928600907CF6 /* 敵攻撃.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "敵攻撃.mp3"; path = "../../DrillQuiz/it/敵攻撃.mp3"; sourceTree = "<group>"; };
-		18A44FE42CA7928600907CF6 /* 味方攻撃.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "味方攻撃.mp3"; path = "../../DrillQuiz/it/味方攻撃.mp3"; sourceTree = "<group>"; };
-		18A44FE52CA7928600907CF6 /* カウントダウン.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "カウントダウン.mp3"; path = "../../DrillQuiz/it/カウントダウン.mp3"; sourceTree = "<group>"; };
-		18A44FE62CA7928600907CF6 /* おとも切り替え.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "おとも切り替え.mp3"; path = "../../DrillQuiz/it/おとも切り替え.mp3"; sourceTree = "<group>"; };
-		18A44FE72CA7928600907CF6 /* ホームに戻る.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ホームに戻る.mp3"; path = "../../DrillQuiz/it/ホームに戻る.mp3"; sourceTree = "<group>"; };
-		18A44FE82CA7928600907CF6 /* キャンセル.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "キャンセル.mp3"; path = "../../DrillQuiz/it/キャンセル.mp3"; sourceTree = "<group>"; };
-		18A44FE92CA7928600907CF6 /* レベルアップ回復.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "レベルアップ回復.mp3"; path = "../../DrillQuiz/it/レベルアップ回復.mp3"; sourceTree = "<group>"; };
-		18A44FEA2CA7928600907CF6 /* ガチャる.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ガチャる.mp3"; path = "../../DrillQuiz/it/ガチャる.mp3"; sourceTree = "<group>"; };
-		18A44FEB2CA7928600907CF6 /* 不正解.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "不正解.mp3"; path = "../../DrillQuiz/it/不正解.mp3"; sourceTree = "<group>"; };
 		18B2AA072D1525A9009437D3 /* StoryShakaiListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryShakaiListView.swift; sourceTree = "<group>"; };
 		18B2AA092D1525C7009437D3 /* StoryRikaListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryRikaListView.swift; sourceTree = "<group>"; };
 		18C37B162D104FE700326A2E /* ProgressExpBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressExpBar.swift; sourceTree = "<group>"; };
@@ -279,6 +309,23 @@
 		18FC73282C9B18BC00A95341 /* ChangeNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeNameView.swift; sourceTree = "<group>"; };
 		18FC732A2C9FC58F00A95341 /* ContactView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactView.swift; sourceTree = "<group>"; };
 		18FC732C2C9FC8D100A95341 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		210C954A797248CDAF8C4377 /* WeeklyLeagueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyLeagueView.swift; sourceTree = "<group>"; };
+		2BC5CBC2355E47A79B88411C /* FriendManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendManager.swift; sourceTree = "<group>"; };
+		2FCF1F57551E4302A665B4B8 /* FriendListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendListView.swift; sourceTree = "<group>"; };
+		3466558560F740D29FE39DBB /* BattleManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattleManager.swift; sourceTree = "<group>"; };
+		4812A6EED09B472D8D5FFE7C /* LoginBonusModernView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginBonusModernView.swift; sourceTree = "<group>"; };
+		518E79B3B2734E888D23F5E6 /* SpacedReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpacedReviewView.swift; sourceTree = "<group>"; };
+		567023399291426986FED660 /* GuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuildView.swift; sourceTree = "<group>"; };
+		7A4D1B5E3C0A4D0100000011 /* Mission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mission.swift; sourceTree = "<group>"; };
+		7A4D1B5E3C0A4D0100000012 /* MissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissionManager.swift; sourceTree = "<group>"; };
+		7A4D1B5E3C0A4D0100000013 /* MissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissionView.swift; sourceTree = "<group>"; };
+		7A4D1B5E3C0A4D0100000014 /* InventoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryView.swift; sourceTree = "<group>"; };
+		7D0D683CFD004828ABD93DC5 /* SocialDesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialDesignSystem.swift; sourceTree = "<group>"; };
+		A82D5F8260F640D0B18A0F1A /* ReviewScheduleService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewScheduleService.swift; sourceTree = "<group>"; };
+		B0ADFE2B454742879B3281FC /* GuildBossBattleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuildBossBattleView.swift; sourceTree = "<group>"; };
+		D3D6654F3C5E4BC1A6DF8F0B /* LoginBonusConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginBonusConfig.swift; sourceTree = "<group>"; };
+		F614D0A46FCC4090B489E966 /* WeeklyLeagueService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyLeagueService.swift; sourceTree = "<group>"; };
+		FFAB049C599C480C85E51CAF /* LoginBonusListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginBonusListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -286,16 +333,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				180BEDC12E1199F300F92223 /* FirebaseAnalytics in Frameworks */,
-				180BEDBE2E11997500F92223 /* GoogleMobileAds in Frameworks */,
-				180BEDC92E119D4900F92223 /* FirebaseMessaging in Frameworks */,
+				18FA86AA2F77D10900FA0BBD /* FirebaseMessaging in Frameworks */,
+				18037ED52F77CB48006547BC /* FirebaseDatabase in Frameworks */,
 				18FC72892C93160D00A95341 /* Charts.framework in Frameworks */,
+				18037EDB2F77CD1F006547BC /* AppVersionMonitorSwiftUI in Frameworks */,
+				18037ED32F77CB48006547BC /* FirebaseAuth in Frameworks */,
+				18FA86A82F77D09700FA0BBD /* GoogleMobileAds in Frameworks */,
 				18FC72872C93160500A95341 /* AVKit.framework in Frameworks */,
-				18FC728E2C9317DE00A95341 /* AppVersionMonitorSwiftUI in Frameworks */,
-				180BEDC72E119A7300F92223 /* FirebaseCore in Frameworks */,
-				180BEDC52E1199F300F92223 /* FirebaseDatabase in Frameworks */,
+				18037ED12F77CB48006547BC /* FirebaseAnalytics in Frameworks */,
 				18FC728B2C93162100A95341 /* StoreKit.framework in Frameworks */,
-				180BEDC32E1199F300F92223 /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -342,6 +388,28 @@
 		18FC72552C93128E00A95341 /* drill */ = {
 			isa = PBXGroup;
 			children = (
+				F614D0A46FCC4090B489E966 /* WeeklyLeagueService.swift */,
+				210C954A797248CDAF8C4377 /* WeeklyLeagueView.swift */,
+				3466558560F740D29FE39DBB /* BattleManager.swift */,
+				0E00A471925341778310DCA8 /* BattleView.swift */,
+				06845309774145F7A09D3807 /* GuildManager.swift */,
+				567023399291426986FED660 /* GuildView.swift */,
+				B0ADFE2B454742879B3281FC /* GuildBossBattleView.swift */,
+				A82D5F8260F640D0B18A0F1A /* ReviewScheduleService.swift */,
+				518E79B3B2734E888D23F5E6 /* SpacedReviewView.swift */,
+				2BC5CBC2355E47A79B88411C /* FriendManager.swift */,
+				2FCF1F57551E4302A665B4B8 /* FriendListView.swift */,
+				7D0D683CFD004828ABD93DC5 /* SocialDesignSystem.swift */,
+				18A236DE2F1516050007E444 /* SubjectComponents.swift */,
+				181476082F7785CF007FFCFF /* GachaCatalogView.swift */,
+				7A4D1B5E3C0A4D0100000014 /* InventoryView.swift */,
+				7A4D1B5E3C0A4D0100000011 /* Mission.swift */,
+				7A4D1B5E3C0A4D0100000012 /* MissionManager.swift */,
+				7A4D1B5E3C0A4D0100000013 /* MissionView.swift */,
+				183FA98E2F754D37006B346C /* GachaManagerView.swift */,
+				D3D6654F3C5E4BC1A6DF8F0B /* LoginBonusConfig.swift */,
+				4812A6EED09B472D8D5FFE7C /* LoginBonusModernView.swift */,
+				FFAB049C599C480C85E51CAF /* LoginBonusListView.swift */,
 				18FC72A92C933D9A00A95341 /* Info.plist */,
 				18FC72562C93128E00A95341 /* drillApp.swift */,
 				182899C52CBBC4B0001BD535 /* ReviewView.swift */,
@@ -443,17 +511,19 @@
 				18C37B3A2D142F3500326A2E /* StoryView.swift */,
 				18C37B3C2D142F3700326A2E /* SubModalView.swift */,
 				18C37B422D142F3B00326A2E /* TutorialStoryModalView.swift */,
-				18A44FE62CA7928600907CF6 /* おとも切り替え.mp3 */,
-				18A44FE52CA7928600907CF6 /* カウントダウン.mp3 */,
-				18A44FEA2CA7928600907CF6 /* ガチャる.mp3 */,
-				18A44FE82CA7928600907CF6 /* キャンセル.mp3 */,
-				18A44FE72CA7928600907CF6 /* ホームに戻る.mp3 */,
-				18A44FE92CA7928600907CF6 /* レベルアップ回復.mp3 */,
-				18A44FE22CA7928600907CF6 /* 正解.mp3 */,
-				18A44FE32CA7928600907CF6 /* 敵攻撃.mp3 */,
-				18A44FE12CA7928600907CF6 /* 倒した.mp3 */,
-				18A44FEB2CA7928600907CF6 /* 不正解.mp3 */,
-				18A44FE42CA7928600907CF6 /* 味方攻撃.mp3 */,
+				18A233C42F13F8D60007E444 /* おとも切り替え.mp3 */,
+				18A233C52F13F8D60007E444 /* カウントダウン.mp3 */,
+				18A233C62F13F8D60007E444 /* キャンセル.mp3 */,
+				18A233C72F13F8D60007E444 /* ゲームオーバー.mp3 */,
+				18A233C82F13F8D60007E444 /* ゲームクリア.mp3 */,
+				18A233C92F13F8D60007E444 /* ホームに戻る.mp3 */,
+				18A233CA2F13F8D60007E444 /* レベルアップ.mp3 */,
+				18A233CB2F13F8D60007E444 /* 称号.mp3 */,
+				18A233CC2F13F8D60007E444 /* 正解.mp3 */,
+				18A233CD2F13F8D60007E444 /* 敵攻撃.mp3 */,
+				18A233CE2F13F8D60007E444 /* 倒れる.mp3 */,
+				18A233CF2F13F8D60007E444 /* 不正解.mp3 */,
+				18A233D02F13F8D60007E444 /* 味方攻撃.mp3 */,
 				18324D1A2CA11BC300B4043D /* GoogleService-Info.plist */,
 				18FC725A2C93128F00A95341 /* Assets.xcassets */,
 				18FC725C2C93128F00A95341 /* Preview Content */,
@@ -520,13 +590,12 @@
 			);
 			name = drill;
 			packageProductDependencies = (
-				18FC728D2C9317DE00A95341 /* AppVersionMonitorSwiftUI */,
-				180BEDBD2E11997500F92223 /* GoogleMobileAds */,
-				180BEDC02E1199F300F92223 /* FirebaseAnalytics */,
-				180BEDC22E1199F300F92223 /* FirebaseAuth */,
-				180BEDC42E1199F300F92223 /* FirebaseDatabase */,
-				180BEDC62E119A7300F92223 /* FirebaseCore */,
-				180BEDC82E119D4900F92223 /* FirebaseMessaging */,
+				18037ED02F77CB48006547BC /* FirebaseAnalytics */,
+				18037ED22F77CB48006547BC /* FirebaseAuth */,
+				18037ED42F77CB48006547BC /* FirebaseDatabase */,
+				18037EDA2F77CD1F006547BC /* AppVersionMonitorSwiftUI */,
+				18FA86A72F77D09700FA0BBD /* GoogleMobileAds */,
+				18FA86A92F77D10900FA0BBD /* FirebaseMessaging */,
 			);
 			productName = drill;
 			productReference = 18FC72532C93128E00A95341 /* drill.app */;
@@ -601,9 +670,9 @@
 			);
 			mainGroup = 18FC724A2C93128E00A95341;
 			packageReferences = (
-				18FC728C2C93164600A95341 /* XCRemoteSwiftPackageReference "AppVersionMonitorSwiftUI" */,
-				180BEDBC2E11997500F92223 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
-				180BEDBF2E1199F300F92223 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				18037ECF2F77CB48006547BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				18037ED92F77CD1F006547BC /* XCRemoteSwiftPackageReference "AppVersionMonitorSwiftUI" */,
+				18FA86A62F77D09700FA0BBD /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
 			);
 			productRefGroup = 18FC72542C93128E00A95341 /* Products */;
 			projectDirPath = "";
@@ -621,20 +690,22 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				18A44FEE2CA7928600907CF6 /* 敵攻撃.mp3 in Resources */,
-				18A44FF12CA7928600907CF6 /* おとも切り替え.mp3 in Resources */,
-				18A44FF22CA7928600907CF6 /* ホームに戻る.mp3 in Resources */,
-				18A44FF42CA7928600907CF6 /* レベルアップ回復.mp3 in Resources */,
-				18A44FF62CA7928600907CF6 /* 不正解.mp3 in Resources */,
-				18A44FF32CA7928600907CF6 /* キャンセル.mp3 in Resources */,
-				18A44FED2CA7928600907CF6 /* 正解.mp3 in Resources */,
 				18FC725E2C93128F00A95341 /* Preview Assets.xcassets in Resources */,
-				18A44FEC2CA7928600907CF6 /* 倒した.mp3 in Resources */,
-				18A44FEF2CA7928600907CF6 /* 味方攻撃.mp3 in Resources */,
 				18FC725B2C93128F00A95341 /* Assets.xcassets in Resources */,
+				18A233D12F13F8D60007E444 /* ゲームクリア.mp3 in Resources */,
+				18A233D22F13F8D60007E444 /* カウントダウン.mp3 in Resources */,
+				18A233D32F13F8D60007E444 /* おとも切り替え.mp3 in Resources */,
+				18A233D42F13F8D60007E444 /* 敵攻撃.mp3 in Resources */,
+				18A233D52F13F8D60007E444 /* 正解.mp3 in Resources */,
+				18A233D62F13F8D60007E444 /* 不正解.mp3 in Resources */,
+				18A233D72F13F8D60007E444 /* ホームに戻る.mp3 in Resources */,
+				18A233D82F13F8D60007E444 /* レベルアップ.mp3 in Resources */,
+				18A233D92F13F8D60007E444 /* ゲームオーバー.mp3 in Resources */,
+				18A233DA2F13F8D60007E444 /* 倒れる.mp3 in Resources */,
+				18A233DB2F13F8D60007E444 /* キャンセル.mp3 in Resources */,
+				18A233DC2F13F8D60007E444 /* 称号.mp3 in Resources */,
+				18A233DD2F13F8D60007E444 /* 味方攻撃.mp3 in Resources */,
 				18324D1B2CA11BC300B4043D /* GoogleService-Info.plist in Resources */,
-				18A44FF52CA7928600907CF6 /* ガチャる.mp3 in Resources */,
-				18A44FF02CA7928600907CF6 /* カウントダウン.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -659,6 +730,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				870852FFD37E4C859F568CB5 /* WeeklyLeagueService.swift in Sources */,
+				6FD74ACBE2844AEEBD561F79 /* WeeklyLeagueView.swift in Sources */,
+				9741990A691842DC8683B189 /* BattleManager.swift in Sources */,
+				C68C442C45C64B08B0FF6E95 /* BattleView.swift in Sources */,
+				88174CBB4D7D4ED48E57F03F /* GuildManager.swift in Sources */,
+				4D17C5ADD48F4FB68B32C240 /* GuildView.swift in Sources */,
+				793507BF55304AA68AB27480 /* GuildBossBattleView.swift in Sources */,
+				F4F91B72505A4182B46BD3CA /* ReviewScheduleService.swift in Sources */,
+				482EF9EBFFB84C419E9C6417 /* SpacedReviewView.swift in Sources */,
+				84B32B8C8B37434ABEC15083 /* FriendManager.swift in Sources */,
+				D9E573F0EEEA4ED5ABC667A2 /* FriendListView.swift in Sources */,
+				35E1826D8D234DFB80954E27 /* SocialDesignSystem.swift in Sources */,
 				18C37B492D142F3F00326A2E /* StorySutaminaModalView.swift in Sources */,
 				18FC731F2C9822FD00A95341 /* PentagonShakaiView.swift in Sources */,
 				18C37B462D142F3F00326A2E /* InterstitialStory.swift in Sources */,
@@ -712,6 +795,7 @@
 				18FC72A22C931D3400A95341 /* GraphManagerView.swift in Sources */,
 				18FC72F32C95C59800A95341 /* Rika3ListView.swift in Sources */,
 				18FC72DB2C95B2D000A95341 /* Shakai2ListView.swift in Sources */,
+				183FA98F2F754D37006B346C /* GachaManagerView.swift in Sources */,
 				18FC72E62C95BED600A95341 /* Kokugo1ListView.swift in Sources */,
 				18C37B4F2D142F3F00326A2E /* StoryKokugoListView.swift in Sources */,
 				18FC72DC2C95B2D000A95341 /* Shakai3ListView.swift in Sources */,
@@ -736,9 +820,18 @@
 				18FC73232C9AF75A00A95341 /* TutorialModalView.swift in Sources */,
 				18C37B4C2D142F3F00326A2E /* TutorialStoryModalView.swift in Sources */,
 				18FC729E2C931C1600A95341 /* ManagerTabView.swift in Sources */,
+				181476092F7785CF007FFCFF /* GachaCatalogView.swift in Sources */,
 				18FC72C72C952C9B00A95341 /* ModalView.swift in Sources */,
 				18FC72CD2C95B15300A95341 /* Sansu4ListView.swift in Sources */,
 				18FC72CB2C95B15100A95341 /* Sansu2ListView.swift in Sources */,
+				18A236DF2F1516080007E444 /* SubjectComponents.swift in Sources */,
+				7A4D1B5E3C0A4D0100000004 /* InventoryView.swift in Sources */,
+				7A4D1B5E3C0A4D0100000001 /* Mission.swift in Sources */,
+				7A4D1B5E3C0A4D0100000002 /* MissionManager.swift in Sources */,
+				7A4D1B5E3C0A4D0100000003 /* MissionView.swift in Sources */,
+				F80587DB7AC4473FBA8E442B /* LoginBonusConfig.swift in Sources */,
+				39DA85CB28AD4F4F94F385E3 /* LoginBonusModernView.swift in Sources */,
+				5A0F41686FAE4D728422AEC4 /* LoginBonusListView.swift in Sources */,
 				18FC73052C96CD3200A95341 /* IncorrectKokugoListView.swift in Sources */,
 				18FC72E52C95BED600A95341 /* Kokugo5ListView.swift in Sources */,
 				18FC72D12C95B15800A95341 /* Sansu6ListView.swift in Sources */,
@@ -920,14 +1013,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2.7;
+				CURRENT_PROJECT_VERSION = 3.14;
 				DEVELOPMENT_ASSET_PATHS = "\"drill/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = drill/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "ドリルクエスト";
+				INFOPLIST_KEY_CFBundleDisplayName = "小学クエスト";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -938,7 +1031,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.7;
+				MARKETING_VERSION = 3.17;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.drillQuiz3948";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -953,14 +1046,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2.7;
+				CURRENT_PROJECT_VERSION = 3.14;
 				DEVELOPMENT_ASSET_PATHS = "\"drill/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = drill/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "ドリルクエスト";
+				INFOPLIST_KEY_CFBundleDisplayName = "小学クエスト";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -971,7 +1064,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.7;
+				MARKETING_VERSION = 3.17;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.drillQuiz3948";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1098,23 +1191,15 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		180BEDBC2E11997500F92223 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 12.6.0;
-			};
-		};
-		180BEDBF2E1199F300F92223 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+		18037ECF2F77CB48006547BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 11.15.0;
+				minimumVersion = 12.11.0;
 			};
 		};
-		18FC728C2C93164600A95341 /* XCRemoteSwiftPackageReference "AppVersionMonitorSwiftUI" */ = {
+		18037ED92F77CD1F006547BC /* XCRemoteSwiftPackageReference "AppVersionMonitorSwiftUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SNQ-2001/AppVersionMonitorSwiftUI";
 			requirement = {
@@ -1122,43 +1207,46 @@
 				minimumVersion = 0.1.1;
 			};
 		};
+		18FA86A62F77D09700FA0BBD /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		180BEDBD2E11997500F92223 /* GoogleMobileAds */ = {
+		18037ED02F77CB48006547BC /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 180BEDBC2E11997500F92223 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
-			productName = GoogleMobileAds;
-		};
-		180BEDC02E1199F300F92223 /* FirebaseAnalytics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 180BEDBF2E1199F300F92223 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = 18037ECF2F77CB48006547BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAnalytics;
 		};
-		180BEDC22E1199F300F92223 /* FirebaseAuth */ = {
+		18037ED22F77CB48006547BC /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 180BEDBF2E1199F300F92223 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = 18037ECF2F77CB48006547BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAuth;
 		};
-		180BEDC42E1199F300F92223 /* FirebaseDatabase */ = {
+		18037ED42F77CB48006547BC /* FirebaseDatabase */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 180BEDBF2E1199F300F92223 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = 18037ECF2F77CB48006547BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseDatabase;
 		};
-		180BEDC62E119A7300F92223 /* FirebaseCore */ = {
+		18037EDA2F77CD1F006547BC /* AppVersionMonitorSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 180BEDBF2E1199F300F92223 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseCore;
-		};
-		180BEDC82E119D4900F92223 /* FirebaseMessaging */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 180BEDBF2E1199F300F92223 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseMessaging;
-		};
-		18FC728D2C9317DE00A95341 /* AppVersionMonitorSwiftUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 18FC728C2C93164600A95341 /* XCRemoteSwiftPackageReference "AppVersionMonitorSwiftUI" */;
+			package = 18037ED92F77CD1F006547BC /* XCRemoteSwiftPackageReference "AppVersionMonitorSwiftUI" */;
 			productName = AppVersionMonitorSwiftUI;
+		};
+		18FA86A72F77D09700FA0BBD /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 18FA86A62F77D09700FA0BBD /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
+		};
+		18FA86A92F77D10900FA0BBD /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 18037ECF2F77CB48006547BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

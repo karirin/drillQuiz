@@ -1,4 +1,14 @@
 {
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
   "identifier" : "19F3F119",
   "nonRenewingSubscriptions" : [
 
@@ -51,56 +61,53 @@
     }
   ],
   "settings" : {
+    "_askToBuyEnabled" : false,
+    "_billingGracePeriodEnabled" : false,
+    "_billingIssuesEnabled" : false,
+    "_disableDialogs" : false,
     "_failTransactionsEnabled" : false,
     "_locale" : "en_US",
-    "_storefront" : "USA",
+    "_renewalBillingIssuesEnabled" : false,
+    "_storefront" : "JPN",
     "_storeKitErrors" : [
       {
-        "current" : null,
         "enabled" : false,
         "name" : "Load Products"
       },
       {
-        "current" : null,
         "enabled" : false,
         "name" : "Purchase"
       },
       {
-        "current" : null,
         "enabled" : false,
         "name" : "Verification"
       },
       {
-        "current" : null,
         "enabled" : false,
         "name" : "App Store Sync"
       },
       {
-        "current" : null,
         "enabled" : false,
         "name" : "Subscription Status"
       },
       {
-        "current" : null,
         "enabled" : false,
         "name" : "App Transaction"
       },
       {
-        "current" : null,
         "enabled" : false,
         "name" : "Manage Subscriptions Sheet"
       },
       {
-        "current" : null,
         "enabled" : false,
         "name" : "Refund Request Sheet"
       },
       {
-        "current" : null,
         "enabled" : false,
         "name" : "Offer Code Redeem Sheet"
       }
-    ]
+    ],
+    "_timeRate" : 0
   },
   "subscriptionGroups" : [
     {
@@ -114,6 +121,15 @@
           "adHocOffers" : [
 
           ],
+          "billingPlans" : [
+            {
+              "billingPlanType" : "BILLED_UPFRONT",
+              "commitmentDisplayPrice" : "2.00",
+              "displayPrice" : "2.00",
+              "internalID" : "46A60F3C",
+              "isEnabled" : true
+            }
+          ],
           "codeOffers" : [
 
           ],
@@ -121,7 +137,9 @@
           "familyShareable" : false,
           "groupNumber" : 1,
           "internalID" : "22EFC764",
-          "introductoryOffer" : null,
+          "introductoryOffers" : [
+
+          ],
           "localizations" : [
             {
               "description" : "広告非表示",
@@ -133,13 +151,133 @@
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "広告非表示プラン",
           "subscriptionGroupID" : "52040B4D",
-          "type" : "RecurringSubscription"
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "billingPlans" : [
+            {
+              "billingPlanType" : "BILLED_UPFRONT",
+              "commitmentDisplayPrice" : "4.80",
+              "displayPrice" : "4.80",
+              "internalID" : "118B34BE",
+              "isEnabled" : true
+            }
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "4.80",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "7C4A91A1",
+          "introductoryOffers" : [
+
+          ],
+          "localizations" : [
+            {
+              "description" : "広告非表示",
+              "displayName" : "広告非表示",
+              "locale" : "ja"
+            }
+          ],
+          "productID" : "drill_premium_weekly_480",
+          "recurringSubscriptionPeriod" : "P1W",
+          "referenceName" : "広告非表示プラン（週額）",
+          "subscriptionGroupID" : "52040B4D",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "billingPlans" : [
+            {
+              "billingPlanType" : "BILLED_UPFRONT",
+              "commitmentDisplayPrice" : "9.80",
+              "displayPrice" : "9.80",
+              "internalID" : "E7818574",
+              "isEnabled" : true
+            }
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "9.80",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "8D7B03C2",
+          "introductoryOffers" : [
+
+          ],
+          "localizations" : [
+            {
+              "description" : "広告非表示",
+              "displayName" : "広告非表示",
+              "locale" : "ja"
+            }
+          ],
+          "productID" : "drill_premium_monthly_980",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "広告非表示プラン（月額）",
+          "subscriptionGroupID" : "52040B4D",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "billingPlans" : [
+            {
+              "billingPlanType" : "BILLED_UPFRONT",
+              "commitmentDisplayPrice" : "98.0",
+              "displayPrice" : "98.0",
+              "internalID" : "D1E1084C",
+              "isEnabled" : true
+            }
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "98.0",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "9E8C14D3",
+          "introductoryOffers" : [
+
+          ],
+          "localizations" : [
+            {
+              "description" : "広告非表示",
+              "displayName" : "広告非表示",
+              "locale" : "ja"
+            }
+          ],
+          "productID" : "drill_premium_yearly_9800",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "広告非表示プラン（年額）",
+          "subscriptionGroupID" : "52040B4D",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         }
       ]
     }
   ],
   "version" : {
-    "major" : 3,
+    "major" : 5,
     "minor" : 0
   }
 }

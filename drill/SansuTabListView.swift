@@ -32,8 +32,6 @@ struct SansuTabListView: View {
     @State private var buttonRect: CGRect = .zero
     @State private var bubbleHeight: CGFloat = 0.0
     @State private var isIncorrectAnswersEmpty: Bool = true
-//    @ObservedObject var reward = Reward()
-    @StateObject var reward = Reward()
     @State private var showLoginModal: Bool = false
     @State private var isButtonClickable: Bool = false
     @State private var showAlert: Bool = false
@@ -334,7 +332,6 @@ struct SansuTabListView: View {
             .frame(maxWidth:.infinity,maxHeight: .infinity)
             .background(Color("Color2"))
             .onAppear {
-                reward.LoadReward()
                 fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
                     authManager.fetchPreFlag()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {

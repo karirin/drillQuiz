@@ -1,0 +1,8 @@
+# Xcode build output / DerivedData
+build/
+drill/build/
+DerivedData/
+*.xcuserstate
+
+# macOS
+.DS_Store

@@ -59,7 +59,8 @@ struct StoryMonsterModalView: View {
         29: Monster(name: "モンスター29", playerExperience: 140, playerMoney: 140, monsterHP: 360, monsterUnderHP: 360, monsterAttack: 78),
         30: Monster(name: "モンスター30", playerExperience: 145, playerMoney: 145, monsterHP: 370, monsterUnderHP: 370, monsterAttack: 80),
         31: Monster(name: "モンスター31", playerExperience: 150, playerMoney: 150, monsterHP: 380, monsterUnderHP: 380, monsterAttack: 82),
-        32: Monster(name: "モンスター32", playerExperience: 155, playerMoney: 155, monsterHP: 390, monsterUnderHP: 390, monsterAttack: 85)
+        32: Monster(name: "モンスター32", playerExperience: 155, playerMoney: 155, monsterHP: 390, monsterUnderHP: 390, monsterAttack: 85),
+        150: Monster(name: "ボス150", playerExperience: 1500, playerMoney: 3000, monsterHP: 6000, monsterUnderHP: 6000, monsterAttack: 750)
     ]
 
     var body: some View {
@@ -260,18 +261,8 @@ struct StoryMonsterModalView: View {
     }
     
     private func setQuizTitle() {
-        switch viewModel.userPosition {
-        case 1...4, 9...14, 40...50:
-            quizTitle = "算数"
-        case 5...8, 15...19:
-            quizTitle = "国語"
-        case 20...24, 29...34:
-            quizTitle = "理科"
-        case 25...28, 35...39:
-            quizTitle = "社会"
-        default:
-            quizTitle = "算数"
-        }
+        let targetFloor = DungeonTheme.clampedFloor(viewModel.userPosition + 1)
+        quizTitle = DungeonQuizSubject.subject(for: targetFloor).title
     }
     
     private func setMonsterParameters(monster: Int) {

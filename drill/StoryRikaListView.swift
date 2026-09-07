@@ -900,7 +900,7 @@ struct StoryRikaListView: View {
                 "雨",
                 "雪"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "晴れた日には星がよく見えます。"
         ),
         QuizQuestion(
@@ -977,7 +977,7 @@ struct StoryRikaListView: View {
                 "暖かくするため",
                 "体を休めるため"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "動物は冬になると食べ物が少なくなるため、冬眠します。"
         ),
         QuizQuestion(
@@ -1065,7 +1065,7 @@ struct StoryRikaListView: View {
                 "雨",
                 "雪"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 1,
             explanation: "晴れた夜には星がよく見えますが、雪の夜は星が隠れてしまいます。"
         ),
         QuizQuestion(
@@ -1076,7 +1076,7 @@ struct StoryRikaListView: View {
                 "窒素",
                 "アルゴン"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "植物は二酸化炭素と水を使って光合成を行います。"
         ),
         QuizQuestion(
@@ -3654,7 +3654,7 @@ struct StoryRikaListView: View {
                 "花を咲かせる",
                 "水を沸かす"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "乾電池を使うとスピーカーで音を鳴らすことができます。"
         ),
 
@@ -3666,7 +3666,7 @@ struct StoryRikaListView: View {
                 "寒い場所",
                 "砂漠"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "植物は光が当たる場所で育ちやすいです。"
         ),
 
@@ -4926,7 +4926,7 @@ struct StoryRikaListView: View {
                 "気圧の差",
                 "温度差"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 2,
             explanation: "風は主に気圧の差によって発生しますが、温度差も風の発生に影響を与えます。"
         ),
 
@@ -4938,7 +4938,7 @@ struct StoryRikaListView: View {
                 "昼と夜の変化",
                 "潮の満ち引き"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 2,
             explanation: "地球の自転によって昼と夜が生じます。"
         ),
 
@@ -4962,7 +4962,7 @@ struct StoryRikaListView: View {
                 "水蒸気",
                 "氷"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 2,
             explanation: "海水が蒸発すると水蒸気が発生し、空に上がります。"
         ),
 
@@ -4986,7 +4986,7 @@ struct StoryRikaListView: View {
                 "融解",
                 "沈殿"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 2,
             explanation: "氷が溶けて液体になる現象を融解といいます。"
         ),
 
@@ -4998,7 +4998,7 @@ struct StoryRikaListView: View {
                 "水星",
                 "地球"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 2,
             explanation: "太陽系で最も太陽に近い惑星は水星です。"
         ),
         QuizQuestion(
@@ -5199,7 +5199,7 @@ struct StoryRikaListView: View {
                    "閃光",
                    "虹"
                ],
-               correctAnswerIndex: 2,
+               correctAnswerIndex: 1,
                explanation: "雷が鳴る際に空で見える光は稲光と呼ばれます。"
            ),
 
@@ -5639,7 +5639,7 @@ struct StoryRikaListView: View {
                    "気圧の差",
                    "月の引力"
                ],
-               correctAnswerIndex: 3,
+               correctAnswerIndex: 2,
                explanation: "風は主に気圧の差によって発生します。"
            ),
 
@@ -5675,7 +5675,7 @@ struct StoryRikaListView: View {
                    "気圧が低くなるから",
                    "酸素がなくなるから"
                ],
-               correctAnswerIndex: 3,
+               correctAnswerIndex: 2,
                explanation: "山では気圧が低くなり、空気が薄く感じられます。"
            ),
 
@@ -5743,11 +5743,11 @@ struct StoryRikaListView: View {
                choices: [
                    "水",
                    "ガス",
-                   "マグマ",
+                   "溶岩",
                    "岩石"
                ],
-               correctAnswerIndex: 3,
-               explanation: "火山が噴火すると、溶けたマグマが冷えて岩石になります。"
+               correctAnswerIndex: 2,
+               explanation: "地下のマグマが地表に出たものを溶岩といいます。"
            ),
 
            QuizQuestion(
@@ -5782,7 +5782,7 @@ struct StoryRikaListView: View {
                    "地球が自転しているから",
                    "太陽が動いているから"
                ],
-               correctAnswerIndex: 3,
+               correctAnswerIndex: 2,
                explanation: "地球が自転することで、昼と夜が生じます。"
            ),
 
@@ -5794,7 +5794,7 @@ struct StoryRikaListView: View {
                    "光の速度が変わるから",
                    "水の温度が高いから"
                ],
-               correctAnswerIndex: 3,
+               correctAnswerIndex: 2,
                explanation: "光が水に入ると、光の速度が変わるため屈折が起こります。"
            ),
 
@@ -5818,7 +5818,7 @@ struct StoryRikaListView: View {
                    "水蒸気",
                    "太陽"
                ],
-               correctAnswerIndex: 3,
+               correctAnswerIndex: 2,
                explanation: "水蒸気が冷えて凝結することで雲が形成されます。"
            ),
 
@@ -5960,7 +5960,7 @@ struct StoryRikaListView: View {
                    "光が真空中を通るとき",
                    "光が白い紙に当たるとき"
                ],
-               correctAnswerIndex: 1,
+               correctAnswerIndex: 0,
                explanation: "光は空気から水のような異なる物質に入るときに屈折します。"
            ),
 
@@ -5972,7 +5972,7 @@ struct StoryRikaListView: View {
                    "太陽が沈むから",
                    "風が強く吹くから"
                ],
-               correctAnswerIndex: 1,
+               correctAnswerIndex: 0,
                explanation: "虹は太陽の光が空気中の水滴に反射・屈折することで見えます。"
            ),
 
@@ -6210,7 +6210,7 @@ struct StoryRikaListView: View {
                    "雲がぶつかり合うから",
                    "気圧が低くなるから"
                ],
-               correctAnswerIndex: 2,
+               correctAnswerIndex: 0,
                explanation: "雷は雲と地面、または雲同士の間で電気が流れることで発生します。"
            ),
 

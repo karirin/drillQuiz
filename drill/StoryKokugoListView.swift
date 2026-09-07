@@ -45,7 +45,7 @@ struct StoryKokugoListView: View {
             explanation: "『星が見え始めた』が自然な展開です。"
         ),
         QuizQuestion(
-            question: "次の文で正しい『かん』の漢字はどれですか？『時間＿＿を守る』",
+            question: "次の文で正しい『かん』の漢字はどれですか？『時＿＿を守る』",
             choices: [
                 "完",
                 "官",
@@ -53,7 +53,7 @@ struct StoryKokugoListView: View {
                 "間"
             ],
             correctAnswerIndex: 3,
-            explanation: "『時間間を守る』が正解です。"
+            explanation: "『時間を守る』が正解です。"
         ),
         QuizQuestion(
             question: "『のばす』という言葉の意味として適切なものはどれですか？",
@@ -162,8 +162,8 @@ struct StoryKokugoListView: View {
                 "習",
                 "修"
             ],
-            correctAnswerIndex: 3,
-            explanation: "『学修を終える』が正解です。"
+            correctAnswerIndex: 2,
+            explanation: "『学習を終える』が正解です。"
         ),
         QuizQuestion(
             question: "『しんじる』という言葉の意味として適切なものはどれですか？",
@@ -188,7 +188,7 @@ struct StoryKokugoListView: View {
             explanation: "『雨が降り出した』が自然な展開です。"
         ),
         QuizQuestion(
-            question: "次の文で正しい『てい』の漢字はどれですか？『＿＿度の天気』",
+            question: "次の文で正しい『てい』の漢字はどれですか？『＿＿気圧が近づく』",
             choices: [
                 "停",
                 "定",
@@ -196,7 +196,7 @@ struct StoryKokugoListView: View {
                 "邸"
             ],
             correctAnswerIndex: 2,
-            explanation: "『低度の天気』が正解です。"
+            explanation: "『低気圧が近づく』が正解です。"
         ),
         QuizQuestion(
             question: "『たすける』という言葉の意味として適切なものはどれですか？",
@@ -221,7 +221,7 @@ struct StoryKokugoListView: View {
             explanation: "『黒板に何かを書き始めた』が自然な展開です。"
         ),
         QuizQuestion(
-            question: "次の文で正しい『そう』の漢字はどれですか？『計画＿＿に従う』",
+            question: "次の文で正しい『そう』の漢字はどれですか？『＿＿作方法を学ぶ』",
             choices: [
                 "層",
                 "想",
@@ -229,7 +229,7 @@ struct StoryKokugoListView: View {
                 "走"
             ],
             correctAnswerIndex: 2,
-            explanation: "『計画操に従う』が正解です。"
+            explanation: "『操作方法を学ぶ』が正解です。"
         ),
         QuizQuestion(
             question: "次の文で正しい『かい』の漢字はどれですか？『＿＿を開く』",
@@ -265,7 +265,7 @@ struct StoryKokugoListView: View {
             explanation: "『お母さんが部屋に入ってきた』が自然な流れです。"
         ),
         QuizQuestion(
-            question: "次の文で正しい『しん』の漢字はどれですか？『新しい＿＿を買う』",
+            question: "次の文で正しい『しん』の漢字はどれですか？『＿＿聞を買う』",
             choices: [
                 "信",
                 "進",
@@ -273,7 +273,7 @@ struct StoryKokugoListView: View {
                 "新"
             ],
             correctAnswerIndex: 3,
-            explanation: "『新しい新を買う』が正解です。"
+            explanation: "『新聞を買う』が正解です。"
         ),
         QuizQuestion(
             question: "『くわしい』という言葉の意味として適切なものはどれですか？",
@@ -298,7 +298,7 @@ struct StoryKokugoListView: View {
             explanation: "『電気がついた』が自然な展開です。"
         ),
         QuizQuestion(
-            question: "次の文で正しい『せい』の漢字はどれですか？『学＿＿を取る』",
+            question: "次の文で正しい『せい』の漢字はどれですか？『先＿＿に質問する』",
             choices: [
                 "精",
                 "生",
@@ -306,7 +306,7 @@ struct StoryKokugoListView: View {
                 "姓"
             ],
             correctAnswerIndex: 1,
-            explanation: "『学生を取る』が正解です。"
+            explanation: "『先生に質問する』が正解です。"
         ),
         QuizQuestion(
             question: "『もえる』という言葉の意味として適切なものはどれですか？",
@@ -331,7 +331,7 @@ struct StoryKokugoListView: View {
             explanation: "『友達と再会した』が自然な流れです。"
         ),
         QuizQuestion(
-            question: "次の文で正しい『かん』の漢字はどれですか？『＿＿を感じる』",
+            question: "次の文で正しい『かん』の漢字はどれですか？『＿＿動する』",
             choices: [
                 "管",
                 "完",
@@ -339,10 +339,10 @@ struct StoryKokugoListView: View {
                 "感"
             ],
             correctAnswerIndex: 3,
-            explanation: "『感を感じる』が正解です。"
+            explanation: "『感動する』が正解です。"
         ),
         QuizQuestion(
-            question: "次の文で正しい『かん』の漢字はどれですか？『試験＿＿を終えた』",
+            question: "次の文で正しい『かん』の漢字はどれですか？『＿＿成させる』",
             choices: [
                 "完",
                 "官",
@@ -350,7 +350,7 @@ struct StoryKokugoListView: View {
                 "漢"
             ],
             correctAnswerIndex: 0,
-            explanation: "『試験完を終えた』が正解です。"
+            explanation: "『完成させる』が正解です。"
         ),
         QuizQuestion(
             question: "『ふえる』という言葉の意味として適切なものはどれですか？",
@@ -375,7 +375,7 @@ struct StoryKokugoListView: View {
             explanation: "『外で遊びたい』が自然な流れです。"
         ),
         QuizQuestion(
-            question: "次の文で正しい『せい』の漢字はどれですか？『＿＿がつく』",
+            question: "次の文で正しい『せい』の漢字はどれですか？『＿＿解に丸がつく』",
             choices: [
                 "正",
                 "性",
@@ -383,7 +383,7 @@ struct StoryKokugoListView: View {
                 "星"
             ],
             correctAnswerIndex: 0,
-            explanation: "『正がつく』が正解です。"
+            explanation: "『正解に丸がつく』が正解です。"
         ),
         QuizQuestion(
             question: "『しごと』という言葉の意味として適切なものはどれですか？",
@@ -441,7 +441,7 @@ struct StoryKokugoListView: View {
             explanation: "『電話が鳴った』が自然な流れです。"
         ),
         QuizQuestion(
-            question: "次の文で正しい『たん』の漢字はどれですか？『＿＿を探す』",
+            question: "次の文で正しい『たん』の漢字はどれですか？『＿＿語を覚える』",
             choices: [
                 "短",
                 "単",
@@ -449,7 +449,7 @@ struct StoryKokugoListView: View {
                 "探"
             ],
             correctAnswerIndex: 1,
-            explanation: "『単を探す』が正解です。"
+            explanation: "『単語を覚える』が正解です。"
         ),
         QuizQuestion(
             question: "次の文で正しい『しろ』の漢字はどれですか？『＿＿を見に行った』",
@@ -780,7 +780,7 @@ QuizQuestion(
             "盆に水を入れること",
             "失敗したことをやり直すこと"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 0,
         explanation: "『覆水盆に返らず』は、一度失ったものは取り戻せないという意味のことわざです。"
     ),
 
@@ -851,7 +851,7 @@ QuizQuestion(
             "先のことは考えすぎずに、その時に任せること",
             "風が変われば運も変わること"
         ],
-        correctAnswerIndex: 3,
+        correctAnswerIndex: 2,
         explanation: "『明日は明日の風が吹く』は、未来のことをあまり心配せず、その時その時で対処すればよいという意味です。"
     ),
 
@@ -922,7 +922,7 @@ QuizQuestion(
             "一度したことは元に戻らないこと",
             "失敗してもやり直せること"
         ],
-        correctAnswerIndex: 3,
+        correctAnswerIndex: 2,
         explanation: "『覆水盆に返らず』は、一度起こったことや失われたものは元に戻らないという意味のことわざです。"
     ),
         QuizQuestion(
@@ -1301,7 +1301,7 @@ QuizQuestion(
                     "盆に水を入れること",
                     "失敗したことをやり直すこと"
                 ],
-                correctAnswerIndex: 1,
+                correctAnswerIndex: 0,
                 explanation: "『覆水盆に返らず』は、一度失ったものは取り戻せないという意味のことわざです。"
             ),
 
@@ -1313,7 +1313,7 @@ QuizQuestion(
                     "先のことは考えすぎずに、その時に任せること",
                     "風が変われば運も変わること"
                 ],
-                correctAnswerIndex: 3,
+                correctAnswerIndex: 2,
                 explanation: "『明日は明日の風が吹く』は、未来のことをあまり心配せず、その時その時で対処すればよいという意味です。"
             ),
 
@@ -1467,7 +1467,7 @@ QuizQuestion(
                     "盆に水を入れること",
                     "失敗したことをやり直すこと"
                 ],
-                correctAnswerIndex: 1,
+                correctAnswerIndex: 0,
                 explanation: "『覆水盆に返らず』は、一度失ったものは取り戻せないという意味のことわざです。"
             ),
 
@@ -1479,7 +1479,7 @@ QuizQuestion(
                     "先のことは考えすぎずに、その時に任せること",
                     "風が変われば運も変わること"
                 ],
-                correctAnswerIndex: 3,
+                correctAnswerIndex: 2,
                 explanation: "『明日は明日の風が吹く』は、未来のことをあまり心配せず、その時その時で対処すればよいという意味です。"
             ),
 
@@ -2151,7 +2151,7 @@ QuizQuestion(
                 "占めた",
                 "染めた"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『ドアをしめた』の場合、『閉めた』が正しい漢字です。"
         ),
 
@@ -2210,7 +2210,7 @@ QuizQuestion(
                 "切り捨てた",
                 "着た"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 0,
             explanation: "『話をきった』の場合、『切った』が正しい漢字です。"
         ),
 
@@ -2269,7 +2269,7 @@ QuizQuestion(
                 "戸じた",
                 "止めた"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 0,
             explanation: "『本をとじた』の場合、『閉じた』が正しい漢字です。"
         ),
 
@@ -2328,7 +2328,7 @@ QuizQuestion(
                 "占めた",
                 "染めた"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『窓をしめた』の場合、『閉めた』が正しい漢字です。"
         ),
 
@@ -2387,7 +2387,7 @@ QuizQuestion(
                 "切った",
                 "木田"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『服をきた』の場合、『着た』が正しい漢字です。"
         ),
 
@@ -2399,7 +2399,7 @@ QuizQuestion(
                 "買いた",
                 "書いた"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 1,
             explanation: "『絵をかいた』の場合、『描いた』が正しい漢字です。"
         ),
 
@@ -2453,7 +2453,7 @@ QuizQuestion(
             question: "次の漢字『挑戦』の読みはどれですか？",
             choices: [
                 "ちょうせん",
-                "ちょうせん",
+                "ちょうぜん",
                 "とうせん",
                 "ちょうせい"
             ],
@@ -2666,7 +2666,7 @@ QuizQuestion(
                 "頭が竜で尾が蛇であること",
                 "竜の頭に蛇が乗っていること"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『竜頭蛇尾』は、物事が始めは勢いがあるが、終わりがだめになることを意味します。"
         ),
         QuizQuestion(
@@ -2677,7 +2677,7 @@ QuizQuestion(
                 "きも",
                 "きめい"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『希望』の正しい読みは『きぼう』です。"
         ),
         QuizQuestion(
@@ -2688,7 +2688,7 @@ QuizQuestion(
                 "羊の頭を持った犬のこと",
                 "犬が羊に変身すること"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『羊頭狗肉』は、見かけと中身が違うことを意味します。"
         ),
         QuizQuestion(
@@ -2699,7 +2699,7 @@ QuizQuestion(
                 "かんせい",
                 "かんけつ"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『感激』の正しい読みは『かんげき』です。"
         ),
         QuizQuestion(
@@ -2710,7 +2710,7 @@ QuizQuestion(
                 "山で修行すること",
                 "他人の目を気にしないこと"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『泰然自若』は、どんな状況でも落ち着いていて動じない様子を意味します。"
         ),
         QuizQuestion(
@@ -2721,7 +2721,7 @@ QuizQuestion(
                 "とうはつ",
                 "ちょうふつ"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『挑発』の正しい読みは『ちょうはつ』です。"
         ),
         QuizQuestion(
@@ -2732,7 +2732,7 @@ QuizQuestion(
                 "雷が鳴り響くこと",
                 "激しい風と雷が同時に起こること"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『疾風迅雷』は、素早く激しい行動や変化を意味します。"
         ),
         QuizQuestion(
@@ -2743,7 +2743,7 @@ QuizQuestion(
                 "せつむ",
                 "ぜっむ"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『絶望』の正しい読みは『ぜつぼう』です。"
         ),
         QuizQuestion(
@@ -2754,7 +2754,7 @@ QuizQuestion(
                 "一つの喜びに浸ること",
                 "心が一つにまとまること"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『一喜一憂』は、物事の結果に一喜一憂することを意味します。"
         ),
         QuizQuestion(
@@ -2765,7 +2765,7 @@ QuizQuestion(
                 "不安",
                 "怒り"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "詩の情景から、詩人の感じた気持ちは『達成感』が最も適切です。"
         ),
         QuizQuestion(
@@ -2787,7 +2787,7 @@ QuizQuestion(
                 "せんこう",
                 "せいきょう"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『成功』の正しい読みは『せいこう』です。"
         ),
         QuizQuestion(
@@ -2798,7 +2798,7 @@ QuizQuestion(
                 "自分の仕事を他人に任せること",
                 "得意なことをして成功すること"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 0,
             explanation: "『自業自得』は、自分の行いの結果が自分に返ってくることを意味します。"
         ),
         QuizQuestion(
@@ -2809,7 +2809,7 @@ QuizQuestion(
                 "つうい",
                 "ちょい"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『注意』の正しい読みは『ちゅうい』です。"
         ),
         QuizQuestion(
@@ -2820,7 +2820,7 @@ QuizQuestion(
                 "悔いがない人生を送ること",
                 "後から悔やむことを防ぐこと"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 0,
             explanation: "『後悔先に立たず』は、後悔しても取り返しがつかないことを意味します。"
         ),
         QuizQuestion(
@@ -2831,7 +2831,7 @@ QuizQuestion(
                 "こなん",
                 "こなんい"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『困難』の正しい読みは『こんなん』です。"
         ),
         QuizQuestion(
@@ -2842,7 +2842,7 @@ QuizQuestion(
                 "二つの束で三文の価値があること",
                 "二文の束で三つの商品を買えること"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 0,
             explanation: "『二束三文』は、非常に安い値段を意味します。"
         ),
         QuizQuestion(
@@ -2853,7 +2853,7 @@ QuizQuestion(
                 "恐怖",
                 "喜び"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "詩の情景から、詩人の感じた気持ちは『感動』が最も適切です。"
         ),
         QuizQuestion(
@@ -2875,7 +2875,7 @@ QuizQuestion(
                 "あんせい",
                 "あんさん"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "『安心』の正しい読みは『あんしん』です。"
         ),
         QuizQuestion(
@@ -3062,7 +3062,7 @@ QuizQuestion(
                 "三日間の修行をすること",
                 "何事も続けることができること"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 0,
             explanation: "『三日坊主』は、物事が長続きしないことを意味します。"
         ),
         QuizQuestion(
@@ -3073,7 +3073,7 @@ QuizQuestion(
                 "恐怖",
                 "喜び"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 3,
             explanation: "詩の情景から、詩人の感じた気持ちは『喜び』が最も適切です。"
         ),
         QuizQuestion(
@@ -3128,7 +3128,7 @@ QuizQuestion(
                 "風が東から吹くこと",
                 "馬が風に驚くこと"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 0,
             explanation: "『馬耳東風』は、他人の意見や批評をまったく気にせず、聞き流すことを意味します。"
         ),
         QuizQuestion(

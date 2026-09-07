@@ -10,6 +10,7 @@ import SwiftUI
 
 struct ManagerView: View {
     @Environment(\.presentationMode) var presentationMode
+    var showsBackButton: Bool = true
     @State private var selectedTab: Int = 0
     @ObservedObject var authManager = AuthManager.shared
     @ObservedObject var audioManager = AudioManager.shared
@@ -65,19 +66,21 @@ struct ManagerView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        generateHapticFeedback()
-                        presentationMode.wrappedValue.dismiss()
-                        audioManager.playCancelSound()
-                    }) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "chevron.left")
-                                .font(.system(size: 14, weight: .semibold))
-                            Text("戻る")
-                                .font(.system(size: 16))
+                if showsBackButton {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button(action: {
+                            generateHapticFeedback()
+                            presentationMode.wrappedValue.dismiss()
+                            audioManager.playCancelSound()
+                        }) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "chevron.left")
+                                    .font(.system(size: 14, weight: .semibold))
+                                Text("戻る")
+                                    .font(.system(size: 16))
+                            }
+                            .foregroundColor(Color("fontGray"))
                         }
-                        .foregroundColor(Color("fontGray"))
                     }
                 }
                 

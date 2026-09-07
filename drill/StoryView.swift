@@ -16,6 +16,64 @@ struct QuizStoryData: Identifiable {
     let backgroundName: String
 }
 
+enum DungeonQuizSubject {
+    case math
+    case japanese
+    case science
+    case socialStudies
+
+    var title: String {
+        switch self {
+        case .math: return "算数"
+        case .japanese: return "国語"
+        case .science: return "理科"
+        case .socialStudies: return "社会"
+        }
+    }
+
+    static func subject(for floor: Int) -> DungeonQuizSubject {
+        switch floor {
+        case 1...5, 10...15, 41...52, 53...64:
+            return .math
+        case 6...9, 16...20, 65...76:
+            return .japanese
+        case 21...25, 30...35, 77...88:
+            return .science
+        case 26...29, 36...40, 89...100:
+            return .socialStudies
+        default:
+            return .math
+        }
+    }
+}
+
+struct DungeonTheme {
+    static let maxFloor = 100
+
+    static func clampedFloor(_ floor: Int) -> Int {
+        min(max(floor, 1), maxFloor)
+    }
+
+    static func mapBackgroundName(for floor: Int) -> String {
+        switch clampedFloor(floor) {
+        case 1...52: return "背景1"
+        default: return "背景3"
+        }
+    }
+
+    static func battleBackgroundName(for floor: Int) -> String {
+        clampedFloor(floor) <= 52 ? "ダンジョン背景1" : "ダンジョン背景2"
+    }
+
+    static func platformImageName(for floor: Int) -> String {
+        switch clampedFloor(floor) {
+        case 1...52: return floor == 52 ? "ボス足場1" : "足場1"
+        case 53...99: return "足場3"
+        default: return "ボス足場3"
+        }
+    }
+}
+
 // PositionViewModel の定義
 class PositionViewModel: ObservableObject {
     // MARK: - Published Properties
@@ -30,6 +88,7 @@ class PositionViewModel: ObservableObject {
     @Published var isPositionFetched: Bool = false // フラグを追加
     @Published var showMonsterQuizList = false
     @Published var avatarName: String = ""
+    @Published var selectedBattleFloor: Int?
     private let authManager = AuthManager.shared
     
     // MARK: - Private Properties
@@ -43,8 +102,33 @@ class PositionViewModel: ObservableObject {
     // MARK: - Constants
     struct Constants {
         static let maxStamina: Int = 100
+        static let maxDungeonPosition: Int = DungeonTheme.maxFloor
         static let staminaRecoveryInterval: TimeInterval = 60 // 60秒 = 1分
         static let staminaRecoveryAmount: Int = 1
+    }
+
+    static var isDeveloperMode: Bool {
+        #if DEBUG
+        true
+        #else
+        false
+        #endif
+    }
+
+    var isStaminaUnlimited: Bool {
+        Self.isDeveloperMode
+    }
+
+    var staminaDisplayText: String {
+        isStaminaUnlimited ? "∞" : "\(stamina)/\(Constants.maxStamina)"
+    }
+
+    var staminaProgress: Float {
+        isStaminaUnlimited ? 1 : Float(stamina) / Float(Constants.maxStamina)
+    }
+
+    func hasEnoughStamina(for cost: Int) -> Bool {
+        isStaminaUnlimited || stamina >= cost
     }
     
     // MARK: - Singleton Instance
@@ -99,6 +183,7 @@ class PositionViewModel: ObservableObject {
     
     // MARK: - Stamina Recovery
     private func recoverStamina() {
+        guard !isStaminaUnlimited else { return }
         guard stamina < Constants.maxStamina else { return }
         
         DispatchQueue.main.async {
@@ -119,12 +204,13 @@ class PositionViewModel: ObservableObject {
         }
         
         // スタミナが十分か確認
-        guard self.stamina >= 10 else {
+        guard hasEnoughStamina(for: 10) else {
             showStaminaAlert = true
             return
         }
         
-        let newPosition = userPosition + 1
+        guard userPosition < Constants.maxDungeonPosition else { return }
+        let newPosition = min(userPosition + 1, Constants.maxDungeonPosition)
         let newStamina = self.stamina
         
         // ローカルの状態を即時に更新し、アニメーションをトリガー
@@ -138,10 +224,10 @@ class PositionViewModel: ObservableObject {
         let storyRef = dbRef.child("storys").child(userId)
         
         // 複数のフィールドを同時に更新するためのデータ構造
-        let updates = [
-            "position": newPosition,
-            "stamina": newStamina
-        ] as [String : Any]
+        var updates: [String: Any] = ["position": newPosition]
+        if !isStaminaUnlimited {
+            updates["stamina"] = newStamina
+        }
         
         // Firebase に位置とスタミナを同時に更新
         storyRef.updateChildValues(updates) { error, _ in
@@ -156,6 +242,8 @@ class PositionViewModel: ObservableObject {
                 }
             } else {
                 print("position と stamina が更新されました: position=\(newPosition), stamina=\(newStamina)")
+                AuthManager.shared.recordDungeonStep(position: newPosition)
+                GuildManager.shared.recordDungeonStep()
             }
         }
     }
@@ -163,6 +251,10 @@ class PositionViewModel: ObservableObject {
     // スタミナ回復のためのメソッド
     func recoverStaminaOnAppLaunch(completion: @escaping (Bool) -> Void) {
         stopStaminaRecoveryTimer()
+        guard !isStaminaUnlimited else {
+            completion(true)
+            return
+        }
         authManager.fetchLastActiveTimeFromFirebase { [weak self] lastActiveTimestamp in
             guard let self = self else {
                 completion(false)
@@ -221,26 +313,49 @@ class PositionViewModel: ObservableObject {
         stopStaminaRecoveryTimer()
     }
     
-    func recoverStamina(by amount: Int) {
-        guard amount > 0 else { return }
-        DispatchQueue.main.async {
-            self.stamina = min(self.stamina + amount, Constants.maxStamina)
+    func recoverStamina(by amount: Int, completion: ((Bool) -> Void)? = nil) {
+        guard !isStaminaUnlimited else {
+            completion?(false)
+            return
         }
-        updateStaminaInFirebase()
+        guard amount > 0 else {
+            completion?(false)
+            return
+        }
+
+        let recoveredStamina = min(stamina + amount, Constants.maxStamina)
+        guard recoveredStamina > stamina else {
+            completion?(false)
+            return
+        }
+
+        updateStaminaInFirebase(value: recoveredStamina) { success in
+            DispatchQueue.main.async {
+                if success {
+                    self.stamina = recoveredStamina
+                }
+                completion?(success)
+            }
+        }
     }
     
     // スタミナを更新するメソッド
-    func updateStaminaInFirebase() {
-        guard let userId = AuthManager.shared.currentUserId else { return }
+    func updateStaminaInFirebase(value: Int? = nil, completion: ((Bool) -> Void)? = nil) {
+        guard let userId = AuthManager.shared.currentUserId else {
+            completion?(false)
+            return
+        }
         let storyRef = dbRef.child("storys").child(userId)
-        let updates = ["stamina": stamina] as [String : Any]
+        let staminaValue = value ?? stamina
+        let updates = ["stamina": staminaValue] as [String : Any]
         
         storyRef.updateChildValues(updates) { error, _ in
             if let error = error {
                 print("スタミナの更新に失敗しました: \(error.localizedDescription)")
-                // 必要に応じてエラーハンドリングを追加
+                completion?(false)
             } else {
-                print("スタミナが\(self.stamina)に回復しました")
+                print("スタミナが\(staminaValue)に回復しました")
+                completion?(true)
             }
         }
     }
@@ -286,14 +401,14 @@ class PositionViewModel: ObservableObject {
             guard let self = self else { return }
             if let positionValue = snapshot.value as? Int {
                 DispatchQueue.main.async {
-                    self.userPosition = positionValue
+                    self.userPosition = DungeonTheme.clampedFloor(positionValue)
                     self.isPositionFetched = true // フラグを設定
                     print("取得した position: \(positionValue)")
                 }
             } else if let positionValue = snapshot.value as? Double {
                 // FirebaseからDoubleとして取得される場合もあるため
                 DispatchQueue.main.async {
-                    self.userPosition = Int(positionValue)
+                    self.userPosition = DungeonTheme.clampedFloor(Int(positionValue))
                     self.isPositionFetched = true // フラグを設定
                     print("取得した position (Double): \(positionValue)")
                 }
@@ -330,13 +445,15 @@ class PositionViewModel: ObservableObject {
         }
         
         // スタミナが十分か確認
-        guard self.stamina >= 10 else {
+        guard hasEnoughStamina(for: 10) else {
             showStaminaAlert = true
             return
         }
         
-        let newPosition = userPosition + 1
-        let newStamina = self.stamina - 10
+        guard userPosition < Constants.maxDungeonPosition else { return }
+        let newPosition = min(userPosition + 1, Constants.maxDungeonPosition)
+        let previousStamina = stamina
+        let newStamina = isStaminaUnlimited ? previousStamina : previousStamina - 10
         
         // ローカルの状態を即時に更新し、アニメーションをトリガー
         DispatchQueue.main.async {
@@ -349,10 +466,10 @@ class PositionViewModel: ObservableObject {
         let storyRef = dbRef.child("storys").child(userId)
         
         // 複数のフィールドを同時に更新するためのデータ構造
-        let updates = [
-            "position": newPosition,
-            "stamina": newStamina
-        ] as [String : Any]
+        var updates: [String: Any] = ["position": newPosition]
+        if !isStaminaUnlimited {
+            updates["stamina"] = newStamina
+        }
         
         // Firebase に位置とスタミナを同時に更新
         storyRef.updateChildValues(updates) { error, _ in
@@ -362,17 +479,20 @@ class PositionViewModel: ObservableObject {
                 DispatchQueue.main.async {
                     withAnimation {
                         self.userPosition = newPosition - 1
-                        self.stamina = newStamina + 10
+                        self.stamina = previousStamina
                     }
                 }
             } else {
                 print("position と stamina が更新されました: position=\(newPosition), stamina=\(newStamina)")
+                AuthManager.shared.recordDungeonStep(position: newPosition)
+                GuildManager.shared.recordDungeonStep()
             }
         }
     }
 
     /// スタミナを減少させる関数
     func decreaseStamina(by amount: Int = 10) {
+        guard !isStaminaUnlimited else { return }
         guard let userId = authManager.currentUserId else {
             print("ユーザーがログインしていません。")
             return
@@ -445,6 +565,10 @@ class PositionViewModel: ObservableObject {
     }
     
     func startStaminaRecoveryTimer() {
+        guard !isStaminaUnlimited else {
+            stopStaminaRecoveryTimer()
+            return
+        }
         guard !isTimerActive else {
         print("タイマーは既に動作中です")
         return
@@ -499,6 +623,10 @@ struct ScrollOffsetKey: PreferenceKey {
     }
 }
 
+private enum StoryDungeonScrollTarget: Hashable {
+    case currentPosition(Int)
+}
+
 // TestView の定義
 struct StoryView: View {
     @StateObject var viewModel = PositionViewModel.shared
@@ -507,6 +635,7 @@ struct StoryView: View {
     @ObservedObject var authManager = AuthManager()
     @Namespace private var animationNamespace
     @State private var initialScrollDone = false
+    @State private var isPreparingInitialScroll = false
     @State private var isStorySutaminaModal = false
     @State private var isLoading = true
     @State private var position: Int = 1
@@ -582,7 +711,7 @@ struct StoryView: View {
                                         .resizable()
                                         .scaledToFit()
                                         .frame(height: 20)
-                                    Text("スタミナ: \(viewModel.stamina)/100")
+                                    Text("スタミナ: \(viewModel.staminaDisplayText)")
                                         .fontWeight(.bold)
                                         .foregroundColor(.white)
                                 }
@@ -604,7 +733,7 @@ struct StoryView: View {
 //                                .frame(height:45)
 //                        }
                         // スタミナゲージ
-                        ProgressStoryView(progress: .constant((Float(viewModel.stamina) / 100)))
+                        ProgressStoryView(progress: .constant(viewModel.staminaProgress))
                             .progressViewStyle(LinearProgressViewStyle(tint: .green))
                             .padding(.bottom, 10)
                         
@@ -615,14 +744,10 @@ struct StoryView: View {
                             }
                             NavigationLink("", destination: StoryRankingView(viewModel: rankingViewModel, isReturnFlag: .constant(true)).navigationBarBackButtonHidden(true), isActive: $isStoryRankingModal)
                         }
-                        .background(
-                            GeometryReader { geometry in
-                                Color.clear
-                                    .preference(key: ScrollOffsetKey.self, value: geometry.frame(in: .global).minY)
-                            }
-                        )
-                        .onPreferenceChange(ScrollOffsetKey.self) { offset in
-                            updateBackgroundImageBasedOnScroll(offset: offset)
+                        .opacity(initialScrollDone ? 1 : 0)
+                        .allowsHitTesting(initialScrollDone)
+                        .onPreferenceChange(ViewOffsetKey.self) { offsets in
+                            updateVisiblePosition(from: offsets)
                         }
                         
                     }
@@ -711,8 +836,6 @@ struct StoryView: View {
                     let userDefaults = UserDefaults.standard
                     if !userDefaults.bool(forKey: "hasLaunchedStoryOnappear") {
                         isStoryFlag = true
-                        proxy.scrollTo(14, anchor: .top)
-                        isLoading = false
                     }
                     userDefaults.set(true, forKey: "hasLaunchedStoryOnappear")
                     userDefaults.synchronize()
@@ -731,8 +854,13 @@ struct StoryView: View {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                         userPreFlag = authManager.userPreFlag
                     }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
-                        isLoading = false
+                    if viewModel.isPositionFetched {
+                        prepareInitialCurrentPositionScroll(proxy: proxy)
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 4.5) {
+                        if !initialScrollDone && !isPreparingInitialScroll {
+                            prepareInitialCurrentPositionScroll(proxy: proxy)
+                        }
                     }
                     viewModel.recoverStaminaOnAppLaunch { success in
                         if success {
@@ -746,8 +874,7 @@ struct StoryView: View {
                 // userPosition が取得されたときにスクロール
                 .onReceive(viewModel.$isPositionFetched) { fetched in
                     if fetched && !initialScrollDone {
-                        scrollToPosition(proxy: proxy)
-                        initialScrollDone = true
+                        prepareInitialCurrentPositionScroll(proxy: proxy)
                     }
                 }
                 // userPosition が変更されたときにスクロール
@@ -756,7 +883,7 @@ struct StoryView: View {
                         viewModel.fetchUserStamina(for: userId)
                     }
                     if initialScrollDone {
-                        scrollToPosition(proxy: proxy)
+                        scrollToCurrentPosition(proxy: proxy, animated: true)
                     }
                 }
 //                .onPreferenceChange(ViewOffsetKey.self) { offsets in
@@ -807,32 +934,6 @@ struct StoryView: View {
         }
     }
     
-    struct PositionMapping {
-        let range: ClosedRange<Int>
-        let target: Int
-    }
-    
-    let positionMappings: [PositionMapping] = [
-                PositionMapping(range: 1...3, target: 17),
-                PositionMapping(range: 4...6, target: 16),
-                PositionMapping(range: 7...9, target: 15),
-                PositionMapping(range: 10...12, target: 14),
-                PositionMapping(range: 13...15, target: 13),
-                PositionMapping(range: 16...18, target: 12),
-                PositionMapping(range: 19...21, target: 11),
-                PositionMapping(range: 22...24, target: 10),
-                PositionMapping(range: 25...27, target: 9),
-                PositionMapping(range: 28...30, target: 8),
-                PositionMapping(range: 31...33, target: 7),
-                PositionMapping(range: 34...36, target: 6),
-                PositionMapping(range: 37...39, target: 5),
-                PositionMapping(range: 40...42, target: 4),
-                PositionMapping(range: 43...45, target: 3),
-                PositionMapping(range: 46...48, target: 2),
-                PositionMapping(range: 49...51, target: 1),
-                PositionMapping(range: 52...52, target: 1)
-    ]
-    
     func executeProcessEveryfifTimes() {
         // UserDefaultsからカウンターを取得
         let count = UserDefaults.standard.integer(forKey: "launchStoryCSCount") + 1
@@ -846,47 +947,56 @@ struct StoryView: View {
         }
     }
     
-    private func updateBackgroundImageBasedOnScroll(offset: CGFloat) {
-        if offset < -300 {
-            currentVisiblePosition = 21
-        } else if offset < -200 {
-            currentVisiblePosition = 11
-        } else {
-            currentVisiblePosition = 1
+    private func updateVisiblePosition(from offsets: [Int: CGFloat]) {
+        let screenCenterY = UIScreen.main.bounds.midY
+        guard let closestFloor = offsets.min(by: {
+            abs($0.value - screenCenterY) < abs($1.value - screenCenterY)
+        })?.key else {
+            return
+        }
+
+        if currentVisiblePosition != closestFloor {
+            currentVisiblePosition = DungeonTheme.clampedFloor(closestFloor)
         }
     }
     
     private func backgroundImageName(for position: Int) -> String {
-        switch position {
-        case 1...27:
-            return "背景1"
-        case 28...51:
-            return "背景2"
-        case 52...60:
-            return "背景3"
-        default:
-            return "背景1" // デフォルトの背景
+        DungeonTheme.mapBackgroundName(for: position)
+    }
+    private func prepareInitialCurrentPositionScroll(proxy: ScrollViewProxy) {
+        guard !initialScrollDone, !isPreparingInitialScroll else { return }
+
+        isPreparingInitialScroll = true
+        let delays: [TimeInterval] = [0, 0.05, 0.16, 0.30]
+
+        for delay in delays {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                scrollToCurrentPosition(proxy: proxy, animated: false)
+            }
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.34) {
+            withAnimation(.easeOut(duration: 0.16)) {
+                initialScrollDone = true
+                isLoading = false
+            }
+            isPreparingInitialScroll = false
         }
     }
-    /// スクロール処理と isLoading の設定を行う関数
-    private func scrollToPosition(proxy: ScrollViewProxy) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            withAnimation {
-                let userPos = viewModel.userPosition
-                print("userPos      :\(userPos)")
-                if let mapping = positionMappings.first(where: { $0.range.contains(userPos) }) {
-                    print("Scroll to position: \(mapping.target)")
-                    proxy.scrollTo(mapping.target, anchor: .bottom)
-                } else {
-                    // デフォルトのスクロール先を設定
-                    let defaultTarget = 33
-                    print("Default scroll to position: \(defaultTarget)")
-                    proxy.scrollTo(defaultTarget, anchor: .bottom)
-                }
+
+    private func scrollToCurrentPosition(proxy: ScrollViewProxy, animated: Bool) {
+        let userPos = DungeonTheme.clampedFloor(viewModel.userPosition)
+        let action = {
+            proxy.scrollTo(StoryDungeonScrollTarget.currentPosition(userPos), anchor: .center)
+        }
+
+        if animated {
+            withAnimation(.spring(response: 0.45, dampingFraction: 0.88)) {
+                action()
             }
-            // アニメーション完了後に isLoading を false に設定
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { // アニメーション時間と合わせる
-                isLoading = false
+        } else {
+            withTransaction(Transaction(animation: nil)) {
+                action()
             }
         }
     }
@@ -894,7 +1004,7 @@ struct StoryView: View {
 
 
 struct PlatformData: Identifiable {
-    let id = UUID()
+    var id: Int { position }
     let imageName: String
     let position: Int
     let padding: EdgeInsets?
@@ -940,7 +1050,7 @@ struct PlatformsContainer: View {
         self.viewModel = viewModel
         self.namespace = namespace
         self.platformImageName = "足場1"
-        self.platformDatas = [
+        let lowerFloorDatas: [[PlatformData]] = [
 //            [
 //                PlatformData(
 //                    imageName: self.platformImageName,
@@ -1263,7 +1373,7 @@ struct PlatformsContainer: View {
 //            ],
             [
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: DungeonTheme.platformImageName(for: 52),
                     position: 52,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
                     padding1: nil,
@@ -1676,6 +1786,87 @@ struct PlatformsContainer: View {
                 )
             ],
         ]
+        self.platformDatas = Self.makeUpperFloorDatas() + lowerFloorDatas
+    }
+
+    private static func makeUpperFloorDatas() -> [[PlatformData]] {
+        let monsterPositions = Array(stride(from: 55, through: 97, by: 3)) + [99]
+        let monsterByPosition = Dictionary(
+            uniqueKeysWithValues: zip(monsterPositions, Array(17...32))
+        )
+        let treasureByPosition: [Int: Int] = [
+            60: 13,
+            69: 14,
+            78: 15,
+            87: 16,
+            96: 17
+        ]
+
+        func makePlatform(position: Int, index: Int, ascending: Bool) -> PlatformData {
+            let platformBottomOffsets: [CGFloat] = ascending ? [-60, 0, 60] : [60, 0, -60]
+            let avatarBottomOffsets: [CGFloat] = ascending ? [0, 60, 120] : [120, 60, 0]
+            let monster = monsterByPosition[position] ?? 0
+            let treasure = treasureByPosition[position] ?? 0
+
+            return PlatformData(
+                imageName: DungeonTheme.platformImageName(for: position),
+                position: position,
+                padding: EdgeInsets(
+                    top: 0,
+                    leading: 0,
+                    bottom: platformBottomOffsets[index],
+                    trailing: 0
+                ),
+                padding1: EdgeInsets(
+                    top: 0,
+                    leading: 0,
+                    bottom: avatarBottomOffsets[index],
+                    trailing: 0
+                ),
+                paddingMonster: monster == 0
+                    ? nil
+                    : EdgeInsets(top: -110, leading: 0, bottom: 0, trailing: 0),
+                paddingTreasure: treasure == 0
+                    ? nil
+                    : EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                treasure: treasure,
+                monster: monster
+            )
+        }
+
+        var rows: [[PlatformData]] = [
+            [
+                PlatformData(
+                    imageName: DungeonTheme.platformImageName(for: 100),
+                    position: 100,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: nil,
+                    boss: 150
+                )
+            ]
+        ]
+
+        var rowTop = 99
+        while rowTop >= 57 {
+            let ascendingPositions = Array((rowTop - 2)...rowTop)
+            rows.append(
+                ascendingPositions.enumerated().map { index, position in
+                    makePlatform(position: position, index: index, ascending: true)
+                }
+            )
+
+            let descendingPositions = Array(
+                stride(from: rowTop - 3, through: max(rowTop - 5, 53), by: -1)
+            )
+            rows.append(
+                descendingPositions.enumerated().map { index, position in
+                    makePlatform(position: position, index: index, ascending: false)
+                }
+            )
+            rowTop -= 6
+        }
+
+        return rows
     }
     
     var body: some View {
@@ -1707,6 +1898,7 @@ struct PlatformsContainer: View {
                             }
                         }
                     }
+                    .id("dungeon-row-\(index)")
                 }
             }
         }
@@ -1715,7 +1907,7 @@ struct PlatformsContainer: View {
 
 // PlatformView の定義
 struct PlatformView: View {
-//    let imageName: String
+    let imageName: String
     let position: Int
     let padding: EdgeInsets
     let padding1: EdgeInsets?
@@ -1739,12 +1931,78 @@ struct PlatformView: View {
     @State private var coin: Int = 1
     private var audioManager = AudioManager.shared
     
-    var imageName: String {
-        position == 52 ? "ボス足場1" : "足場1"
+    private var targetFloor: Int {
+        DungeonTheme.clampedFloor(viewModel.selectedBattleFloor ?? (viewModel.userPosition + 1))
+    }
+
+    private var battleBackgroundName: String {
+        DungeonTheme.battleBackgroundName(for: targetFloor)
+    }
+
+    private var isBossFloor: Bool {
+        position == 52 || position == 100
+    }
+
+    private var platformContentYOffset: CGFloat {
+        (padding.top - padding.bottom) / 2
+    }
+
+    /// The crystal tips extend above the circular surface where occupants stand.
+    private var platformSurfaceInset: CGFloat {
+        18
+    }
+
+    /// Upper-floor monsters use 1024px images with different transparent margins.
+    /// Align each visible bottom edge with the top surface of its own platform.
+    private var upperFloorMonsterYOffset: CGFloat {
+        guard let monster, monster >= 17 else { return 0 }
+
+        let imageBaselineOffset: CGFloat
+
+        switch monster {
+        case 17: imageBaselineOffset = -50
+        case 18: imageBaselineOffset = -47
+        case 19: imageBaselineOffset = -48
+        case 20: imageBaselineOffset = -46
+        case 21: imageBaselineOffset = -45
+        case 22: imageBaselineOffset = -43
+        case 23: imageBaselineOffset = -51
+        case 24: imageBaselineOffset = -49
+        case 25: imageBaselineOffset = -48
+        case 26: imageBaselineOffset = -53
+        case 27: imageBaselineOffset = -44
+        case 28: imageBaselineOffset = -48
+        case 29: imageBaselineOffset = -43
+        case 30: imageBaselineOffset = -51
+        case 31: imageBaselineOffset = -61
+        case 32: imageBaselineOffset = -52
+        default: imageBaselineOffset = -48
+        }
+
+        return platformContentYOffset + imageBaselineOffset + platformSurfaceInset
+    }
+
+    /// Upper-floor treasure images also have different transparent margins.
+    /// Keep their visible bottom edges on the same platform surface as monsters.
+    private var upperFloorTreasureYOffset: CGFloat {
+        guard let treasure, treasure >= 13 else { return 0 }
+
+        let imageBaselineOffset: CGFloat
+
+        switch treasure {
+        case 13: imageBaselineOffset = -48
+        case 14: imageBaselineOffset = -48
+        case 15: imageBaselineOffset = -55
+        case 16: imageBaselineOffset = -49
+        case 17: imageBaselineOffset = -54
+        default: imageBaselineOffset = -60
+        }
+
+        return platformContentYOffset + imageBaselineOffset + platformSurfaceInset
     }
     
     init(imageName: String, position: Int, padding: EdgeInsets = EdgeInsets(), padding1: EdgeInsets? = nil, paddingMonster: EdgeInsets? = nil, paddingTreasure: EdgeInsets? = nil, userPosition: Int, onArrowTap: (() -> Void)? = nil, namespace: Namespace.ID, treasure: Int? = 0, monster: Int? = 0, boss: Int? = 0, viewModel: PositionViewModel) {
-//        self.imageName = imageName
+        self.imageName = imageName
         self.position = position
         self.padding = padding
         self.padding1 = padding1
@@ -1765,7 +2023,7 @@ struct PlatformView: View {
             Image(imageName)
                 .resizable()
                 .scaledToFit()
-                .frame(width: position == 52 ? 350 : 80)
+                .frame(width: isBossFloor ? 350 : 80)
                 .padding(padding)
                 .background(
                     GeometryReader { geometry in
@@ -1813,6 +2071,7 @@ struct PlatformView: View {
                     .padding(.top, -45)
                     .padding(padding1 ?? EdgeInsets())
                     .offset(y: isMovingUp ? -3 : 3)
+                    .id(StoryDungeonScrollTarget.currentPosition(position))
                     .onAppear {
                         withAnimation(Animation.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
                             isMovingUp.toggle()
@@ -1826,9 +2085,10 @@ struct PlatformView: View {
                 Image("宝箱\(treasure)")
                     .resizable()
                     .frame(width: 80, height: 80)
-                    .padding(paddingTreasure ?? EdgeInsets())
+                    .padding(treasure >= 13 ? EdgeInsets() : (paddingTreasure ?? EdgeInsets()))
+                    .offset(y: treasure >= 13 ? upperFloorTreasureYOffset : 0)
                     .onTapGesture {
-                        if viewModel.stamina >= 10 {
+                        if viewModel.hasEnoughStamina(for: 10) {
                             if position == userPosition + 1 {
                                 self.triggerHaptic()
                                 audioManager.playTittleSound()
@@ -1849,13 +2109,15 @@ struct PlatformView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 80)
-                        .padding(paddingMonster ?? EdgeInsets())
+                        .padding(monster >= 17 ? EdgeInsets() : (paddingMonster ?? EdgeInsets()))
+                        .offset(y: monster >= 17 ? upperFloorMonsterYOffset : 0)
                         .onTapGesture {
                             if position == userPosition + 1 {
                                 self.triggerHaptic()
                                 audioManager.playSound()
-                                if viewModel.stamina >= 10 {
-                                    let data = QuizStoryData(monsterName: "モンスター\(monster)", backgroundName: "ダンジョン背景1")
+                                if viewModel.hasEnoughStamina(for: 10) {
+                                    viewModel.selectedBattleFloor = position
+                                    let data = QuizStoryData(monsterName: "モンスター\(monster)", backgroundName: battleBackgroundName)
                                     quizStoryData = data
                                     viewModel.monsterName = "モンスター\(monster)"
                                     viewModel.monster = monster
@@ -1874,17 +2136,18 @@ struct PlatformView: View {
                     .resizable()
                     .scaledToFit()
                     .shadow(radius: 10)
-                    .frame(width: 200)
-                    .padding(.top,boss == 15 ? -30 : 80)
-                    .padding(.leading ,boss == 15 ? 40 : 40)
+                    .frame(width: boss == 150 ? 260 : 200)
+                    .padding(.top, boss == 150 ? -80 : -30)
+                    .padding(.leading, boss == 150 ? 0 : 40)
                     .onTapGesture {
                         if position == userPosition + 1 {
                             self.triggerHaptic()
                             audioManager.playSound()
-                            if viewModel.stamina >= 10 {
-                                let data = QuizStoryData(monsterName: "ボス\(boss)", backgroundName: "ダンジョン背景1")
-                                quizStoryData = data
-                                isPresentingQuizStory = true
+                            if viewModel.hasEnoughStamina(for: 10) {
+                                viewModel.selectedBattleFloor = position
+                                viewModel.monsterName = "ボス\(boss)"
+                                viewModel.monster = boss
+                                viewModel.showMonsterAlert = true
                             } else {
                                 viewModel.showStaminaAlert = true
                             }
@@ -1916,7 +2179,7 @@ struct PlatformView: View {
                         }
                     }
                     .onTapGesture {
-                        if viewModel.stamina >= 10 {
+                        if viewModel.hasEnoughStamina(for: 10) {
                             if let treasure = treasure, treasure != 0 {
                                 audioManager.playTittleSound()
                                 viewModel.coin = treasure
@@ -1925,15 +2188,14 @@ struct PlatformView: View {
                             }
                             if let boss = boss, boss != 0 {
                                 audioManager.playSound()
-                                let data = QuizStoryData(monsterName: "ボス\(boss)", backgroundName: "ダンジョン背景1")
+                                viewModel.selectedBattleFloor = position
                                 viewModel.monsterName = "ボス\(boss)"
                                 viewModel.monster = boss
                                 viewModel.showMonsterAlert = true
                             }
                             if let monster = monster, monster != 0 {
                                 audioManager.playSound()
-                                let data = QuizStoryData(monsterName: "モンスター\(monster)", backgroundName: "ダンジョン背景1")
-//                                quizStoryData = data
+                                viewModel.selectedBattleFloor = position
                                 viewModel.monsterName = "モンスター\(monster)"
                                 viewModel.monster = monster
                                 viewModel.showMonsterAlert = true
@@ -1961,41 +2223,33 @@ struct PlatformView: View {
 //                .font(.system(size: 50))
         }
         .fullScreenCover(isPresented: $viewModel.showMonsterQuizList) {
-            switch viewModel.userPosition {
-            case 1...4, 9...14, 40...50:
+            switch DungeonQuizSubject.subject(for: targetFloor) {
+            case .math:
                 StorySansuListView(
                     isPresenting: $viewModel.showMonsterQuizList,
                     monsterName: viewModel.monsterName,
-                    backgroundName: "ダンジョン背景1",
+                    backgroundName: battleBackgroundName,
                     viewModel: viewModel
                 )
-            case 5...8, 15...19:
+            case .japanese:
                 StoryKokugoListView(
                     isPresenting: $viewModel.showMonsterQuizList,
                     monsterName: viewModel.monsterName,
-                    backgroundName: "ダンジョン背景1",
+                    backgroundName: battleBackgroundName,
                     viewModel: viewModel
                 )
-            case 20...24, 29...34:
+            case .science:
                 StoryRikaListView(
                     isPresenting: $viewModel.showMonsterQuizList,
                     monsterName: viewModel.monsterName,
-                    backgroundName: "ダンジョン背景1",
+                    backgroundName: battleBackgroundName,
                     viewModel: viewModel
                 )
-            case 25...28, 35...39:
+            case .socialStudies:
                 StoryShakaiListView(
                     isPresenting: $viewModel.showMonsterQuizList,
                     monsterName: viewModel.monsterName,
-                    backgroundName: "ダンジョン背景1",
-                    viewModel: viewModel
-                )
-            default:
-                // デフォルトのビュー、またはエラーハンドリング
-                StorySansuListView(
-                    isPresenting: $viewModel.showMonsterQuizList,
-                    monsterName: viewModel.monsterName,
-                    backgroundName: "ダンジョン背景1",
+                    backgroundName: battleBackgroundName,
                     viewModel: viewModel
                 )
             }

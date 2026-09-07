@@ -724,7 +724,7 @@ struct StorySansuListView: View {
                 "10",
                 "11"
             ],
-            correctAnswerIndex: 2, // 修正: 元は0でしたが、正解は1
+            correctAnswerIndex: 1,
             explanation: "17から8を引くと9になります。"
         ),
         QuizQuestion(
@@ -918,10 +918,10 @@ struct StorySansuListView: View {
         QuizQuestion(
             question: "りんごが5個ありました。さらに3個買いました。りんごは全部で何個ですか？",
             choices: [
-                "7",
-                "8",
-                "9",
-                "10"
+                "7個",
+                "8個",
+                "9個",
+                "10個"
             ],
             correctAnswerIndex: 1,
             explanation: "5個と3個を足すと8個になります。"
@@ -1027,7 +1027,6 @@ struct StorySansuListView: View {
             explanation: "6個と5個を足すと11個になります。"
         ),
 
-        // 修正開始: 正解は「1時」なのでcorrectAnswerIndexを2に変更
         QuizQuestion(
             question: "時計が9時を指しています。あと4時間後は何時ですか？",
             choices: [
@@ -1036,10 +1035,9 @@ struct StorySansuListView: View {
                 "2時",
                 "3時"
             ],
-            correctAnswerIndex: 2, // 修正: 元は2でしたが、正解は1
+            correctAnswerIndex: 1,
             explanation: "9時に4時間足すと1時になります。"
         ),
-        // 修正終了
 
         QuizQuestion(
             question: "時計が6時を指しています。あと3時間後は何時ですか？",
@@ -1223,7 +1221,6 @@ struct StorySansuListView: View {
             explanation: "8時に6時間足すと2時になります。"
         ),
 
-        // 修正開始: 正解は「8時」なのでcorrectAnswerIndexを3に変更
         QuizQuestion(
             question: "時計が2時を指しています。あと4時間後は何時ですか？",
             choices: [
@@ -1232,10 +1229,9 @@ struct StorySansuListView: View {
                 "7時",
                 "8時"
             ],
-            correctAnswerIndex: 3, // 修正: 元は3でしたが、正解は3
+            correctAnswerIndex: 1,
             explanation: "2時に4時間足すと6時になります。"
         ),
-        // 修正終了
 
         QuizQuestion(
             question: "ジュースが12本ありました。5本飲みました。残りは何本ですか？",
@@ -1245,7 +1241,7 @@ struct StorySansuListView: View {
                 "8本",
                 "9本"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "12本から5本を引くと7本残ります。"
         ),
 
@@ -1427,7 +1423,7 @@ struct StorySansuListView: View {
                 "12時",
                 "1時"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 1,
             explanation: "6時に5時間足すと11時になります。"
         ),
 
@@ -1698,8 +1694,8 @@ struct StorySansuListView: View {
                 "14冊",
                 "15冊"
             ],
-            correctAnswerIndex: 2,
-            explanation: "9冊と4冊を足すと14冊になります。"
+            correctAnswerIndex: 1,
+            explanation: "9冊と4冊を足すと13冊になります。"
         ),
 
         QuizQuestion(
@@ -1722,7 +1718,7 @@ struct StorySansuListView: View {
                 "1時",
                 "2時"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 2,
             explanation: "9時に4時間足すと1時になります。"
         ),
 
@@ -2229,15 +2225,14 @@ struct StorySansuListView: View {
         QuizQuestion(
             question: "300センチメートルは何メートルですか？",
             choices: [
-                "0.35メートル",
-                "3.5メートル",
-                "35メートル",
-                "350メートル"
+                "0.3メートル",
+                "3メートル",
+                "30メートル",
+                "300メートル"
             ],
-            correctAnswerIndex: 1, // 修正: 正解は「35メートル」なのでindex 2に変更
+            correctAnswerIndex: 1,
             explanation: "300センチメートルは 3メートルです。"
         ),
-        // 修正終了
 
         QuizQuestion(
             question: "56 ÷ 7 はいくつですか？",
@@ -2321,7 +2316,6 @@ struct StorySansuListView: View {
             explanation: "90 ÷ 10 は 9 です。"
         ),
 
-        // 修正開始: 正解は「7.8」なのでcorrectAnswerIndexを2に変更
         QuizQuestion(
             question: "4.5 + 3.2 はいくつですか？",
             choices: [
@@ -2330,10 +2324,9 @@ struct StorySansuListView: View {
                 "7.8",
                 "7.9"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "4.5 + 3.2 は 7.7 です。"
         ),
-        // 修正終了
 
         QuizQuestion(
             question: "250センチメートルは何メートルですか？",
@@ -2465,7 +2458,6 @@ struct StorySansuListView: View {
             explanation: "90 ÷ 10 は 9 です。"
         ),
 
-        // 修正開始: 正解は「7.8」なのでcorrectAnswerIndexを2に変更
         QuizQuestion(
             question: "4.5 + 3.2 はいくつですか？",
             choices: [
@@ -2474,10 +2466,9 @@ struct StorySansuListView: View {
                 "7.8",
                 "7.9"
             ],
-            correctAnswerIndex: 2, // 修正: 元は2でしたが、正解は3
+            correctAnswerIndex: 1,
             explanation: "4.5 + 3.2 は 7.7 です。"
         ),
-        // 修正終了
 
         QuizQuestion(
             question: "250センチメートルは何メートルですか？",
@@ -2546,8 +2537,8 @@ struct StorySansuListView: View {
                 "9.6",
                 "9.4"
             ],
-            correctAnswerIndex: 2,
-            explanation: "5.7 + 3.8 は 9.6 です。"
+            correctAnswerIndex: 1,
+            explanation: "5.7 + 3.8 は 9.5 です。"
         ),
 
         QuizQuestion(
@@ -2558,8 +2549,8 @@ struct StorySansuListView: View {
                 "40メートル",
                 "400メートル"
             ],
-            correctAnswerIndex: 1,
-            explanation: "4,000センチメートルは 4メートルです。"
+            correctAnswerIndex: 2,
+            explanation: "4,000センチメートルは 40メートルです。"
         ),
 
         QuizQuestion(
@@ -2675,7 +2666,7 @@ struct StorySansuListView: View {
                 "5/8",
                 "6/8"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 1,
             explanation: "2/8は3/8より小さい分数です。"
         ),
         QuizQuestion(
@@ -2719,7 +2710,7 @@ struct StorySansuListView: View {
                 "28平方センチメートル",
                 "30平方センチメートル"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "長方形の面積は縦×横で求めます。13×2=26平方センチメートルです。"
         ),
         QuizQuestion(
@@ -2862,14 +2853,14 @@ struct StorySansuListView: View {
                 "500円",
                 "550円"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "90円×5個で450円です。"
         ),
         QuizQuestion(
             question: "次の中で、3/8より大きい分数はどれですか？",
             choices: [
                 "2/8",
-                "4/8",
+                "3/8",
                 "1/8",
                 "5/8"
             ],
@@ -3188,7 +3179,7 @@ struct StorySansuListView: View {
             question: "次の中で、3/8より大きい分数はどれですか？",
             choices: [
                 "1/8",
-                "4/8",
+                "3/8",
                 "2/8",
                 "5/8"
             ],
@@ -3266,7 +3257,7 @@ struct StorySansuListView: View {
             choices: [
                 "2/7",
                 "1/7",
-                "4/7",
+                "3/7",
                 "5/7"
             ],
             correctAnswerIndex: 3,
@@ -3564,7 +3555,7 @@ struct StorySansuListView: View {
                 "5/9",
                 "1/3",
                 "3/4",
-                "2/5"
+                "1/2"
             ],
             correctAnswerIndex: 1,
             explanation: "1/3は4/9より小さい分数です。"
@@ -3610,7 +3601,7 @@ struct StorySansuListView: View {
                 "60平方センチメートル",
                 "72平方センチメートル"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 0,
             explanation: "長方形の面積は縦×横で求めます。12×4=48平方センチメートルです。"
         ),
         QuizQuestion(
@@ -3683,12 +3674,12 @@ struct StorySansuListView: View {
             question: "次の中で、5/6より小さい分数はどれですか？",
             choices: [
                 "2/3",
-                "3/4",
-                "1/2",
-                "全て"
+                "5/6",
+                "6/5",
+                "1"
             ],
-            correctAnswerIndex: 3,
-            explanation: "全ての選択肢は5/6より小さい分数です。"
+            correctAnswerIndex: 0,
+            explanation: "2/3は5/6より小さい分数です。"
         ),
         QuizQuestion(
             question: "お菓子が3個入った袋が4袋あります。お菓子は全部で何個ですか？",
@@ -3762,9 +3753,9 @@ struct StorySansuListView: View {
                 "2/5",
                 "4/5",
                 "1/3",
-                "5/6"
+                "1/2"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "4/5は3/5より大きい分数です。"
         ),
         QuizQuestion(
@@ -3782,12 +3773,12 @@ struct StorySansuListView: View {
             question: "次の中で、7/8より小さい分数はどれですか？",
             choices: [
                 "5/6",
-                "1/2",
-                "3/4",
-                "全て"
+                "7/8",
+                "1",
+                "9/8"
             ],
-            correctAnswerIndex: 3,
-            explanation: "全ての選択肢は7/8より小さい分数です。"
+            correctAnswerIndex: 0,
+            explanation: "5/6は7/8より小さい分数です。"
         ),
         QuizQuestion(
             question: "りんごが2個入った袋が5袋あります。りんごは全部で何個ですか？",
@@ -3808,7 +3799,7 @@ struct StorySansuListView: View {
                 "40平方センチメートル",
                 "44平方センチメートル"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "長方形の面積は縦×横で求めます。9×4=36平方センチメートルです。"
         ),
         QuizQuestion(
@@ -4728,8 +4719,8 @@ struct StorySansuListView: View {
             choices: [
                 "1100円",
                 "1260円",
-                "1260円",
-                "1260円"
+                "1240円",
+                "1280円"
             ],
             correctAnswerIndex: 1,
             explanation: "イチゴ1個180円×7個=1260円です。"
@@ -4764,7 +4755,7 @@ struct StorySansuListView: View {
             choices: [
                 "620円",
                 "630円",
-                "630円",
+                "640円",
                 "650円"
             ],
             correctAnswerIndex: 1,
@@ -4800,7 +4791,7 @@ struct StorySansuListView: View {
                 "950円",
                 "960円",
                 "880円",
-                "960円"
+                "980円"
             ],
             correctAnswerIndex: 1,
             explanation: "オレンジ1個120円×8個=960円です。"
@@ -4968,8 +4959,8 @@ struct StorySansuListView: View {
                 "144立方センチメートル",
                 "120立方センチメートル"
             ],
-            correctAnswerIndex: 2,
-            explanation: "直方体の体積は、縦×横×高さで計算します。4×8×4=144立方センチメートルです。"
+            correctAnswerIndex: 0,
+            explanation: "直方体の体積は、縦×横×高さで計算します。4×8×4=128立方センチメートルです。"
         ),
 
         QuizQuestion(
@@ -5083,8 +5074,8 @@ struct StorySansuListView: View {
             choices: [
                 "860円",
                 "910円",
-                "850円",
-                "910円"
+                "900円",
+                "920円"
             ],
             correctAnswerIndex: 1,
             explanation: "バナナ1個130円×7個=910円です。"
@@ -5530,13 +5521,13 @@ struct StorySansuListView: View {
         QuizQuestion(
             question: "半径24cmの円の面積はおおよそ何平方センチメートルですか？（円周率を3.14とする）",
             choices: [
-                "1,810.56平方センチメートル",
-                "1,809.76平方センチメートル",
+                "1,809平方センチメートル",
+                "1,800平方センチメートル",
                 "1,805平方センチメートル",
                 "1,820平方センチメートル"
             ],
             correctAnswerIndex: 0,
-            explanation: "面積は、半径の2乗×円周率で求められます。24×24×3.14=1,810.56平方センチメートルです。"
+            explanation: "面積は、半径の2乗×円周率で求められます。24×24×3.14=1,808.64平方センチメートルなので、おおよそ1,809平方センチメートルです。"
         ),
 
         QuizQuestion(
@@ -5705,13 +5696,13 @@ struct StorySansuListView: View {
         QuizQuestion(
             question: "半径13cmの円の面積はおおよそ何平方センチメートルですか？（円周率を3.14とする）",
             choices: [
-                "529.66平方センチメートル",
-                "530平方センチメートル",
+                "529平方センチメートル",
+                "531平方センチメートル",
                 "525平方センチメートル",
-                "532平方センチメートル"
+                "540平方センチメートル"
             ],
-            correctAnswerIndex: 0,
-            explanation: "面積は、半径の2乗×円周率で求められます。13×13×3.14=529.66平方センチメートルです。"
+            correctAnswerIndex: 1,
+            explanation: "面積は、半径の2乗×円周率で求められます。13×13×3.14=530.66平方センチメートルなので、おおよそ531平方センチメートルです。"
         ),
 
         QuizQuestion(
@@ -5846,12 +5837,12 @@ struct StorySansuListView: View {
             question: "半径25cmの円の面積はおおよそ何平方センチメートルですか？（円周率を3.14とする）",
             choices: [
                 "1,960平方センチメートル",
-                "1,962.5平方センチメートル",
-                "1,962平方センチメートル",
+                "1,963平方センチメートル",
+                "1,950平方センチメートル",
                 "1,965平方センチメートル"
             ],
-            correctAnswerIndex: 2,
-            explanation: "面積は、半径の2乗×円周率で求められます。25×25×3.14=1,962.5平方センチメートルです。"
+            correctAnswerIndex: 1,
+            explanation: "面積は、半径の2乗×円周率で求められます。25×25×3.14=1,962.5平方センチメートルなので、おおよそ1,963平方センチメートルです。"
         ),
 
         QuizQuestion(
@@ -5908,8 +5899,8 @@ struct StorySansuListView: View {
                 "15人",
                 "16人"
             ],
-            correctAnswerIndex: 0,
-            explanation: "36人の40%は12人です。"
+            correctAnswerIndex: 1,
+            explanation: "36人の40%は14.4人なので、女子はおおよそ14人です。"
         ),
 
         QuizQuestion(
@@ -6093,10 +6084,10 @@ struct StorySansuListView: View {
                 "200平方センチメートル",
                 "201平方センチメートル",
                 "220平方センチメートル",
-                "201.06平方センチメートル"
+                "210平方センチメートル"
             ],
-            correctAnswerIndex: 3,
-            explanation: "面積は、半径の2乗×円周率で求められます。8×8×3.14=201.06平方センチメートルです。"
+            correctAnswerIndex: 1,
+            explanation: "面積は、半径の2乗×円周率で求められます。8×8×3.14=200.96平方センチメートルなので、おおよそ201平方センチメートルです。"
         ),
 
         QuizQuestion(
@@ -6142,7 +6133,7 @@ struct StorySansuListView: View {
                 "130km",
                 "140km"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "時速80kmで1.5時間走ると、80×1.5=120km進みます。"
         ),
         QuizQuestion(

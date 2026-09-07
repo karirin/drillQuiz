@@ -21,7 +21,6 @@ struct ModernUserNameBar: View {
     
     var body: some View {
         HStack(spacing: 8) {
-            // ユーザーアイコン
             Circle()
                 .fill(
                     LinearGradient(
@@ -36,13 +35,15 @@ struct ModernUserNameBar: View {
                         .foregroundColor(.white)
                         .font(.system(size: 14, weight: .semibold))
                 )
-            
+
             if userName.isEmpty {
                 Button(action: onTapRegister) {
                     HStack(spacing: 4) {
                         Text("名前を登録")
                             .font(.system(size: 14, weight: .bold))
                             .foregroundColor(.white)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                         Image(systemName: "pencil.circle.fill")
                             .foregroundColor(.white.opacity(0.8))
                     }
@@ -62,10 +63,13 @@ struct ModernUserNameBar: View {
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(Color("fontGray"))
                     .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                    .layoutPriority(1)
             }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
+        .frame(maxWidth: 220, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 20)
                 .fill(.ultraThinMaterial)
@@ -129,33 +133,6 @@ struct ModernCoinBar: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 isAnimating = false
             }
-        }
-    }
-}
-
-struct ModernHelpButton: View {
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 6) {
-                Image(systemName: "questionmark.circle.fill")
-                    .font(.system(size: 16, weight: .semibold))
-                Text("ヘルプ")
-                    .font(.system(size: 13, weight: .semibold))
-            }
-            .foregroundColor(.white)
-            .padding(.horizontal, 14)
-            .padding(.vertical, 8)
-            .background(
-                LinearGradient(
-                    colors: [Color.blue, Color.cyan],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-            )
-            .cornerRadius(20)
-            .shadow(color: .blue.opacity(0.3), radius: 4, x: 0, y: 2)
         }
     }
 }
@@ -251,6 +228,557 @@ struct ModernLevelBar: View {
     }
 }
 
+struct ModernStatusCard: View {
+    let avatarName: String
+    let baseHp: Int
+    let bonusHp: Int
+    let baseAttack: Int
+    let bonusAttack: Int
+
+    private var displayAvatarName: String {
+        avatarName.isEmpty ? "defaultIcon" : avatarName
+    }
+
+    private var totalHp: Int {
+        baseHp + bonusHp
+    }
+
+    private var totalAttack: Int {
+        baseAttack + bonusAttack
+    }
+
+    private var totalAttackText: String {
+        PositionViewModel.isDeveloperMode ? "∞" : "\(totalAttack)"
+    }
+
+    var body: some View {
+        HStack(spacing: 16) {
+            HStack(spacing: isSmallDevice() ? 0 : -20) {
+                ZStack {
+                    Image(displayAvatarName)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: isSmallDevice() ? 150 : 200)
+                        .shadow(color: Color.black.opacity(0.3), radius: 5, x: 5, y: 5)
+                        .shadow(color: Color.black.opacity(0.2), radius: 10, x: -5, y: 0)
+                }
+                .padding(.trailing, 20)
+
+                VStack {
+                    VStack(spacing: 0) {
+                        ZStack {
+                            Image("ハートバー")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 40)
+                            Text("\(totalHp)")
+                                .multilineTextAlignment(.leading)
+                                .font(.system(size: 20))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.7)
+                                .padding(.leading, 45)
+                                .padding(.top, 10)
+                        }
+
+                        ZStack {
+                            Image("上昇バー１")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 30)
+                            HStack(spacing: 0) {
+                                Text("＋\(bonusHp)")
+                                    .padding(.top, 3)
+                                    .font(.system(size: 18))
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.7)
+                                Image(displayAvatarName)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height: isSmallDevice() ? 30 : 40)
+                                    .padding(.top, 8)
+                            }
+                            .padding(.leading, 40)
+                            .frame(minWidth: isSmallDevice() ? 92 : 108, alignment: .leading)
+                        }
+                        .padding(.leading, 40)
+                    }
+
+                    VStack(spacing: 0) {
+                        ZStack {
+                            Image("攻撃バー")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 40)
+                            Text(totalAttackText)
+                                .multilineTextAlignment(.leading)
+                                .padding(.leading, 45)
+                                .padding(.top, 8)
+                                .font(.system(size: 20))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.7)
+                        }
+
+                        ZStack {
+                            Image("上昇バー２")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 30)
+                            HStack(spacing: 0) {
+                                Text("＋\(bonusAttack)")
+                                    .padding(.top, 3)
+                                    .font(.system(size: 18))
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.7)
+                                Image(displayAvatarName)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height: isSmallDevice() ? 30 : 40)
+                                    .padding(.top, 8)
+                            }
+                            .padding(.leading, 40)
+                            .frame(minWidth: isSmallDevice() ? 92 : 108, alignment: .leading)
+                        }
+                        .padding(.leading, 40)
+                    }
+                }
+                .padding(.top, isSmallDevice() ? 10 : 0)
+            }
+        }
+    }
+}
+
+// MARK: - Compact Home (itQuizと同じデザイン言語のホーム画面コンポーネント)
+
+private enum CompactHomePalette {
+    static let canvas = Color(uiColor: .systemGroupedBackground)
+    static let card = Color(uiColor: .secondarySystemGroupedBackground)
+    static let primaryText = Color(uiColor: .label)
+    static let secondaryText = Color(uiColor: .secondaryLabel)
+    static let divider = Color(uiColor: .separator).opacity(0.28)
+    static let shadow = Color.black.opacity(0.07)
+}
+
+private enum CompactHomeIcon {
+    case asset(String)
+    case symbol(String)
+}
+
+private struct CompactHomeSectionHeader: View {
+    let title: String
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Text(title)
+                .font(.system(size: 15, weight: .bold))
+                .foregroundStyle(CompactHomePalette.primaryText)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background {
+                    Capsule()
+                        .fill(.thinMaterial)
+                        .overlay {
+                            Capsule()
+                                .fill(Color.white.opacity(0.48))
+                        }
+                }
+                .overlay {
+                    Capsule()
+                        .strokeBorder(Color.white.opacity(0.88), lineWidth: 0.8)
+                }
+                .shadow(color: Color.black.opacity(0.12), radius: 4, x: 0, y: 2)
+
+            Rectangle()
+                .fill(Color.white.opacity(0.82))
+                .frame(height: 1)
+                .shadow(color: Color.black.opacity(0.16), radius: 1, x: 0, y: 1)
+        }
+        .accessibilityAddTraits(.isHeader)
+    }
+}
+
+struct PressedEffectStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+            .opacity(configuration.isPressed ? 0.7 : 1.0)
+            .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
+    }
+}
+
+private struct CompactHomeFeatureCard: View {
+    let title: String
+    let subtitle: String
+    let icon: CompactHomeIcon
+    let accent: Color
+    var badge: Int = 0
+    var progress: Double? = nil
+    var progressLabel: String? = nil
+    var artworkName: String? = nil
+    var artworkIsSquare: Bool = false
+    var artworkIsWide: Bool = false
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            if let artworkName {
+                artworkView(artworkName)
+                    .overlay(alignment: .topTrailing) {
+                        notificationBadge
+                            .padding(10)
+                    }
+            } else {
+                HStack(spacing: 10) {
+                    iconView
+                        .overlay(alignment: .topTrailing) {
+                            notificationBadge
+                                .offset(x: 4, y: -4)
+                        }
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(title)
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundStyle(CompactHomePalette.primaryText)
+                            .lineLimit(1)
+
+                        if let progress {
+                            HStack(spacing: 6) {
+                                GeometryReader { proxy in
+                                    ZStack(alignment: .leading) {
+                                        Capsule().fill(Color(uiColor: .systemGray5))
+                                        Capsule()
+                                            .fill(accent)
+                                            .frame(width: proxy.size.width * min(max(progress, 0), 1))
+                                    }
+                                }
+                                .frame(height: 5)
+
+                                if let progressLabel {
+                                    Text(progressLabel)
+                                        .font(.system(size: 10, weight: .bold))
+                                        .foregroundStyle(accent)
+                                        .lineLimit(1)
+                                }
+                            }
+                        } else {
+                            Text(subtitle)
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundStyle(CompactHomePalette.secondaryText)
+                                .lineLimit(1)
+                        }
+                    }
+
+                    Spacer(minLength: 0)
+                }
+                .padding(.horizontal, 10)
+                .frame(maxWidth: .infinity, minHeight: 66, alignment: .leading)
+                .background {
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .fill(
+                                    LinearGradient(
+                                        colors: [
+                                            Color.white.opacity(0.34),
+                                            Color.white.opacity(0.12)
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                        }
+                }
+                .overlay {
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .strokeBorder(Color.white.opacity(0.72), lineWidth: 0.8)
+                }
+                .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+                .contentShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            }
+        }
+        .buttonStyle(PressedEffectStyle())
+        .accessibilityLabel(
+            badge > 0
+                ? "\(title)、\(subtitle)、新着\(badge)件"
+                : "\(title)、\(subtitle)"
+        )
+    }
+
+    @ViewBuilder
+    private func artworkView(_ name: String) -> some View {
+        if artworkIsSquare {
+            ZStack {
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .fill(.ultraThinMaterial)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 20, style: .continuous)
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        Color.white.opacity(0.34),
+                                        Color.white.opacity(0.12)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                    }
+
+                GeometryReader { proxy in
+                    Image(name)
+                        .resizable()
+                        .interpolation(.high)
+                        .scaledToFill()
+                        .frame(width: proxy.size.width, height: proxy.size.height)
+                        .clipped()
+                }
+                .padding(8)
+            }
+            .aspectRatio(1.22, contentMode: .fit)
+            .overlay {
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .strokeBorder(Color.white.opacity(0.72), lineWidth: 0.8)
+            }
+            .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+            .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        } else if artworkIsWide {
+            ZStack {
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .fill(.ultraThinMaterial)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 20, style: .continuous)
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        Color.white.opacity(0.34),
+                                        Color.white.opacity(0.12)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                    }
+
+                GeometryReader { proxy in
+                    Image(name)
+                        .resizable()
+                        .interpolation(.high)
+                        .scaledToFit()
+                        .frame(width: proxy.size.width, height: proxy.size.height)
+                }
+                .padding(6)
+            }
+            .aspectRatio(3.65, contentMode: .fit)
+            .overlay {
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .strokeBorder(Color.white.opacity(0.72), lineWidth: 0.8)
+            }
+            .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+            .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        } else {
+            Image(name)
+                .resizable()
+                .interpolation(.high)
+                .scaledToFit()
+                .frame(maxWidth: .infinity)
+                .frame(height: 66)
+                .contentShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        }
+    }
+
+    @ViewBuilder
+    private var notificationBadge: some View {
+        if badge > 0 {
+            Text("\(min(badge, 99))")
+                .font(.system(size: 10, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 6)
+                .frame(minWidth: 19, minHeight: 19)
+                .background(Color(red: 0.96, green: 0.32, blue: 0.43), in: Capsule())
+                .accessibilityLabel("通知\(badge)件")
+        }
+    }
+
+    @ViewBuilder
+    private var iconView: some View {
+        switch icon {
+        case .asset(let name):
+            Image(name)
+                .resizable()
+                .interpolation(.high)
+                .scaledToFill()
+                .frame(width: 48, height: 48)
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .accessibilityHidden(true)
+        case .symbol(let name):
+            Image(systemName: name)
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: 36, height: 36)
+                .background(accent, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+        }
+    }
+}
+
+private struct CompactHomeProfileCard: View {
+    let userName: String
+    let avatarName: String
+    let coins: Int
+    let level: Int
+    let experience: Int
+    let maxExperience: Int
+    let hp: Int
+    let hpBonus: Int
+    let attack: Int
+    let attackBonus: Int
+    let registerName: () -> Void
+
+    private var progress: Double {
+        guard maxExperience > 0 else { return 0 }
+        return min(max(Double(experience) / Double(maxExperience), 0), 1)
+    }
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Color.clear
+                .frame(width: 72, height: 82)
+                .overlay(
+                    Image(avatarName.isEmpty ? "defaultIcon" : avatarName)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 108, height: 123)
+                )
+                .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: 7) {
+                HStack(spacing: 6) {
+                    Text(userName.isEmpty ? "ゲスト" : userName)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(CompactHomePalette.primaryText)
+                        .lineLimit(1)
+
+                    if userName.isEmpty {
+                        Button(action: registerName) {
+                            Label("名前を登録", systemImage: "pencil")
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundStyle(Color.pink)
+                                .padding(.horizontal, 7)
+                                .padding(.vertical, 4)
+                                .background(Color.pink.opacity(0.1), in: Capsule())
+                        }
+                        .buttonStyle(.plain)
+                    }
+
+                    Spacer(minLength: 4)
+
+                    Label("\(coins)", systemImage: "dollarsign.circle.fill")
+                        .font(.system(size: 12, weight: .bold, design: .rounded))
+                        .foregroundStyle(Color(red: 0.64, green: 0.43, blue: 0.04))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 5)
+                        .background(Color.yellow.opacity(0.2), in: Capsule())
+                }
+
+                HStack(spacing: 8) {
+                    Text("Lv.\(level)")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(Color.indigo)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Color.indigo.opacity(0.1), in: Capsule())
+
+                    GeometryReader { proxy in
+                        ZStack(alignment: .leading) {
+                            Capsule().fill(Color(uiColor: .systemGray5))
+                            Capsule()
+                                .fill(LinearGradient(colors: [.indigo, .purple], startPoint: .leading, endPoint: .trailing))
+                                .frame(width: proxy.size.width * progress)
+                        }
+                    }
+                    .frame(height: 7)
+
+                    Text("\(experience) / \(maxExperience)")
+                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .foregroundStyle(CompactHomePalette.secondaryText)
+                        .monospacedDigit()
+                }
+
+                HStack(spacing: 8) {
+                    statChip(symbol: "heart.fill", title: "HP \(hp)", bonus: hpBonus, color: .pink)
+                    statChip(symbol: "bolt.fill", title: "攻撃 \(attack)", bonus: attackBonus, color: .orange)
+                }
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color.white.opacity(0.34),
+                                    Color.white.opacity(0.12)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                }
+        }
+        .overlay {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(Color.white.opacity(0.72), lineWidth: 0.8)
+        }
+        .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+    }
+
+    private func statChip(symbol: String, title: String, bonus: Int, color: Color) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: symbol)
+                .fixedSize()
+            Text(title)
+                .fixedSize(horizontal: true, vertical: false)
+                .layoutPriority(1)
+
+            if bonus > 0 {
+                Spacer(minLength: 0)
+
+                HStack(spacing: 3) {
+                    Image(avatarName.isEmpty ? "defaultIcon" : avatarName)
+                        .renderingMode(.original)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 22, height: 22)
+                        .clipShape(Circle())
+                        .fixedSize()
+
+                    Text("+\(bonus)")
+                        .font(.system(size: 9, weight: .bold, design: .rounded))
+                        .foregroundStyle(color)
+                        .monospacedDigit()
+                        .fixedSize(horizontal: true, vertical: false)
+                }
+                .frame(width: 54, height: 24)
+                .background(Color.white.opacity(0.58), in: Capsule())
+                .fixedSize(horizontal: true, vertical: false)
+                .layoutPriority(3)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("おともによる補正、プラス\(bonus)")
+            }
+        }
+        .font(.system(size: 9.5, weight: .bold))
+        .foregroundStyle(color)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 7)
+        .padding(.vertical, 3)
+        .background(color.opacity(0.1), in: Capsule())
+        .accessibilityElement(children: .contain)
+    }
+}
+
 struct ContentView: View {
     @ObservedObject var authManager = AuthManager.shared
     @State private var userName: String = ""
@@ -275,6 +803,14 @@ struct ContentView: View {
     @State private var isPresentingIllustratedView: Bool = false
     @State private var isPresentingPentagonView: Bool = false
     @State private var isPresentingRankingView: Bool = false
+    @ObservedObject private var friendManager = FriendManager.shared
+    @ObservedObject private var guildManager = GuildManager.shared
+    @ObservedObject private var battleManager = BattleManager.shared
+    @ObservedObject private var missionManager = MissionManager.shared
+    @State private var isPresentingFriendView: Bool = false
+    @State private var isPresentingGuildView: Bool = false
+    @State private var isPresentingWeeklyLeagueView: Bool = false
+    @State private var isPresentingMissionView: Bool = false
     @State private var audioPlayerKettei: AVAudioPlayer?
     @ObservedObject var audioManager = AudioManager.shared
     @State private var showTutorial = true
@@ -283,9 +819,8 @@ struct ContentView: View {
     @State private var isSoundOn: Bool = true
     @State private var isLoading: Bool = true
     @State private var isShowingLoginBonus = false
-    @State private var showLoginModal: Bool = false
 //    @ObservedObject var interstitial = Interstitial()
-    @ObservedObject var reward = Reward()
+    @StateObject var reward = Reward()
     @State private var rewardFlag: Int = 0
     @State private var customerFlag: Bool = false
     @Environment(\.requestReview) var requestReview
@@ -299,17 +834,50 @@ struct ContentView: View {
     @State private var csFlag: Bool = false
     @State private var helpFlag: Bool = false
     @State private var showLoginBonus: Bool = false
-    @State private var currentBonus: Int = 0 // 追加: 現在のボーナス額を保持
+    @State private var currentBonus: Int = 0
     @State private var loginCount: Int = 0
-    @State private var showCoinAlert: Bool = false
-    @State private var isSignUpFlag: Bool = true
+    @State private var tutorialPulse: Bool = false
     @State private var isPresentingTraining: Bool = false
     @State private var updateNameFlag: Bool = false
+    @State private var hasBootstrapped = false
+    @State private var hasLoadedDeferredHomeData = false
+    private static let homeLoadingTimeout: TimeInterval = 8
+    private let initialLaunchKey = "hasLaunchedBeforeOnappear"
+    private let introOptOutKey = "hasOptedOutOfIntroTutorial"
     
     private var maxExperience: Int {
         return 100 // または authManager から取得
     }
-    
+
+    private var avatarName: String {
+        avatar.first?["name"] as? String ?? ""
+    }
+
+    private var avatarBonusHp: Int {
+        avatar.first?["health"] as? Int ?? 0
+    }
+
+    private var avatarBonusAttack: Int {
+        avatar.first?["attack"] as? Int ?? 0
+    }
+
+    private var friendNotificationCount: Int {
+        friendManager.incomingRequests.count + friendManager.pendingThanksCount
+    }
+
+    private var guildNotificationCount: Int {
+        let claimableMissions = guildManager.missionProgresses.filter { $0.isCompleted && !$0.isClaimed }.count
+        return claimableMissions + guildManager.claimableRankRewards.count
+    }
+
+    private var guildMissionProgress: Double? {
+        guildManager.myGuildId != nil ? guildManager.guildLevelState.progressValue : nil
+    }
+
+    private var guildProgressLabel: String? {
+        guildManager.myGuildId != nil ? "Lv.\(guildManager.guildLevelState.level)" : nil
+    }
+
     var body: some View {
         NavigationView {
             ZStack{
@@ -326,239 +894,227 @@ struct ContentView: View {
                                 .padding(.bottom, -10)
                         }
                         ZStack{
-                            Image("背景IT")
-                                .resizable()
-                                .edgesIgnoringSafeArea(.all)
+                            // LazyVStack内に置くと画面外では未描画のままになり遷移が発火しないため、
+                            // ScrollViewの外(常に描画される場所)にNavigationLinkをまとめて置く。
+                            Group {
+                                NavigationLink("", destination: ManagerView().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizList)
+                                NavigationLink("", destination: GachaManagerView().navigationBarBackButtonHidden(true), isActive: $isPresentingGachaView)
+                                NavigationLink("", destination: IllustratedView(isPresenting: .constant(false)).navigationBarBackButtonHidden(true), isActive: $isPresentingIllustratedView)
+                                NavigationLink("", destination: TittlesView(isPresenting: .constant(false)).navigationBarBackButtonHidden(true), isActive: $isPresentingTittleView)
+                                NavigationLink("", destination: RankingView(audioManager: audioManager).navigationBarBackButtonHidden(true), isActive: $isPresentingRankingView)
+                                NavigationLink("", destination: ContactView(audioManager: AudioManager()).navigationBarBackButtonHidden(true), isActive: $isPresentingSettingView)
+                                NavigationLink("", destination: StoryView(isReturnActive: .constant(true), isPresented: $isPresentingTraining).navigationBarBackButtonHidden(true), isActive: $isPresentingTraining)
+                            }
+                            Group {
+                                NavigationLink("", destination: FriendListView().navigationBarBackButtonHidden(true), isActive: $isPresentingFriendView)
+                                NavigationLink("", destination: GuildEntryView().navigationBarBackButtonHidden(true), isActive: $isPresentingGuildView)
+                                NavigationLink("", destination: WeeklyLeagueView().navigationBarBackButtonHidden(true), isActive: $isPresentingWeeklyLeagueView)
+                                NavigationLink("", destination: MissionView(), isActive: $isPresentingMissionView)
+                            }
                             ScrollView(.vertical, showsIndicators: false) {
-                                VStack(spacing:10) {
-                                    HStack{
-                                            ModernUserNameBar(
-                                                userName: userName,
-                                                onTapRegister: {
-                                                    updateNameFlag = true
-                                                }
-                                            )
-                                            .onChange(of: updateNameFlag) { _ in
-                                                authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
-                                                    self.userName = name ?? ""
-                                                    self.avatar = avatar ?? [[String: Any]]()
-                                                    self.userMoney = money ?? 0
-                                                    self.userHp = hp ?? 100
-                                                    self.userAttack = attack ?? 20
-                                                    self.tutorialNum = tutorialNum ?? 0
-                                                    self.isLoading = false
-                                                }
-                                            }
-                                        
-                                        Spacer()
-                                        ModernCoinBar(coins: userMoney)
-                                        
-                                        ModernHelpButton {
-                                            generateHapticFeedback()
-                                            helpFlag = true
-                                        }
-                                    }
-                                    ModernLevelBar(
+                                LazyVStack(spacing: 10) {
+                                    CompactHomeProfileCard(
+                                        userName: userName,
+                                        avatarName: avatarName,
+                                        coins: userMoney,
                                         level: authManager.level,
                                         experience: authManager.experience,
-                                        maxExperience: maxExperience
+                                        maxExperience: maxExperience,
+                                        hp: userHp + avatarBonusHp,
+                                        hpBonus: avatarBonusHp,
+                                        attack: userAttack + avatarBonusAttack,
+                                        attackBonus: avatarBonusAttack,
+                                        registerName: {
+                                            generateHapticFeedback()
+                                            updateNameFlag = true
+                                        }
                                     )
+                                    .onChange(of: updateNameFlag) { _ in
+                                        authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
+                                            self.userName = name ?? ""
+                                            self.avatar = avatar ?? [[String: Any]]()
+                                            self.userMoney = money ?? 0
+                                            self.userHp = hp ?? 100
+                                            self.userAttack = attack ?? 20
+                                            self.tutorialNum = tutorialNum ?? 0
+                                            self.isLoading = false
+                                        }
+                                    }
+
+                                    CompactHomeSectionHeader(title: "挑戦する")
+
+                                    LazyVGrid(
+                                        columns: [
+                                            GridItem(.flexible(), spacing: 8),
+                                            GridItem(.flexible(), spacing: 8)
+                                        ],
+                                        spacing: 8
+                                    ) {
+                                        CompactHomeFeatureCard(
+                                            title: "ダンジョン",
+                                            subtitle: "スタミナを確認",
+                                            icon: .asset("HomeDungeonIcon"),
+                                            accent: .orange,
+                                            artworkName: "HomeDungeonButtonSquare",
+                                            artworkIsSquare: true
+                                        ) {
+                                            generateHapticFeedback()
+                                            self.isPresentingTraining = true
+                                            audioManager.playSound()
+                                        }
+
+                                        CompactHomeFeatureCard(
+                                            title: "学習モード",
+                                            subtitle: "4教科から選ぶ",
+                                            icon: .asset("HomeTrainingIcon"),
+                                            accent: .green,
+                                            artworkName: "HomeTrainingButtonSquare",
+                                            artworkIsSquare: true
+                                        ) {
+                                            generateHapticFeedback()
+                                            self.isPresentingQuizList = true
+                                            audioManager.playSound()
+                                        }
+                                        .background(GeometryReader { geometry in
+                                            Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
+                                        })
+
+                                        CompactHomeFeatureCard(
+                                            title: "週間リーグ",
+                                            subtitle: battleManager.incomingBattles.isEmpty
+                                                ? "今週の順位を確認"
+                                                : "対戦できみの番です",
+                                            icon: .asset("HomeWeeklyLeagueIcon"),
+                                            accent: Color(red: 0.82, green: 0.59, blue: 0.04),
+                                            badge: battleManager.incomingBattles.count
+                                        ) {
+                                            generateHapticFeedback()
+                                            self.isPresentingWeeklyLeagueView = true
+                                            audioManager.playSound()
+                                        }
+
+                                        CompactHomeFeatureCard(
+                                            title: "ミッション",
+                                            subtitle: missionManager.totalClaimableCount > 0
+                                                ? "達成報酬を受け取ろう"
+                                                : "今日の目標を確認",
+                                            icon: .asset("HomeMissionIcon"),
+                                            accent: Color(red: 0.25, green: 0.48, blue: 0.95),
+                                            badge: missionManager.totalClaimableCount
+                                        ) {
+                                            generateHapticFeedback()
+                                            self.isPresentingMissionView = true
+                                            audioManager.playSound()
+                                        }
+                                    }
+
+                                    CompactHomeSectionHeader(title: "みんなで")
+
+                                    LazyVGrid(
+                                        columns: [
+                                            GridItem(.flexible(), spacing: 8),
+                                            GridItem(.flexible(), spacing: 8)
+                                        ],
+                                        spacing: 8
+                                    ) {
+                                        CompactHomeFeatureCard(
+                                            title: "フレンド",
+                                            subtitle: friendNotificationCount == 0
+                                                ? "フレンドとつながろう"
+                                                : "新着情報があります",
+                                            icon: .asset("HomeFriendIcon"),
+                                            accent: Color(red: 0.94, green: 0.35, blue: 0.65),
+                                            badge: friendNotificationCount
+                                        ) {
+                                            generateHapticFeedback()
+                                            self.isPresentingFriendView = true
+                                            audioManager.playSound()
+                                        }
+
+                                        CompactHomeFeatureCard(
+                                            title: "ギルド",
+                                            subtitle: guildManager.guild?.name ?? "仲間と一緒に強くなろう",
+                                            icon: .asset("HomeGuildIcon"),
+                                            accent: Color(red: 0.05, green: 0.71, blue: 0.49),
+                                            badge: guildNotificationCount,
+                                            progress: guildMissionProgress,
+                                            progressLabel: guildProgressLabel
+                                        ) {
+                                            generateHapticFeedback()
+                                            self.isPresentingGuildView = true
+                                            audioManager.playSound()
+                                        }
+                                    }
+
+                                    CompactHomeSectionHeader(title: "あつめる")
+
+                                    LazyVGrid(
+                                        columns: [
+                                            GridItem(.flexible(), spacing: 8),
+                                            GridItem(.flexible(), spacing: 8)
+                                        ],
+                                        spacing: 8
+                                    ) {
+                                        CompactHomeFeatureCard(
+                                            title: "ガチャ",
+                                            subtitle: "コインでおともを獲得",
+                                            icon: .asset("HomeGachaIcon"),
+                                            accent: .pink
+                                        ) {
+                                            generateHapticFeedback()
+                                            self.isPresentingGachaView = true
+                                            audioManager.playSound()
+                                        }
+
+                                        CompactHomeFeatureCard(
+                                            title: "ランキング",
+                                            subtitle: "みんなの記録を確認",
+                                            icon: .asset("HomeRankingIcon"),
+                                            accent: .purple
+                                        ) {
+                                            generateHapticFeedback()
+                                            self.isPresentingRankingView = true
+                                            audioManager.playSound()
+                                        }
+
+                                        CompactHomeFeatureCard(
+                                            title: "おとも図鑑",
+                                            subtitle: "集めたおともを見る",
+                                            icon: .asset("HomeCompanionDexIcon"),
+                                            accent: .teal
+                                        ) {
+                                            generateHapticFeedback()
+                                            self.isPresentingIllustratedView = true
+                                            audioManager.playSound()
+                                        }
+
+                                        CompactHomeFeatureCard(
+                                            title: "称号",
+                                            subtitle: "実績で称号を獲得",
+                                            icon: .asset("HomeTitleIcon"),
+                                            accent: .orange
+                                        ) {
+                                            generateHapticFeedback()
+                                            self.isPresentingTittleView = true
+                                            audioManager.playSound()
+                                        }
+                                    }
+
                                 }
-                                .padding(.horizontal)
-                                VStack(spacing: 10) {
-                                    ZStack{
-                                        HStack(spacing: isSmallDevice() ? 0 : -20) {
-                                            ZStack{
-                                                Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .frame(width: isSmallDevice() ? 150 : 200)
-                                                    .shadow(color: Color.black.opacity(0.3), radius: 5, x: 5, y: 5)
-                                                    .shadow(color: Color.black.opacity(0.2), radius: 10, x: -5, y: 0)
-                                            }
-                                            .padding(.top, isSmallDevice() ? 20 : 30)
-                                            .padding(.trailing, isSmallDevice() ? 0 : 0)
-                                            HStack{
-                                                VStack{
-                                                    VStack(spacing:0){
-                                                        ZStack {
-                                                            Image("ハートバー")
-                                                                .resizable()
-                                                                .scaledToFit()
-                                                                .frame(height: isSmallDevice() ? 40 : 40)
-                                                            Text("\(userHp + (avatar.first?["health"] as? Int ?? 0))")
-                                                                .multilineTextAlignment(.leading)
-                                                                .font(.system(size: 20))
-                                                                .padding(.leading,45)
-                                                                .padding(.top,10)
-                                                        }
-                                                        HStack(spacing:3){
-                                                            ZStack{
-                                                                Image("上昇バー１")
-                                                                    .resizable()
-                                                                    .scaledToFit()
-                                                                    .frame(height: isSmallDevice() ? 30 : 30)
-                                                                HStack(spacing: 0){
-                                                                    Text("＋\(avatar.first?["health"] as? Int ?? 0)")
-                                                                        .padding(.top,3)
-                                                                        .font(.system(size: 18))
-                                                                    Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
-                                                                        .resizable()
-                                                                        .scaledToFit()
-                                                                        .frame(height:isSmallDevice() ? 30 : 40)
-                                                                        .padding(.top,8)
-                                                                }
-                                                                .padding(.leading,40)
-                                                            }.padding(.leading,40)
-                                                        }
-                                                    }
-                                                    VStack(spacing:0){
-                                                        ZStack {
-                                                            Image("攻撃バー")
-                                                                .resizable()
-                                                                .scaledToFit()
-                                                                .frame(height:isSmallDevice() ? 40 : 40)
-                                                            Text("\(userAttack + (avatar.first?["attack"] as? Int ?? 0))")
-                                                                .multilineTextAlignment(.leading)
-                                                                .padding(.leading,45)
-                                                                .padding(.top,8)
-                                                                .font(.system(size: 20))
-                                                        }
-                                                        HStack(spacing:3){
-                                                            ZStack{
-                                                                Image("上昇バー２")
-                                                                    .resizable()
-                                                                    .scaledToFit()
-                                                                    .frame(height:isSmallDevice() ? 30 : 30)
-                                                                HStack(spacing: 0){
-                                                                    Text("＋\(avatar.first?["attack"] as? Int ?? 0)")
-                                                                        .padding(.top,3)
-                                                                        .font(.system(size:18))
-                                                                    Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
-                                                                        .resizable()
-                                                                        .scaledToFit()
-                                                                        .frame(height:isSmallDevice() ? 30 : 40)
-                                                                        .padding(.top,8)
-                                                                }
-                                                                .padding(.leading,40)
-                                                            }.padding(.leading,40)
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            .padding(.top, isSmallDevice() ? 10 : 0)
-                                        }
-                                    }
-                                    VStack(spacing:-5){
-                                        HStack{
-                                            VStack{
-                                                HStack{
-                                                    Spacer()
-                                                    ZStack{
-                                                        Button(action: {
-                                generateHapticFeedback()
-                                                            self.isPresentingTraining = true
-                                                            audioManager.playSound()
-                                                        }) {
-                                                            Image("ダンジョンボタン")
-                                                                .resizable()
-                                                                .scaledToFit()
-                                                                .frame(width:isSmallDevice() ? 150 : 160)
-                                                            
-                                                        }.shadow(radius:10)
-                                                            .padding(.leading ,10)
-                                                    }
-                                                    Button(action: {
-                                generateHapticFeedback()
-                                                        self.isPresentingQuizList = true
-                                                        audioManager.playSound()
-                                                    }) {
-                                                        Image("トレーニングボタン")
-                                                            .resizable()
-                                                            .scaledToFit()
-                                                            .frame(width:isSmallDevice() ? 150 : 160)
-                                                            .background(GeometryReader { geometry in
-                                                                Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
-                                                            })
-                                                            .padding(.leading ,10)
-                                                    }
-                                                    .shadow(radius:10)
-                                                    .padding(.trailing)
-                                                    Spacer()
-                                                }
-                                                HStack{
-                                                    Button(action: {
-                                generateHapticFeedback()
-                                                        self.isPresentingGachaView = true
-                                                        audioManager.playSound()
-                                                    }) {
-                                                        Image("ガチャボタン")
-                                                            .resizable()
-                                                            .scaledToFit()
-                                                            .frame(width: isSmallDevice() ? 160 : 160)
-                                                    }
-                                                    .shadow(radius:10)
-                                                    Button(action: {
-                                generateHapticFeedback()
-                                                        self.isPresentingRankingView = true
-                                                        audioManager.playSound()
-                                                    }) {
-                                                        Image("ランキングボタン")
-                                                            .resizable()
-                                                            .scaledToFit()
-                                                            .frame(width: isSmallDevice() ? 180 : 170)
-                                                    }.shadow(radius:10).padding(.bottom, -5)
-                                                }
-                                                HStack{
-                                                    Button(action: {
-                                generateHapticFeedback()
-                                                        // 画面遷移のトリガーをオンにする
-                                                        self.isPresentingIllustratedView = true
-                                                        audioManager.playSound()
-                                                    }) {
-                                                        Image("おとも図鑑ボタン")
-                                                            .resizable()
-                                                            .scaledToFit()
-                                                            .frame(width: isSmallDevice() ? 160 : 160)
-                                                    }.shadow(radius:10)
-                                                    
-                                                    Button(action: {
-                                generateHapticFeedback()
-                                                        self.isPresentingTittleView = true
-                                                        audioManager.playSound()
-                                                    }) {
-                                                        Image("称号ボタン")
-                                                            .resizable()
-                                                            .scaledToFit()
-                                                            .frame(width: isSmallDevice() ? 160 : 160)
-                                                    }.shadow(radius:10).padding(.bottom, -5)
-                                                }.padding(.leading,-10)
-                                            }
-                                        }
-                                    }
-                                    VStack{
-                                        Group{
-                                            NavigationLink("", destination: ManagerView().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizList)
-                                            //
-                                            NavigationLink("", destination: GachaView()
-                                                .navigationBarBackButtonHidden(true), isActive: $isPresentingGachaView)
-                                            //
-                                            NavigationLink("", destination: IllustratedView(isPresenting: .constant(false)).navigationBarBackButtonHidden(true), isActive: $isPresentingIllustratedView)
-                                        }
-                                        NavigationLink("", destination: TittlesView(isPresenting: .constant(false)).navigationBarBackButtonHidden(true), isActive: $isPresentingTittleView)
-                                        NavigationLink("", destination: RankingView(audioManager: audioManager).navigationBarBackButtonHidden(true), isActive: $isPresentingRankingView)
-                                        //                                NavigationLink("", destination: Test(isPresenting: .constant(false), viewModel: QuizBeginnerStoryViewModel()).navigationBarBackButtonHidden(true), isActive: $isPresentingStoryView)
-                                        //
-                                        NavigationLink("", destination: ContactView(audioManager: AudioManager()).navigationBarBackButtonHidden(true), isActive: $isPresentingSettingView)
-                                        NavigationLink("", destination: StoryView(isReturnActive: .constant(true), isPresented: $isPresentingTraining).navigationBarBackButtonHidden(true), isActive: $isPresentingTraining)
-                                        //                                    NavigationLink("", destination:  PentagonView(authManager: authManager).navigationBarBackButtonHidden(true), isActive: $isPresentingPentagonView)
-                                        //                                }
-                                        
-                                    }
-                                    //                            .padding(.horizontal,5)
-                                }
-                                .padding(.top, -15)
+                                .padding(.horizontal, 12)
+                                .padding(.top, 8)
+                                .padding(.bottom, 12)
                             }
+                        }
+                        .background {
+                            Image("HomeBackgroundAdventure")
+                                .resizable()
+                                .interpolation(.high)
+                                .scaledToFill()
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .clipped()
+                                .ignoresSafeArea()
+                                .allowsHitTesting(false)
                         }
                     }
                     .onPreferenceChange(ViewPositionKey.self) { positions in
@@ -566,24 +1122,24 @@ struct ContentView: View {
                     }
                 }
                 if showLoginBonus {
-                    Color.black.opacity(0.4)
-                        .edgesIgnoringSafeArea(.all)
-                        .onTapGesture {
-                            showLoginBonus = false
-                            showCoinAlert = true
+                    LoginBonusModernView(
+                        isPresented: $showLoginBonus,
+                        loginCount: loginCount,
+                        currentBonus: currentBonus,
+                        authManager: authManager,
+                        onCollected: {
+                            authManager.getUserMoney { money in
+                                self.userMoney = money
+                            }
                         }
-                    StampAnimationView(loginCount: $loginCount)
-                        .onTapGesture {
-                            showLoginBonus = false
-                            showCoinAlert = true
-                        }
+                    )
                 }
                 if csFlag {
-                    ReviewView(audioManager: audioManager, isPresented: $csFlag, helpFlag: $helpFlag)
+                    ReviewView(isPresented: $csFlag, helpFlag: $helpFlag)
                 }
                 
                 if helpFlag {
-                    HelpModalView(audioManager: AudioManager(), isPresented: $helpFlag)
+                    HelpModalView(isPresented: $helpFlag)
                 }
                 
                 if startFlag {
@@ -591,51 +1147,95 @@ struct ContentView: View {
                 }
                 
                 if customerFlag == true {
-                    HelpModalView(audioManager: AudioManager(), isPresented: $customerFlag)
+                    HelpModalView(isPresented: $customerFlag)
                 }
                 
                 if isFlag {
-                    ChangeNameView(isPresented: $isFlag, isReturnBtn: .constant(false), tutorialNum: $tutorialNum, authManager: authManager)
+                    ChangeNameView(isPresented: $isFlag, isReturnBtn: .constant(false), tutorialNum: $tutorialNum, initialUserName: userName, authManager: authManager)
                 }
                 
                 if updateNameFlag {
-                    ChangeNameView(isPresented: $updateNameFlag, isReturnBtn: .constant(true), tutorialNum: $tutorialNum, authManager: authManager)
+                    ChangeNameView(isPresented: $updateNameFlag, isReturnBtn: .constant(true), tutorialNum: $tutorialNum, initialUserName: userName, authManager: authManager)
                 }
                 
                 if tutorialNum == 1 {
                     GeometryReader { geometry in
-                        Color.black.opacity(0.5)
+                        let origin = geometry.frame(in: .global).origin
+                        let localX = buttonRect.midX - origin.x
+                        let localY = buttonRect.midY - origin.y
+                        let cutoutWidth = max(buttonRect.width, 0)
+                        let cutoutHeight = max(buttonRect.height, 0)
+
+                        Color.black.opacity(0.6)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 30, style: .continuous)
-//                                Circle()
-                                
-                                    .frame(width: buttonRect.width, height: buttonRect.height)
-                                    .position(x: buttonRect.midX, y: buttonRect.midY)
+                                    .frame(width: cutoutWidth, height: cutoutHeight)
+                                    .position(x: localX, y: localY)
                                     .blendMode(.destinationOut)
                             )
-                            .ignoresSafeArea()
                             .compositingGroup()
-                            .background(.clear)
                     }
+                    .ignoresSafeArea()
+
+                    GeometryReader { geometry in
+                        let origin = geometry.frame(in: .global).origin
+                        let localX = buttonRect.midX - origin.x
+                        let localY = buttonRect.midY - origin.y
+                        let cutoutWidth = max(buttonRect.width, 0)
+                        let cutoutHeight = max(buttonRect.height, 0)
+
+                        RoundedRectangle(cornerRadius: 30, style: .continuous)
+                            .stroke(Color(hex: "667eea"), lineWidth: 3)
+                            .frame(width: cutoutWidth, height: cutoutHeight)
+                            .position(x: localX, y: localY)
+                            .scaleEffect(tutorialPulse ? 1.05 : 1.0)
+                            .opacity(tutorialPulse ? 0.6 : 1.0)
+                    }
+                    .ignoresSafeArea()
+
                     VStack {
                         Spacer()
                             .frame(height: buttonRect.minY - bubbleHeight)
-                        VStack(alignment: .trailing, spacing: .zero) {
-                            Text("「学習モード」をクリックしてください。")
-                                .font(.callout)
-                                .padding(5)
-                                .font(.system(size: 24.0))
-                                .padding(.all, 16.0)
-                                .background(Color("Color2"))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.gray, lineWidth: 15)
+                        VStack(spacing: 10) {
+                            HStack(spacing: 4) {
+                                Text("STEP 1")
+                                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 4)
+                                    .background(
+                                        LinearGradient(
+                                            colors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+                                            startPoint: .leading,
+                                            endPoint: .trailing
+                                        )
+                                    )
+                                    .clipShape(Capsule())
+                            }
+
+                            Image(systemName: "hand.tap.fill")
+                                .font(.system(size: 28))
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
                                 )
-                                .cornerRadius(20)
-                                .padding(.horizontal, 16)
+
+                            Text("「学習モード」をタップ")
+                                .font(.system(size: 17, weight: .bold))
                                 .foregroundColor(Color("fontGray"))
-                                .shadow(radius: 10)
+
+                            Text("クイズに挑戦してみましょう")
+                                .font(.system(size: 13))
+                                .foregroundColor(.secondary)
                         }
+                        .padding(.horizontal, 28)
+                        .padding(.vertical, 22)
+                        .background(Color("Color2"))
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                        .shadow(color: .black.opacity(0.2), radius: 15, y: 8)
                         .background(GeometryReader { geometry in
                             Path { _ in
                                 DispatchQueue.main.async {
@@ -646,22 +1246,31 @@ struct ContentView: View {
                         Spacer()
                     }
                     .ignoresSafeArea()
-                    VStack{
-                        HStack{
+
+                    VStack {
+                        HStack {
                             Button(action: {
                                 generateHapticFeedback()
-                                tutorialNum = 0 // タップでチュートリアルを終了
-                                authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
-                                   }
+                                tutorialNum = 0
+                                authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { _ in
+                                }
                             }) {
-                                Image("スキップ")
-                                    .resizable()
-                                    .frame(width:200,height:60)
-                                    .padding(.top,20)
+                                HStack(spacing: 6) {
+                                    Image(systemName: "forward.fill")
+                                        .font(.system(size: 12))
+                                    Text("スキップ")
+                                        .font(.system(size: 14, weight: .semibold))
+                                }
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 12)
+                                .background(Color.white.opacity(0.2))
+                                .clipShape(Capsule())
                             }
+                            .padding(.leading, 20)
+                            .padding(.top, 60)
                             Spacer()
                         }
-                        .padding(.leading)
                         Spacer()
                     }
                 }
@@ -676,6 +1285,7 @@ struct ContentView: View {
                 }
             }
                         .background(Color("Color2"))
+                        .navigationBarHidden(true)
             }
         .navigationViewStyle(StackNavigationViewStyle())
         .frame(maxWidth: .infinity,maxHeight: .infinity)
@@ -685,131 +1295,34 @@ struct ContentView: View {
                                                 to: nil, from: nil, for: nil)
             }
         )
-        .alert(isPresented: $showCoinAlert) {
-            Alert(
-                title: Text("ログインボーナス！！"),
-                message: Text("\(currentBonus)コイン獲得しました"),
-                dismissButton: .default(Text("OK")) {
-                    // アラートが閉じられた後のアクションが必要ならここに記述
-                }
-            )
-        }
         .onAppear {
-            let userDefaults = UserDefaults.standard
-            if !userDefaults.bool(forKey: "hasLaunchedBeforeOnappear") {
-                isSignUpFlag = false
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                    startFlag = true
-                    showCreateButton = true
-                    authManager.saveUserToDatabase(userName: userName) { success in
-                        if success {
-                            authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
-                                self.userName = name ?? ""
-                                self.avatar = avatar ?? [[String: Any]]()
-                                self.userMoney = money ?? 0
-                                self.userHp = hp ?? 100
-                                self.userAttack = attack ?? 20
-                                self.tutorialNum = tutorialNum ?? 0
-                                self.isLoading = false
-                            }
-                        } else {
-                        }
-                    }
-                    }
-                }
-            userDefaults.set(true, forKey: "hasLaunchedBeforeOnappear")
-            userDefaults.synchronize()
-            if let userId = authManager.currentUserId {
-                authManager.checkIfUserIdExists(userId: userId) { exists in
-                    self.isUserExists = exists
-                    if isUserExists != nil {
-                        authManager.fetchPreFlag()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                            userPreFlag = authManager.userPreFlag
-                            if userPreFlag != 1 {
-                                executeProcessEveryFortyTimes()
-                            }
-                        }
-                        authManager.fetchUserCsFlag()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                            if authManager.userCsFlag == 0 {
-                                executeProcessEveryThreeTimes()
-                                executeProcessEveryTwentyTimes()
-                            }
-                        }
-                        authManager.fetchUserRewardFlag()
-                        reward.checkRewardReset()
-                        authManager.fetchLastClickedDate(userId: authManager.currentUserId ?? "") { lastDate in
-                            if let lastDate = lastDate {
-                                // 2. 現在の日時との差を計算
-                                let currentDate = Date()
-                                let timeInterval = currentDate.timeIntervalSince(lastDate)
-                                
-                                // 3. 24時間以上経過しているか確認
-                                if timeInterval >= 86400 {  // 86400秒 = 24時間
-                                    isButtonEnabled = true
-                                } else {
-                                    isButtonEnabled = false
-                                }
-                            } else {
-                                isButtonEnabled = true
-                            }
-                        }
-                        authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
-                            self.userName = name ?? ""
-                            self.avatar = avatar ?? [[String: Any]]()
-                            self.userMoney = money ?? 0
-                            self.userHp = hp ?? 100
-                            self.userAttack = attack ?? 20
-                            self.tutorialNum = tutorialNum ?? 0
-                            self.isLoading = false
-                            
-                            authManager.checkAndGrantLoginBonus { granted in
-                                if granted {
-                                    self.currentBonus = self.authManager.loginBonus
-                                    self.loginCount = self.authManager.loginCount
-                                    if isSignUpFlag {
-                                        self.showLoginBonus = true
-                                    }
-                                }
-                            }
-                        }
-                        authManager.fetchAvatars {
-                            self.avatar = authManager.avatars.map { avatar in
-                                return ["name": avatar.name]
-                            }
-                        }
-                        authManager.fetchUserExperienceAndLevel()
-                            }
-                        }
-                    }
-                }
+            scheduleHomeLoadingFallback()
+            bootstrapIfNeeded()
+        }
         .fullScreenCover(isPresented: $preFlag) {
             PreView(audioManager: audioManager)
         }
-        .onChange(of: showCoinAlert) { userMoney in
-            authManager.getUserMoney { userMoney in
-                self.userMoney = userMoney
+        .onChange(of: isPresentingQuizList) { isPresenting in
+            fetchUserInfoIfNeeded(isPresenting: isPresenting)
+            authManager.fetchUserExperienceAndLevel()
+            authManager.fetchUserRewardFlag()
+        }
+        .onChange(of: isPresentingAvatarList) { isPresenting in
+            fetchUserInfoIfNeeded(isPresenting: isPresenting)
+            authManager.fetchUserExperienceAndLevel()
+            authManager.fetchUserRewardFlag()
+        }
+        .background(Color("purple2").opacity(0.6))
+        .onChange(of: tutorialNum) { num in
+            if num == 1 {
+                withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                    tutorialPulse = true
+                }
+            } else {
+                tutorialPulse = false
             }
         }
-        .onChange(of: showLoginModal) { userMoney in
-            authManager.getUserMoney { userMoney in
-                self.userMoney = userMoney
-            }
         }
-            .onChange(of: isPresentingQuizList) { isPresenting in
-                fetchUserInfoIfNeeded(isPresenting: isPresenting)
-                authManager.fetchUserExperienceAndLevel()
-                authManager.fetchUserRewardFlag()
-            }
-            .onChange(of: isPresentingAvatarList) { isPresenting in
-                fetchUserInfoIfNeeded(isPresenting: isPresenting)
-                authManager.fetchUserExperienceAndLevel()
-                authManager.fetchUserRewardFlag()
-            }
-            .background(Color("purple2").opacity(0.6))  // ここで背景色を設定
-            .edgesIgnoringSafeArea(.all)  // 画面の端まで背景色を伸ばす
-            }
     func fetchUserInfoIfNeeded(isPresenting: Bool) {
         if !isPresenting {
             authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
@@ -819,6 +1332,165 @@ struct ContentView: View {
                 self.userHp = hp ?? 100
                 self.userAttack = attack ?? 20
                 self.tutorialNum = tutorialNum ?? 0
+            }
+            authManager.fetchCurrentLoginStreak { streakCount in
+                self.loginCount = streakCount
+            }
+        }
+    }
+    
+    private func scheduleHomeLoadingFallback() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.homeLoadingTimeout) {
+            guard isLoading else { return }
+            print("Home loading timed out. Showing the home screen with available data.")
+            isLoading = false
+        }
+    }
+
+    private func bootstrapIfNeeded() {
+        guard !hasBootstrapped else { return }
+        hasBootstrapped = true
+        
+        if authManager.currentUserId != nil {
+            performInitialLoad()
+            return
+        }
+        
+        authManager.onLoginCompleted = {
+            DispatchQueue.main.async {
+                self.authManager.onLoginCompleted = nil
+                self.performInitialLoad()
+            }
+        }
+        authManager.anonymousSignIn {
+            DispatchQueue.main.async {
+                guard self.authManager.currentUserId == nil else { return }
+                self.hasBootstrapped = false
+                self.isLoading = false
+            }
+        }
+    }
+    
+    private func performInitialLoad() {
+        guard let userId = authManager.currentUserId else {
+            hasBootstrapped = false
+            return
+        }
+        
+        let userDefaults = UserDefaults.standard
+        if !userDefaults.bool(forKey: initialLaunchKey) {
+            userDefaults.set(true, forKey: initialLaunchKey)
+            userDefaults.synchronize()
+            showCreateButton = true
+            let shouldShowIntro = !userDefaults.bool(forKey: introOptOutKey)
+            authManager.saveUserToDatabase(userName: userName) { success in
+                if success {
+                    refreshUserInfo {
+                        self.startFlag = shouldShowIntro
+                        loadDeferredHomeData(userId: userId)
+                    }
+                } else {
+                    refreshUserInfo {
+                        self.startFlag = shouldShowIntro
+                    }
+                }
+            }
+            return
+        }
+        
+        authManager.checkIfUserIdExists(userId: userId) { exists in
+            self.isUserExists = exists
+            guard self.isUserExists != nil else { return }
+
+            refreshUserInfo {
+                loadDeferredHomeData(userId: userId)
+            }
+        }
+    }
+    
+    private func refreshUserInfo(completion: (() -> Void)? = nil) {
+        authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
+            self.userName = name ?? ""
+            self.avatar = avatar ?? [[String: Any]]()
+            self.userMoney = money ?? 0
+            self.userHp = hp ?? 100
+            self.userAttack = attack ?? 20
+            self.tutorialNum = tutorialNum ?? 0
+            self.isLoading = false
+            completion?()
+        }
+    }
+
+    private func loadDeferredHomeData(userId: String) {
+        guard !hasLoadedDeferredHomeData else { return }
+        hasLoadedDeferredHomeData = true
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            authManager.fetchCurrentLoginStreak { streakCount in
+                self.loginCount = streakCount
+            }
+            authManager.fetchUserExperienceAndLevel()
+            authManager.fetchInventory()
+            authManager.fetchUserRewardFlag { _ in
+                authManager.syncRewardBoostState()
+                reward.checkRewardReset()
+            }
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            authManager.fetchPreFlag { preFlag in
+                self.userPreFlag = preFlag
+                if preFlag != 1 {
+                    executeProcessEveryFortyTimes()
+                }
+            }
+
+            authManager.fetchUserCsFlag { csFlag in
+                if csFlag == 0 {
+                    executeProcessEveryThreeTimes()
+                    executeProcessEveryTwentyTimes()
+                }
+            }
+
+            authManager.fetchLastClickedDate(userId: userId) { lastDate in
+                if let lastDate = lastDate {
+                    let currentDate = Date()
+                    let timeInterval = currentDate.timeIntervalSince(lastDate)
+                    isButtonEnabled = timeInterval >= 86400
+                } else {
+                    isButtonEnabled = true
+                }
+            }
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+            MissionManager.shared.fetchMissions { success in
+                guard success else { return }
+                MissionManager.shared.refreshAllMissions()
+            }
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            presentLoginBonusIfNeeded()
+        }
+    }
+
+    private func presentLoginBonusIfNeeded() {
+        authManager.fetchCurrentLoginStreak { streakCount in
+            self.loginCount = streakCount
+        }
+
+        authManager.shouldShowLoginBonus { shouldShow in
+            guard shouldShow else { return }
+
+            authManager.checkAndGrantLoginBonus500 { success in
+                guard success else { return }
+
+                DispatchQueue.main.async {
+                    self.loginCount = authManager.loginCount
+                    self.currentBonus = authManager.loginBonus
+                    self.showLoginBonus = true
+                }
             }
         }
     }

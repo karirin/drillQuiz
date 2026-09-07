@@ -111,6 +111,271 @@ struct QuizQuestion {
     var choices: [String]
     var correctAnswerIndex: Int
     var explanation: String
+    var format: QuizQuestionFormat
+    var acceptableAnswers: [String]
+    var orderedChoices: [String]
+    var matchingPairs: [QuizMatchingPair]
+    var referenceTitle: String
+    var referenceRows: [QuizReferenceRow]
+    var mapRegions: [QuizMapRegion]
+    var inputPlaceholder: String
+
+    init(
+        id: String? = nil,
+        question: String,
+        choices: [String],
+        correctAnswerIndex: Int,
+        explanation: String,
+        format: QuizQuestionFormat = .multipleChoice,
+        acceptableAnswers: [String] = [],
+        orderedChoices: [String] = [],
+        matchingPairs: [QuizMatchingPair] = [],
+        referenceTitle: String = "",
+        referenceRows: [QuizReferenceRow] = [],
+        mapRegions: [QuizMapRegion] = [],
+        inputPlaceholder: String = "答えを入力"
+    ) {
+        self.id = id
+        self.question = question
+        self.choices = choices
+        self.correctAnswerIndex = correctAnswerIndex
+        self.explanation = explanation
+        self.format = format
+        self.acceptableAnswers = acceptableAnswers
+        self.orderedChoices = orderedChoices
+        self.matchingPairs = matchingPairs
+        self.referenceTitle = referenceTitle
+        self.referenceRows = referenceRows
+        self.mapRegions = mapRegions
+        self.inputPlaceholder = inputPlaceholder
+    }
+
+    static func fillInBlank(
+        id: String? = nil,
+        question: String,
+        answer: String,
+        acceptableAnswers: [String] = [],
+        explanation: String,
+        inputPlaceholder: String = "答えを入力"
+    ) -> QuizQuestion {
+        let normalizedAnswers = [answer] + acceptableAnswers.filter { $0 != answer }
+        return QuizQuestion(
+            id: id,
+            question: question,
+            choices: [],
+            correctAnswerIndex: 0,
+            explanation: explanation,
+            format: .fillInBlank,
+            acceptableAnswers: normalizedAnswers,
+            inputPlaceholder: inputPlaceholder
+        )
+    }
+
+    static func extractText(
+        id: String? = nil,
+        question: String,
+        answer: String,
+        acceptableAnswers: [String] = [],
+        explanation: String,
+        inputPlaceholder: String = "本文からそのまま入力"
+    ) -> QuizQuestion {
+        let normalizedAnswers = [answer] + acceptableAnswers.filter { $0 != answer }
+        return QuizQuestion(
+            id: id,
+            question: question,
+            choices: [],
+            correctAnswerIndex: 0,
+            explanation: explanation,
+            format: .extractText,
+            acceptableAnswers: normalizedAnswers,
+            inputPlaceholder: inputPlaceholder
+        )
+    }
+
+    static func reorder(
+        id: String? = nil,
+        question: String,
+        choices: [String],
+        orderedChoices: [String],
+        explanation: String
+    ) -> QuizQuestion {
+        QuizQuestion(
+            id: id,
+            question: question,
+            choices: choices,
+            correctAnswerIndex: 0,
+            explanation: explanation,
+            format: .reorder,
+            orderedChoices: orderedChoices
+        )
+    }
+
+    static func matching(
+        id: String? = nil,
+        question: String,
+        pairs: [QuizMatchingPair],
+        choices: [String]? = nil,
+        explanation: String
+    ) -> QuizQuestion {
+        QuizQuestion(
+            id: id,
+            question: question,
+            choices: choices ?? pairs.map(\.match).shuffled(),
+            correctAnswerIndex: 0,
+            explanation: explanation,
+            format: .matching,
+            matchingPairs: pairs
+        )
+    }
+
+    static func related(
+        id: String? = nil,
+        question: String,
+        pairs: [QuizMatchingPair],
+        choices: [String]? = nil,
+        explanation: String
+    ) -> QuizQuestion {
+        QuizQuestion(
+            id: id,
+            question: question,
+            choices: choices ?? pairs.map(\.match).shuffled(),
+            correctAnswerIndex: 0,
+            explanation: explanation,
+            format: .related,
+            matchingPairs: pairs
+        )
+    }
+
+    static func chronological(
+        id: String? = nil,
+        question: String,
+        choices: [String],
+        orderedChoices: [String],
+        explanation: String
+    ) -> QuizQuestion {
+        QuizQuestion(
+            id: id,
+            question: question,
+            choices: choices,
+            correctAnswerIndex: 0,
+            explanation: explanation,
+            format: .chronological,
+            orderedChoices: orderedChoices
+        )
+    }
+
+    static func classification(
+        id: String? = nil,
+        question: String,
+        pairs: [QuizMatchingPair],
+        categories: [String]? = nil,
+        explanation: String
+    ) -> QuizQuestion {
+        QuizQuestion(
+            id: id,
+            question: question,
+            choices: categories ?? Array(NSOrderedSet(array: pairs.map(\.match))).compactMap { $0 as? String },
+            correctAnswerIndex: 0,
+            explanation: explanation,
+            format: .classification,
+            matchingPairs: pairs
+        )
+    }
+
+    static func ranking(
+        id: String? = nil,
+        question: String,
+        choices: [String],
+        rankedChoices: [String],
+        explanation: String
+    ) -> QuizQuestion {
+        QuizQuestion(
+            id: id,
+            question: question,
+            choices: choices,
+            correctAnswerIndex: 0,
+            explanation: explanation,
+            format: .ranking,
+            orderedChoices: rankedChoices
+        )
+    }
+
+    static func dataReading(
+        id: String? = nil,
+        question: String,
+        answer: String,
+        acceptableAnswers: [String] = [],
+        referenceTitle: String,
+        referenceRows: [QuizReferenceRow],
+        explanation: String,
+        inputPlaceholder: String = "資料を見て答えを入力"
+    ) -> QuizQuestion {
+        let normalizedAnswers = [answer] + acceptableAnswers.filter { $0 != answer }
+        return QuizQuestion(
+            id: id,
+            question: question,
+            choices: [],
+            correctAnswerIndex: 0,
+            explanation: explanation,
+            format: .dataReading,
+            acceptableAnswers: normalizedAnswers,
+            referenceTitle: referenceTitle,
+            referenceRows: referenceRows,
+            inputPlaceholder: inputPlaceholder
+        )
+    }
+
+    static func mapSelection(
+        id: String? = nil,
+        question: String,
+        regions: [QuizMapRegion],
+        correctRegionID: String,
+        explanation: String,
+        referenceTitle: String = "地図を見て答えましょう"
+    ) -> QuizQuestion {
+        let correctIndex = regions.firstIndex(where: { $0.id == correctRegionID }) ?? 0
+        return QuizQuestion(
+            id: id,
+            question: question,
+            choices: regions.map(\.label),
+            correctAnswerIndex: correctIndex,
+            explanation: explanation,
+            format: .mapSelection,
+            referenceTitle: referenceTitle,
+            mapRegions: regions
+        )
+    }
+}
+
+enum QuizQuestionFormat: String {
+    case multipleChoice
+    case fillInBlank
+    case extractText
+    case reorder
+    case matching
+    case related
+    case chronological
+    case classification
+    case ranking
+    case dataReading
+    case mapSelection
+}
+
+struct QuizMatchingPair: Hashable {
+    var prompt: String
+    var match: String
+}
+
+struct QuizReferenceRow: Hashable {
+    var label: String
+    var value: String
+}
+
+struct QuizMapRegion: Hashable {
+    var id: String
+    var label: String
+    var row: Int
+    var column: Int
 }
 
 struct IncorrectAnswer {
@@ -119,6 +384,213 @@ struct IncorrectAnswer {
     var choices: [String]
     var correctAnswerIndex: Int
     var explanation: String
+    var format: QuizQuestionFormat
+    var acceptableAnswers: [String]
+    var orderedChoices: [String]
+    var matchingPairs: [QuizMatchingPair]
+    var referenceTitle: String
+    var referenceRows: [QuizReferenceRow]
+    var mapRegions: [QuizMapRegion]
+    var inputPlaceholder: String
+
+    init(
+        userId: String,
+        quizQuestion: String,
+        choices: [String],
+        correctAnswerIndex: Int,
+        explanation: String,
+        format: QuizQuestionFormat = .multipleChoice,
+        acceptableAnswers: [String] = [],
+        orderedChoices: [String] = [],
+        matchingPairs: [QuizMatchingPair] = [],
+        referenceTitle: String = "",
+        referenceRows: [QuizReferenceRow] = [],
+        mapRegions: [QuizMapRegion] = [],
+        inputPlaceholder: String = "答えを入力"
+    ) {
+        self.userId = userId
+        self.quizQuestion = quizQuestion
+        self.choices = choices
+        self.correctAnswerIndex = correctAnswerIndex
+        self.explanation = explanation
+        self.format = format
+        self.acceptableAnswers = acceptableAnswers
+        self.orderedChoices = orderedChoices
+        self.matchingPairs = matchingPairs
+        self.referenceTitle = referenceTitle
+        self.referenceRows = referenceRows
+        self.mapRegions = mapRegions
+        self.inputPlaceholder = inputPlaceholder
+    }
+
+    init(userId: String, quiz: QuizQuestion) {
+        self.init(
+            userId: userId,
+            quizQuestion: quiz.question,
+            choices: quiz.choices,
+            correctAnswerIndex: quiz.correctAnswerIndex,
+            explanation: quiz.explanation,
+            format: quiz.format,
+            acceptableAnswers: quiz.acceptableAnswers,
+            orderedChoices: quiz.orderedChoices,
+            matchingPairs: quiz.matchingPairs,
+            referenceTitle: quiz.referenceTitle,
+            referenceRows: quiz.referenceRows,
+            mapRegions: quiz.mapRegions,
+            inputPlaceholder: quiz.inputPlaceholder
+        )
+    }
+
+    var databasePayload: [String: Any] {
+        [
+            "quizQuestion": quizQuestion,
+            "choices": choices,
+            "correctAnswerIndex": correctAnswerIndex,
+            "explanation": explanation,
+            "format": format.rawValue,
+            "acceptableAnswers": acceptableAnswers,
+            "orderedChoices": orderedChoices,
+            "matchingPairs": matchingPairs.map {
+                [
+                    "prompt": $0.prompt,
+                    "match": $0.match
+                ]
+            },
+            "referenceTitle": referenceTitle,
+            "referenceRows": referenceRows.map {
+                [
+                    "label": $0.label,
+                    "value": $0.value
+                ]
+            },
+            "mapRegions": mapRegions.map {
+                [
+                    "id": $0.id,
+                    "label": $0.label,
+                    "row": $0.row,
+                    "column": $0.column
+                ]
+            },
+            "inputPlaceholder": inputPlaceholder
+        ]
+    }
+}
+
+func quizQuestion(fromIncorrectAnswerDict dict: [String: Any], quizId: String) -> QuizQuestion? {
+    guard
+        let question = dict["quizQuestion"] as? String,
+        let choices = dict["choices"] as? [String],
+        let explanation = dict["explanation"] as? String
+    else {
+        return nil
+    }
+
+    let correctAnswerIndex: Int
+    if let index = dict["correctAnswerIndex"] as? Int {
+        correctAnswerIndex = index
+    } else if let number = dict["correctAnswerIndex"] as? NSNumber {
+        correctAnswerIndex = number.intValue
+    } else {
+        return nil
+    }
+
+    let format = QuizQuestionFormat(rawValue: dict["format"] as? String ?? "") ?? .multipleChoice
+    let acceptableAnswers = dict["acceptableAnswers"] as? [String] ?? []
+    let orderedChoices = dict["orderedChoices"] as? [String] ?? []
+    let inputPlaceholder = dict["inputPlaceholder"] as? String ?? "答えを入力"
+
+    let matchingPairs: [QuizMatchingPair] = (dict["matchingPairs"] as? [[String: Any]] ?? []).compactMap { pairDict in
+        guard
+            let prompt = pairDict["prompt"] as? String,
+            let match = pairDict["match"] as? String
+        else {
+            return nil
+        }
+        return QuizMatchingPair(prompt: prompt, match: match)
+    }
+
+    let referenceTitle = dict["referenceTitle"] as? String ?? ""
+    let referenceRows: [QuizReferenceRow] = (dict["referenceRows"] as? [[String: Any]] ?? []).compactMap { rowDict in
+        guard
+            let label = rowDict["label"] as? String,
+            let value = rowDict["value"] as? String
+        else {
+            return nil
+        }
+        return QuizReferenceRow(label: label, value: value)
+    }
+
+    let mapRegions: [QuizMapRegion] = (dict["mapRegions"] as? [[String: Any]] ?? []).compactMap { regionDict in
+        guard
+            let id = regionDict["id"] as? String,
+            let label = regionDict["label"] as? String
+        else {
+            return nil
+        }
+
+        let row: Int
+        if let intRow = regionDict["row"] as? Int {
+            row = intRow
+        } else if let numberRow = regionDict["row"] as? NSNumber {
+            row = numberRow.intValue
+        } else {
+            return nil
+        }
+
+        let column: Int
+        if let intColumn = regionDict["column"] as? Int {
+            column = intColumn
+        } else if let numberColumn = regionDict["column"] as? NSNumber {
+            column = numberColumn.intValue
+        } else {
+            return nil
+        }
+
+        return QuizMapRegion(id: id, label: label, row: row, column: column)
+    }
+
+    return QuizQuestion(
+        id: quizId,
+        question: question,
+        choices: choices,
+        correctAnswerIndex: correctAnswerIndex,
+        explanation: explanation,
+        format: format,
+        acceptableAnswers: acceptableAnswers,
+        orderedChoices: orderedChoices,
+        matchingPairs: matchingPairs,
+        referenceTitle: referenceTitle,
+        referenceRows: referenceRows,
+        mapRegions: mapRegions,
+        inputPlaceholder: inputPlaceholder
+    )
+}
+
+func balancedShuffledQuizList(_ quizzes: [QuizQuestion]) -> [QuizQuestion] {
+    let specialFormatQuizzes = quizzes.filter { $0.format != .multipleChoice }.shuffled()
+    let multipleChoiceQuizzes = quizzes.filter { $0.format == .multipleChoice }.shuffled()
+
+    var mixedQuizzes: [QuizQuestion] = []
+    var specialIndex = 0
+    var multipleChoiceIndex = 0
+
+    while specialIndex < specialFormatQuizzes.count || multipleChoiceIndex < multipleChoiceQuizzes.count {
+        if specialIndex < specialFormatQuizzes.count {
+            mixedQuizzes.append(specialFormatQuizzes[specialIndex])
+            specialIndex += 1
+        }
+
+        if multipleChoiceIndex < multipleChoiceQuizzes.count {
+            mixedQuizzes.append(multipleChoiceQuizzes[multipleChoiceIndex])
+            multipleChoiceIndex += 1
+        }
+    }
+
+    return mixedQuizzes
+}
+
+func sociallyBalancedShuffledQuizList(_ quizzes: [QuizQuestion]) -> [QuizQuestion] {
+    balancedShuffledQuizList(quizzes)
 }
 
 struct QuizResult {
@@ -151,6 +623,125 @@ struct ViewPositionKey3: PreferenceKey {
     }
 }
 
+enum QuizTutorialMessagePlacement {
+    case above
+    case below
+}
+
+struct QuizTutorialStepStyle {
+    let icon: String
+    let title: String
+    let description: String
+    let accentColors: [Color]
+    let cornerRadius: CGFloat
+    let messagePlacement: QuizTutorialMessagePlacement
+}
+
+struct QuizTutorialOverlayView: View {
+    let spotlightRect: CGRect
+    let cornerRadius: CGFloat
+    let stepNumber: Int
+    let icon: String
+    let title: String
+    let description: String
+    let accentColors: [Color]
+    let messagePlacement: QuizTutorialMessagePlacement
+    let onSkip: () -> Void
+
+    var body: some View {
+        let cutoutWidth = max(spotlightRect.width, 0)
+        let cutoutHeight = max(spotlightRect.height, 0)
+
+        GeometryReader { geometry in
+            let origin = geometry.frame(in: .global).origin
+            let localMidX = spotlightRect.midX - origin.x
+            let localMidY = spotlightRect.midY - origin.y
+            let idealCardY = messagePlacement == .below
+                ? (spotlightRect.maxY - origin.y) + 100
+                : (spotlightRect.minY - origin.y) - 100
+            let cardY = min(max(idealCardY, 120), geometry.size.height - 120)
+
+            ZStack {
+                Color.black.opacity(0.6)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                            .frame(width: cutoutWidth, height: cutoutHeight)
+                            .position(x: localMidX, y: localMidY)
+                            .blendMode(.destinationOut)
+                    )
+                    .compositingGroup()
+
+                VStack(spacing: 10) {
+                    Text("STEP \(stepNumber)")
+                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(
+                            LinearGradient(
+                                colors: accentColors,
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .clipShape(Capsule())
+
+                    Image(systemName: icon)
+                        .font(.system(size: 28))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: accentColors,
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+
+                    Text(title)
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundColor(Color("fontGray"))
+
+                    Text(description)
+                        .font(.system(size: 13))
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(3)
+                }
+                .padding(.horizontal, 28)
+                .padding(.vertical, 22)
+                .background(Color("Color2"))
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .shadow(color: .black.opacity(0.2), radius: 15, y: 8)
+                .frame(maxWidth: .infinity)
+                .position(x: geometry.size.width / 2, y: cardY)
+
+                VStack {
+                    Spacer()
+                    HStack {
+                        Button(action: onSkip) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "forward.fill")
+                                    .font(.system(size: 12))
+                                Text("スキップ")
+                                    .font(.system(size: 14, weight: .semibold))
+                            }
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 12)
+                            .background(Color.white.opacity(0.2))
+                            .clipShape(Capsule())
+                        }
+                        .padding(.leading, 20)
+                        .padding(.bottom, 40)
+
+                        Spacer()
+                    }
+                }
+            }
+        }
+        .ignoresSafeArea()
+    }
+}
+
 struct TimerArc: Shape {
     var startAngle: Angle
     var endAngle: Angle
@@ -159,6 +750,99 @@ struct TimerArc: Shape {
         var path = Path()
         path.addArc(center: CGPoint(x: rect.midX, y: rect.midY), radius: rect.width / 2, startAngle: startAngle, endAngle: endAngle, clockwise: false)
         return path
+    }
+}
+
+struct BattleComboTier {
+    let requiredStreak: Int
+    let multiplier: Double
+    let colors: [Color]
+}
+
+enum MonsterComboSystem {
+    static let tiers: [BattleComboTier] = [
+        BattleComboTier(requiredStreak: 8, multiplier: 2.0, colors: [Color.red, Color.orange]),
+        BattleComboTier(requiredStreak: 5, multiplier: 1.5, colors: [Color.orange, Color.yellow]),
+        BattleComboTier(requiredStreak: 2, multiplier: 1.2, colors: [Color.blue, Color.cyan])
+    ]
+
+    static func tier(for comboCount: Int) -> BattleComboTier? {
+        tiers.first { comboCount >= $0.requiredStreak }
+    }
+
+    static func multiplier(for comboCount: Int) -> Double {
+        tier(for: comboCount)?.multiplier ?? 1.0
+    }
+
+    static func reducedComboCountAfterTimeout(from comboCount: Int) -> Int {
+        comboCount / 2
+    }
+}
+
+struct MonsterComboBadgeView: View {
+    let comboCount: Int
+    let multiplier: Double
+    let isPulsing: Bool
+
+    private var colors: [Color] {
+        MonsterComboSystem.tier(for: comboCount)?.colors ?? [Color.gray.opacity(0.9), Color.gray.opacity(0.7)]
+    }
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "flame.fill")
+                .font(.system(size: 18, weight: .bold))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [.white, .yellow],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .shadow(color: colors.first?.opacity(0.8) ?? .clear, radius: 6)
+
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(spacing: 3) {
+                    Text("\(comboCount)")
+                        .font(.system(size: 20, weight: .black, design: .rounded))
+                    Text("COMBO")
+                        .font(.system(size: 11, weight: .heavy, design: .rounded))
+                        .offset(y: 2)
+                }
+
+                Text(String(format: "ATK x%.1f", multiplier))
+                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                    .foregroundColor(.white.opacity(0.85))
+            }
+        }
+        .foregroundColor(.white)
+        .padding(.leading, 10)
+        .padding(.trailing, 14)
+        .padding(.vertical, 8)
+        .background(
+            Capsule()
+                .fill(
+                    LinearGradient(
+                        colors: colors + [colors.first?.opacity(0.8) ?? .clear],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+        )
+        .overlay(
+            Capsule()
+                .stroke(
+                    LinearGradient(
+                        colors: [.white.opacity(0.6), .white.opacity(0.15)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    ),
+                    lineWidth: 1.5
+                )
+        )
+        .shadow(color: colors.first?.opacity(0.5) ?? .clear, radius: isPulsing ? 16 : 10, x: 0, y: 4)
+        .scaleEffect(isPulsing ? 1.1 : 1.0)
+        .animation(.spring(response: 0.3, dampingFraction: 0.5), value: isPulsing)
     }
 }
 
@@ -177,6 +861,7 @@ struct QuizView: View {
     @State private var showModal: Bool = false
     @State private var showTutorial: Bool = false
     @State private var quizResults: [QuizResult] = []
+    @State private var leagueSessionId: String = UUID().uuidString
     @State private var answerCount: Int = 0
     @State private var incorrectCount: Int = 0
     @State private var incorrectAnswerCount: Int = 0
@@ -226,12 +911,99 @@ struct QuizView: View {
     @State private var elapsedTime: TimeInterval?
     @State private var navigateToQuizResult = false
     @ObservedObject var interstitial: Interstitial
-    @StateObject var appState = AppState()
+    @ObservedObject var appState = AppState.shared
     @State private var rewardFlag: Int = 0
+    @State private var comboCount: Int = 0
+    @State private var comboPulse: Bool = false
+
+    private var isDeveloperMode: Bool {
+        #if DEBUG
+        return true
+        #else
+        return false
+        #endif
+    }
     
     
     var currentQuiz: QuizQuestion {
         quizzes[currentQuizIndex]
+    }
+
+    var isCalculatorQuiz: Bool {
+        currentQuiz.supportsCalculatorInput
+    }
+
+    var isCompactAnswerQuiz: Bool {
+        currentQuiz.usesCompactAnswerLayout
+    }
+
+    @ViewBuilder
+    private var topContentSpacer: some View {
+        if isCompactAnswerQuiz {
+            Color.clear.frame(height: 2)
+        } else {
+            Spacer()
+        }
+    }
+
+    @ViewBuilder
+    private var answerContentSpacer: some View {
+        if isCompactAnswerQuiz {
+            Color.clear.frame(height: 2)
+        } else {
+            Spacer()
+        }
+    }
+
+    @ViewBuilder
+    private var answerInputSection: some View {
+        Group {
+            if isCalculatorQuiz {
+                VStack(spacing: 6) {
+                    answerInputContent
+
+                    if showCompletionMessage {
+                        NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: 0,quizLevel: quizLevel).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.bottom, 2)
+            } else {
+                ScrollView{
+                    VStack(spacing: 0){
+                        answerInputContent
+
+                        if showCompletionMessage {
+                            NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: 0,quizLevel: quizLevel).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+                        }
+                    }
+                }
+                .frame(maxWidth: .infinity,maxHeight:.infinity)
+                .padding(.bottom, 12)
+            }
+        }
+    }
+
+    private var answerInputContent: some View {
+        QuestionAnswerInputView(
+            questionKey: currentQuiz.id ?? "\(currentQuizIndex)-\(currentQuiz.question)",
+            question: currentQuiz,
+            isAnswered: hasAnswered,
+            correctAnswerIndex: hasAnswered ? currentQuiz.correctAnswerIndex : nil,
+            onChoiceSelected: answerSelectionAction,
+            onTextSubmitted: answerSubmissionAction,
+            onReorderSubmitted: reorderSubmissionAction,
+            onMatchingSubmitted: matchingSubmissionAction,
+            onMapSelectionSubmitted: mapSelectionSubmissionAction
+        )
+        .onAppear{
+            showTutorial = true
+        }
+        .frame(maxWidth: .infinity)
+        .shadow(radius: 1)
+        .background(GeometryReader { geometry in
+            Color.clear.preference(key: ViewPositionKey1.self, value: [geometry.frame(in: .global)])
+        })
     }
     
     func pauseTimer() {
@@ -248,6 +1020,7 @@ struct QuizView: View {
                 self.remainingSeconds -= 1
             } else {
                 timer.invalidate()
+                applyTimeoutComboPenalty()
                 playerHP -= monsterAttack
                 self.moveToNextQuiz()
             }
@@ -262,7 +1035,7 @@ struct QuizView: View {
                 } else {
                     timer.invalidate()
                     showCountdown = false
-                    if tutorialNum != 3 {
+                    if !(3...6).contains(tutorialNum) {
                         startTimer()
                     }
                 }
@@ -325,20 +1098,65 @@ struct QuizView: View {
                 self.remainingSeconds -= 1
             } else {
                 timer.invalidate()
+                applyTimeoutComboPenalty()
                 playerHP -= monsterAttack
                 self.moveToNextQuiz()
             }
         }
     }
-    
+
+    private func advanceQuizIndex() {
+        guard !quizzes.isEmpty else { return }
+
+        if isDeveloperMode {
+            currentQuizIndex = (currentQuizIndex + 1) % quizzes.count
+        } else {
+            currentQuizIndex += 1
+        }
+    }
+
+    private func prepareForNextDeveloperQuiz() {
+        if monsterHP <= 0 {
+            monsterType = 1
+            monsterHP = max(monsterUnderHP, 1)
+        }
+
+        if playerHP <= 0 {
+            playerHP = max(userMaxHp, 1)
+        }
+
+        showCompletionMessage = false
+        navigateToQuizResultView = false
+    }
+
     // 次の問題へ移る処理
     func moveToNextQuiz() {
+        if isDeveloperMode {
+            prepareForNextDeveloperQuiz()
+
+            if remainingSeconds == 0 {
+                advanceQuizIndex()
+                selectedAnswerIndex = nil
+                startTimer()
+            } else if userFlag == 0 {
+                showExplanationModal = true
+            } else {
+                advanceQuizIndex()
+                selectedAnswerIndex = nil
+                startTimer()
+            }
+
+            hasAnswered = false
+            return
+        }
+
         if monsterType == 2 && monsterHP <= 0 {
             // 最後のモンスターが倒された場合、結果画面へ遷移
             showCompletionMessage = true
             timer?.invalidate()
             RateManager.shared.updateQuizData(userId: authManager.currentUserId!, quizType: quizLevel, newCorrectAnswers: correctAnswerCount, newTotalAnswers: answerCount)
             RateManager.shared.updateAnswerData(userId: authManager.currentUserId!, quizType: quizLevel,  newTotalAnswers: answerCount)
+            recordWeeklyLeagueResultIfPossible(didClear: true)
             navigateToQuizResultView = true //ここで結果画面への遷移フラグをtrueに
         } else if playerHP <= 0 {
             showCompletionMessage = true
@@ -347,19 +1165,20 @@ struct QuizView: View {
             playerMoney = 5
             RateManager.shared.updateQuizData(userId: authManager.currentUserId!, quizType: quizLevel, newCorrectAnswers: correctAnswerCount, newTotalAnswers: answerCount)
             RateManager.shared.updateAnswerData(userId: authManager.currentUserId!, quizType: quizLevel,  newTotalAnswers: answerCount)
+            recordWeeklyLeagueResultIfPossible(didClear: false)
             navigateToQuizResultView = true  //ここで結果画面への遷移フラグをtrueに
-            
+
         } else if self.remainingSeconds == 0 {
-            currentQuizIndex += 1
-           selectedAnswerIndex = nil
-           startTimer()
-           hasAnswered = false
+            advanceQuizIndex()
+            selectedAnswerIndex = nil
+            startTimer()
+            hasAnswered = false
         } else if currentQuizIndex + 1 < quizzes.count {
             if userFlag == 0 {
                 showExplanationModal = true
             } else {
-                currentQuizIndex += 1
-               selectedAnswerIndex = nil
+                advanceQuizIndex()
+                selectedAnswerIndex = nil
                 startTimer()
             }
             hasAnswered = false
@@ -367,27 +1186,85 @@ struct QuizView: View {
             // すべての問題が終了した場合、結果画面へ遷移
             showCompletionMessage = true
             timer?.invalidate()
+            recordWeeklyLeagueResultIfPossible(didClear: true)
             navigateToQuizResultView = true  // ここで結果画面への遷移フラグをtrueに
         }
     }
+
+    private func recordWeeklyLeagueResultIfPossible(didClear: Bool) {
+        guard let userId = authManager.currentUserId else { return }
+        WeeklyLeagueService.shared.recordQuizResult(
+            userId: userId,
+            context: WeeklyLeagueQuizContext(
+                results: quizResults,
+                quizLevel: quizLevel,
+                didClear: didClear
+            ),
+            sessionId: leagueSessionId
+        )
+    }
     
     func answerSelectionAction(index: Int) {
+        submitAnswer(selectionIndex: index, userAnswer: currentQuiz.choices[index], isAnswerCorrect: index == currentQuiz.correctAnswerIndex)
+    }
+
+    func answerSubmissionAction(userAnswer: String) {
+        let isAnswerCorrect = isCalculatorQuiz
+            ? currentQuiz.matchesCalculatorAnswer(userAnswer)
+            : currentQuiz.matchesTextAnswer(userAnswer)
+        let selectionIndex = isAnswerCorrect ? currentQuiz.correctAnswerIndex : -1
+        submitAnswer(selectionIndex: selectionIndex, userAnswer: userAnswer, isAnswerCorrect: isAnswerCorrect)
+    }
+
+    func reorderSubmissionAction(selections: [String]) {
+        let isAnswerCorrect = currentQuiz.matchesReorderedChoices(selections)
+        let selectionIndex = isAnswerCorrect ? currentQuiz.correctAnswerIndex : -1
+        submitAnswer(
+            selectionIndex: selectionIndex,
+            userAnswer: currentQuiz.formattedReorderedAnswer(selections),
+            isAnswerCorrect: isAnswerCorrect
+        )
+    }
+
+    func matchingSubmissionAction(selections: [String: String]) {
+        let isAnswerCorrect = currentQuiz.matchesMatchingPairs(selections)
+        let selectionIndex = isAnswerCorrect ? currentQuiz.correctAnswerIndex : -1
+        submitAnswer(
+            selectionIndex: selectionIndex,
+            userAnswer: currentQuiz.formattedMatchingAnswer(selections),
+            isAnswerCorrect: isAnswerCorrect
+        )
+    }
+
+    func mapSelectionSubmissionAction(regionID: String) {
+        let isAnswerCorrect = currentQuiz.matchesMapSelection(regionID)
+        let selectionIndex = isAnswerCorrect ? currentQuiz.correctAnswerIndex : -1
+        submitAnswer(
+            selectionIndex: selectionIndex,
+            userAnswer: currentQuiz.formattedMapSelectionAnswer(regionID),
+            isAnswerCorrect: isAnswerCorrect
+        )
+    }
+
+    private func submitAnswer(selectionIndex: Int, userAnswer: String, isAnswerCorrect: Bool) {
         if !hasAnswered {
-            self.selectedAnswerIndex = index
+            self.selectedAnswerIndex = selectionIndex
             self.timer?.invalidate() // 回答を選択したらタイマーを止める
-            
-            let isAnswerCorrect = (selectedAnswerIndex == currentQuiz.correctAnswerIndex)
+
             if isAnswerCorrect {
+                let damage = comboAdjustedDamage()
+                GuildManager.shared.attackRaidBossIfPossible(damage: damage)
                 audioManager.playCorrectSound()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     audioManager.playAttackSound()
-                    
+
                     self.showAttackImage = true
+                    registerSuccessfulCombo()
                     correctAnswerCount += 1 // 正解の場合、正解数をインクリメント
                     incorrectCount -= 1
                     answerCount += 1
                     if quizLevel != .incorrectAnswer && quizLevel != .incorrectSansuAnswer && quizLevel != .incorrectShakaiAnswer && quizLevel != .incorrectRikaAnswer && quizLevel != .incorrectKokugoAnswer && quizLevel != .incorrectITStrategyAnswer {
-                        monsterHP -= userAttack
+                        monsterHP -= damage
                     }
                     if monsterHP <= 0 {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -397,9 +1274,13 @@ struct QuizView: View {
                         // モンスターのHPが0以下になった場合の処理
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                             self.showMonsterDownImage = false
-                            monsterType += 1
+                            if isDeveloperMode {
+                                monsterType = monsterType >= 3 ? 1 : monsterType + 1
+                            } else {
+                                monsterType += 1
+                            }
                         }
-                    } else if playerHP <= 0 {
+                    } else if !isDeveloperMode && playerHP <= 0 {
                         // プレイヤーのHPが0以下になった場合の処理
                         showCompletionMessage = true
                         timer?.invalidate()
@@ -417,16 +1298,18 @@ struct QuizView: View {
                     removeCorrectAnswer(for: authManager.currentUserId!, questionId: currentQuiz.id!)
                 }else if quizLevel == .incorrectITStrategyAnswer {
                     removeCorrectAnswer(for: authManager.currentUserId!, questionId: currentQuiz.id!)
+                }else if quizLevel == .incorrectAnswer, let userId = authManager.currentUserId, let questionId = currentQuiz.id {
+                    // 苦手克服(間隔反復)の復習セッション中に正解した場合
+                    ReviewScheduleService.recordCorrectReview(userId: userId, questionId: questionId)
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     moveToNextQuiz()
                 }
             } else {
+                resetCombo()
                 let incorrectAnswer = IncorrectAnswer(
-                userId: authManager.currentUserId!,
-                quizQuestion: currentQuiz.question,
-                choices: currentQuiz.choices,
-                correctAnswerIndex: currentQuiz.correctAnswerIndex, explanation: currentQuiz.explanation
+                    userId: authManager.currentUserId!,
+                    quiz: currentQuiz
                 )
                 // incorrectAnswer以外のクイズなら不正解の問題をincorrectAnswerテーブルに保存する
                 if quizLevel != .incorrectAnswer && quizLevel != .incorrectSansuAnswer && quizLevel != .incorrectShakaiAnswer && quizLevel != .incorrectRikaAnswer && quizLevel != .incorrectKokugoAnswer && quizLevel != .incorrectITStrategyAnswer {
@@ -434,14 +1317,10 @@ struct QuizView: View {
                     case .itBasic,.itStrategy,.itTechnology,.itManagement:
                         saveIncorrectITAnswer(incorrectAnswer)
                         break
-                    case .itBasic,.itStrategy,.itTechnology,.itManagement:
-                        saveIncorrectITAnswer(incorrectAnswer)
-                        break
-                        
                     case .infoBasic,.infoStrategy,.infoTechnology,.infoManagement:
                         saveIncorrectInfoAnswer(incorrectAnswer)
                         break
-                        
+
                     case .appliedBasic,.appliedStrategy,.appliedTechnology,.appliedManagement:
                         saveIncorrectAppliedAnswer(incorrectAnswer)
                         break
@@ -451,11 +1330,11 @@ struct QuizView: View {
                     case .shakai1,.shakai2,.shakai3,.shakai4,.shakai5,.shakai6:
                         saveIncorrectShakaiAnswer(incorrectAnswer)
                         break
-                        
+
                     case .rika1,.rika2,.rika3,.rika4,.rika5,.rika6:
                         saveIncorrectRikaAnswer(incorrectAnswer)
                         break
-                        
+
                     case .kokugo1,.kokugo2,.kokugo3,.kokugo4,.kokugo5,.kokugo6:
                         saveIncorrectKokugoAnswer(incorrectAnswer)
                         break
@@ -470,6 +1349,20 @@ struct QuizView: View {
                         saveIncorrectAnswer(incorrectAnswer)
                         break
                     }
+                    // 苦手克服(間隔反復)の復習キューにも並行して登録する
+                    if let userId = authManager.currentUserId {
+                        ReviewScheduleService.saveIncorrectAnswer(
+                            userId: userId,
+                            quizQuestion: currentQuiz.question,
+                            choices: currentQuiz.choices,
+                            correctAnswerIndex: currentQuiz.correctAnswerIndex,
+                            explanation: currentQuiz.explanation,
+                            sourceQuizLevel: quizLevel.description
+                        )
+                    }
+                } else if quizLevel == .incorrectAnswer, let userId = authManager.currentUserId, let questionId = currentQuiz.id {
+                    // 苦手克服(間隔反復)の復習セッション中に不正解だった場合、次回を1日後にリセットする
+                    ReviewScheduleService.recordIncorrectReview(userId: userId, questionId: questionId)
                 }
                 answerCount += 1
                 audioManager.playUnCorrectSound()
@@ -484,8 +1377,8 @@ struct QuizView: View {
             }
             let result = QuizResult(
                 question: currentQuiz.question,
-                userAnswer: currentQuiz.choices[index],
-                correctAnswer: currentQuiz.choices[currentQuiz.correctAnswerIndex],
+                userAnswer: userAnswer,
+                correctAnswer: currentQuiz.correctAnswerText,
                 explanation: currentQuiz.explanation,
                 isCorrect: isAnswerCorrect
             )
@@ -494,104 +1387,92 @@ struct QuizView: View {
             hasAnswered = true
         }
     }
+
+    private func comboAdjustedDamage() -> Int {
+        if isDeveloperMode {
+            return max(monsterHP, 1)
+        }
+        let multiplier = MonsterComboSystem.multiplier(for: comboCount + 1)
+        return max(Int((Double(userAttack) * multiplier).rounded()), userAttack)
+    }
+
+    private func registerSuccessfulCombo() {
+        comboCount += 1
+        triggerComboPulse()
+    }
+
+    private func applyTimeoutComboPenalty() {
+        guard comboCount > 0 else { return }
+        comboCount = MonsterComboSystem.reducedComboCountAfterTimeout(from: comboCount)
+        comboPulse = false
+    }
+
+    private func resetCombo() {
+        guard comboCount > 0 else { return }
+        comboCount = 0
+        comboPulse = false
+    }
+
+    private func triggerComboPulse() {
+        comboPulse = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.28) {
+            comboPulse = false
+        }
+    }
+
     func saveIncorrectAnswer(_ answer: IncorrectAnswer) {
     let ref = Database.database().reference().child("IncorrectAnswers").child(answer.userId).childByAutoId()
-    ref.setValue([
-    "quizQuestion": answer.quizQuestion,
-    "choices": answer.choices,
-    "correctAnswerIndex": answer.correctAnswerIndex,
-    "explanation": answer.explanation
-    ])
+    ref.setValue(answer.databasePayload)
     }
-        func saveIncorrectITAnswer(_ answer: IncorrectAnswer) {
+
+    func saveIncorrectITAnswer(_ answer: IncorrectAnswer) {
         // ユーザーIDを親ノードとして設定
         let ref = Database.database().reference().child("IncorrectITAnswers").child(answer.userId).childByAutoId()
-        ref.setValue([
-        "quizQuestion": answer.quizQuestion,
-        "choices": answer.choices,
-        "correctAnswerIndex": answer.correctAnswerIndex,
-        "explanation": answer.explanation
-        ])
-        }
-        func saveIncorrectInfoAnswer(_ answer: IncorrectAnswer) {
+        ref.setValue(answer.databasePayload)
+    }
+
+    func saveIncorrectInfoAnswer(_ answer: IncorrectAnswer) {
         // ユーザーIDを親ノードとして設定
         let ref = Database.database().reference().child("IncorrectInfoAnswers").child(answer.userId).childByAutoId()
-        ref.setValue([
-        "quizQuestion": answer.quizQuestion,
-        "choices": answer.choices,
-        "correctAnswerIndex": answer.correctAnswerIndex,
-        "explanation": answer.explanation
-        ])
-        }
-        func saveIncorrectAppliedAnswer(_ answer: IncorrectAnswer) {
+        ref.setValue(answer.databasePayload)
+    }
+
+    func saveIncorrectAppliedAnswer(_ answer: IncorrectAnswer) {
         // ユーザーIDを親ノードとして設定
         let ref = Database.database().reference().child("IncorrectAppliedAnswers").child(answer.userId).childByAutoId()
-        ref.setValue([
-        "quizQuestion": answer.quizQuestion,
-        "choices": answer.choices,
-        "correctAnswerIndex": answer.correctAnswerIndex,
-        "explanation": answer.explanation
-        ])
-        }
+        ref.setValue(answer.databasePayload)
+    }
+
     func saveIncorrectESAnswer(_ answer: IncorrectAnswer) {
     // ユーザーIDを親ノードとして設定
     let ref = Database.database().reference().child("IncorrectESAnswers").child(answer.userId).childByAutoId()
-    ref.setValue([
-    "quizQuestion": answer.quizQuestion,
-    "choices": answer.choices,
-    "correctAnswerIndex": answer.correctAnswerIndex,
-    "explanation": answer.explanation
-    ])
+    ref.setValue(answer.databasePayload)
     }
+
     func saveIncorrectITStrategyAnswer(_ answer: IncorrectAnswer) {
     // ユーザーIDを親ノードとして設定
     let ref = Database.database().reference().child("IncorrectITStrategyAnswers").child(answer.userId).childByAutoId()
-    ref.setValue([
-    "quizQuestion": answer.quizQuestion,
-    "choices": answer.choices,
-    "correctAnswerIndex": answer.correctAnswerIndex,
-    "explanation": answer.explanation
-    ])
+    ref.setValue(answer.databasePayload)
     }
-    
+
     func saveIncorrectSansuAnswer(_ answer: IncorrectAnswer) {
         let ref = Database.database().reference().child("IncorrectSansuAnswers").child(answer.userId).childByAutoId()
-        ref.setValue([
-        "quizQuestion": answer.quizQuestion,
-        "choices": answer.choices,
-        "correctAnswerIndex": answer.correctAnswerIndex,
-        "explanation": answer.explanation
-        ])
+        ref.setValue(answer.databasePayload)
     }
-    
+
     func saveIncorrectShakaiAnswer(_ answer: IncorrectAnswer) {
         let ref = Database.database().reference().child("IncorrectShakaiAnswers").child(answer.userId).childByAutoId()
-        ref.setValue([
-        "quizQuestion": answer.quizQuestion,
-        "choices": answer.choices,
-        "correctAnswerIndex": answer.correctAnswerIndex,
-        "explanation": answer.explanation
-        ])
+        ref.setValue(answer.databasePayload)
     }
-    
+
     func saveIncorrectRikaAnswer(_ answer: IncorrectAnswer) {
         let ref = Database.database().reference().child("IncorrectRikaAnswers").child(answer.userId).childByAutoId()
-        ref.setValue([
-        "quizQuestion": answer.quizQuestion,
-        "choices": answer.choices,
-        "correctAnswerIndex": answer.correctAnswerIndex,
-        "explanation": answer.explanation
-        ])
+        ref.setValue(answer.databasePayload)
     }
     
     func saveIncorrectKokugoAnswer(_ answer: IncorrectAnswer) {
         let ref = Database.database().reference().child("IncorrectKokugoAnswers").child(answer.userId).childByAutoId()
-        ref.setValue([
-        "quizQuestion": answer.quizQuestion,
-        "choices": answer.choices,
-        "correctAnswerIndex": answer.correctAnswerIndex,
-        "explanation": answer.explanation
-        ])
+        ref.setValue(answer.databasePayload)
     }
     
     func removeCorrectAnswer(for userId: String, questionId: String) {
@@ -699,7 +1580,24 @@ struct QuizView: View {
         }
     }
     
+    @ViewBuilder
     var body: some View {
+        if quizzes.isEmpty {
+            VStack(spacing: 16) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 52))
+                    .foregroundColor(.green)
+                Text("出題できる問題がありません")
+                    .font(.headline)
+                Button("戻る") { isPresenting = false }
+            }
+            .padding()
+        } else {
+            quizContent
+        }
+    }
+
+    private var quizContent: some View {
         NavigationView{
             ZStack{
                 Image("\(monsterBackground)")
@@ -727,32 +1625,58 @@ struct QuizView: View {
                         .foregroundColor(.gray)
                         Spacer()
                         Spacer()
-                        // 正解の場合の赤い円
-                        if let selected = selectedAnswerIndex, selected == currentQuiz.correctAnswerIndex {
-                        }
                         TimerView(remainingSeconds: $remainingSeconds)
                             .background(GeometryReader { geometry in
                                 Color.clear.preference(key: ViewPositionKey3.self, value: [geometry.frame(in: .global)])
                             })
+
+                        if isDeveloperMode {
+                            Button(action: {
+                                generateHapticFeedback()
+                                advanceQuizIndex()
+                                selectedAnswerIndex = nil
+                                hasAnswered = false
+                                showExplanationModal = false
+                                startTimer()
+                            }) {
+                                Text("Next")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 8)
+                                    .background(Color.blue)
+                                    .cornerRadius(8)
+                                    .shadow(color: .black.opacity(0.15), radius: 4, x: 0, y: 2)
+                            }
+                            .padding(.leading, 8)
+                        }
                     }
                     .padding(.trailing)
                     //                    .padding(.top,40)
-                    Spacer()
+                    topContentSpacer
+                    // 正解の場合の赤い円
+                    if let selected = selectedAnswerIndex, selected == currentQuiz.correctAnswerIndex {
+                    }
                     VStack{
                         QuestionCardView(
                             question: currentQuiz.question,
                             selectedAnswerIndex: selectedAnswerIndex,
-                            correctAnswerIndex: currentQuiz.correctAnswerIndex
+                            correctAnswerIndex: currentQuiz.correctAnswerIndex,
+                            compactMode: isCompactAnswerQuiz
                         )
+                        .background(GeometryReader { geometry in
+                            Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
+                        })
                         .padding(.horizontal, 16)
 
                         ZStack{
                                         Image("\(quizLevel)Monster\(monsterType)")
-                            
                                 .resizable()
                                 .scaledToFit()
                                 .shadow(radius: 10)
-                                .frame(width: isSmallDevice() ? 100 : 160)
+                                .scaleEffect(comboPulse ? 1.04 : 1.0)
+                                .animation(.spring(response: 0.32, dampingFraction: 0.55), value: comboPulse)
+                                .frame(width: isCompactAnswerQuiz ? (isSmallDevice() ? 82 : 130) : (isSmallDevice() ? 100 : 160))
                             
                             
                             // 問題に正解して敵キャラにダメージ
@@ -762,7 +1686,7 @@ struct QuizView: View {
                                         Image("attack1")
                                             .resizable()
                                             .scaledToFit()
-                                            .frame(height:isSmallDevice() ? 80 : 130)
+                                            .frame(height:isCompactAnswerQuiz ? (isSmallDevice() ? 58 : 92) : (isSmallDevice() ? 80 : 130))
                                     }
                                 }
                             }
@@ -773,7 +1697,20 @@ struct QuizView: View {
                                                  .scaledToFit()
                                                  .frame(height:80)
                                         }
-                                    
+
+                            if comboCount >= 2 {
+                                MonsterComboBadgeView(
+                                    comboCount: comboCount,
+                                    multiplier: MonsterComboSystem.multiplier(for: comboCount),
+                                    isPulsing: comboPulse
+                                )
+                                .offset(
+                                    x: isCompactAnswerQuiz ? (isSmallDevice() ? 72 : 98) : (isSmallDevice() ? 90 : 120),
+                                    y: 40
+                                )
+                                .transition(.scale.combined(with: .opacity))
+                                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: comboCount)
+                            }
                         }
                         if quizLevel != .incorrectAnswer && quizLevel != .incorrectITAnswer && quizLevel != .incorrectInfoAnswer && quizLevel != .incorrectAppliedAnswer && quizLevel != .incorrectESAnswer && quizLevel != .incorrectITStrategyAnswer && quizLevel != .incorrectSansuAnswer && quizLevel != .incorrectKokugoAnswer && quizLevel != .incorrectShakaiAnswer && quizLevel != .incorrectRikaAnswer {
                             ZStack{
@@ -833,32 +1770,8 @@ struct QuizView: View {
                             .padding()
                         }
                     }
-                    Spacer()
-                    ScrollView{
-                        VStack{
-                            
-                            AnswerSelectionView(choices: currentQuiz.choices, correctAnswerIndex: hasAnswered ? currentQuiz.correctAnswerIndex : nil) { index in
-                                answerSelectionAction(index: index)
-                            }
-                            .onAppear{
-                                showTutorial = true
-                            }
-                            .frame(maxWidth: .infinity)
-                            .shadow(radius: 1)
-                            .background(GeometryReader { geometry in
-                                Color.clear.preference(key: ViewPositionKey1.self, value: [geometry.frame(in: .global)])
-                            })
-                            Spacer()
-                            
-                            if showCompletionMessage {
-//                                    NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: 0, quizBossLevel: .none,quizLevel: quizLevel).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
-                                NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: 0,quizLevel: quizLevel).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
-                            }
-                            Spacer()
-                        }
-                    }
-                    .frame(maxWidth: .infinity,maxHeight:.infinity)
-                    .padding(.bottom)
+                    answerContentSpacer
+                    answerInputSection
                     
                     .sheet(isPresented: $showModal) {
                         ExperienceModalView(showModal: $showModal, addedExperience: 10, addedMoney: 10, authManager: authManager)
@@ -878,18 +1791,30 @@ struct QuizView: View {
                     }
                 if showExplanationModal {
                     ZStack {
-                        Color.black.opacity(0.7).edgesIgnoringSafeArea(.all)
-                        if let selectedIndex = selectedAnswerIndex, selectedIndex < currentQuiz.choices.count {
+                        Color.black.opacity(0.7)
+                            .ignoresSafeArea()
+                        if let latestResult = quizResults.last {
                             ModalExplanationView(
                                 isPresented: $showExplanationModal,
-                                selectedAnswerIndex: $selectedAnswerIndex, showAlert: $showAlert, audioManager: audioManager , question: quizzes[currentQuizIndex].question, userAnswer: currentQuiz.choices[selectedIndex],
-                                correctAnswer: quizzes[currentQuizIndex].choices[quizzes[currentQuizIndex].correctAnswerIndex],
-                                explanation: quizzes[currentQuizIndex].explanation, currentQuizIndex: $currentQuizIndex,
-                                userFlag: $userFlag, pauseTimer:pauseTimer, startTimer: startTimer
+                                selectedAnswerIndex: $selectedAnswerIndex,
+                                showAlert: $showAlert,
+                                audioManager: audioManager,
+                                question: latestResult.question,
+                                userAnswer: latestResult.userAnswer,
+                                correctAnswer: latestResult.correctAnswer,
+                                explanation: latestResult.explanation,
+                                currentQuizIndex: $currentQuizIndex,
+                                userFlag: $userFlag,
+                                pauseTimer: pauseTimer,
+                                startTimer: startTimer,
+                                advanceToNextQuestion: advanceQuizIndex
                             )
-                        }else{
+                        } else {
                             ModalReturnView(
-                                isPresented: $showExplanationModal, pauseTimer:pauseTimer, startTimer: startTimer)
+                                isPresented: $showExplanationModal,
+                                pauseTimer: pauseTimer,
+                                startTimer: startTimer
+                            )
                         }
                     }
                 }
@@ -901,287 +1826,72 @@ struct QuizView: View {
                     }
                 }
                 if tutorialNum == 3 && showTutorial == true {
-                    GeometryReader { geometry in
-                        Color.black.opacity(0.5)
-                        // スポットライトの領域をカットアウ
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .frame(width: buttonRect.width, height: buttonRect.height+20)
-                                    .position(x: buttonRect.midX, y: buttonRect.midY)
-                                    .blendMode(.destinationOut)
-                            )
-                            .ignoresSafeArea()
-                            .compositingGroup()
-                            .background(.clear)
-                    }
-                    VStack {
-                        Spacer()
-                            .frame(height: buttonRect.minY - bubbleHeight)
-                        VStack(alignment: .trailing, spacing: .zero) {
-                            //                            Image("上矢印")
-                            //                                .resizable()
-                            //                                .frame(width: 20, height: 20)
-                            //                                .padding(.trailing, 206.0)
-                            Text("問題が出題されます。")
-                                .font(.callout)
-                                .padding(5)
-                                .font(.system(size: 24.0))
-                                .padding(.all, 16.0)
-                                .background(Color("Color2"))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.gray, lineWidth: 15)
-                                )
-                                .cornerRadius(20)
-                                .padding(.horizontal, 16)
-                                .foregroundColor(Color("fontGray"))
-                                .shadow(radius: 10)
+                    QuizTutorialOverlayView(
+                        spotlightRect: buttonRect,
+                        cornerRadius: 20,
+                        stepNumber: 1,
+                        icon: "doc.text.fill",
+                        title: "問題が表示されます",
+                        description: "ここに問題文が出るので、まずは内容を読みましょう",
+                        accentColors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+                        messagePlacement: .below,
+                        onSkip: {
+                            generateHapticFeedback()
+                            tutorialNum = 0
+                            authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { _ in }
                         }
-                        .background(GeometryReader { geometry in
-                            Path { _ in
-                                DispatchQueue.main.async {
-                                    //                                        print(currentQuiz.question.count)
-                                    if currentQuiz.question.count <= 19{
-                                        self.bubbleHeight = geometry.size.height - 130
-                                    }else if currentQuiz.question.count <= 38{
-                                        self.bubbleHeight = geometry.size.height - 150
-                                    }else{
-                                        self.bubbleHeight = geometry.size.height - 170
-                                    }
-                                }
-                            }
-                        })
-                        Spacer()
-                    }
-                    .ignoresSafeArea()
-                    VStack{
-                        Spacer()
-                        HStack{
-                            Button(action: {
-                                generateHapticFeedback()
-                                tutorialNum = 0 // タップでチュートリアルを終了
-                                authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
-                                    // データベースのアップデートが成功したかどうかをハンドリング
-                                }
-                            }) {
-                                Image("スキップ")
-                                    .resizable()
-                                    .frame(width:200,height:60)
-                            }
-                            Spacer()
-                        }
-                        .padding()
-                    }
+                    )
                 }
                 if tutorialNum == 4 && showTutorial == true{
-                    GeometryReader { geometry in
-                        Color.black.opacity(0.5)
-                            .ignoresSafeArea()
-                        // スポットライトの領域をカットアウ
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .frame(width: buttonRect1.width, height: buttonRect1.height-20)
-                                    .position(x: buttonRect1.midX, y: buttonRect1.midY+5)
-                                    .blendMode(.destinationOut)
-                            )
-                            .ignoresSafeArea()
-                            .compositingGroup()
-                            .background(.clear)
-                    }
-                    VStack {
-                        Spacer()
-                            .frame(height: buttonRect.minY - bubbleHeight - 50)
-                        VStack(alignment: .trailing, spacing: .zero) {
-                            Text("選択肢の中から正解と思うものをクリックしてください。")
-                                .font(.callout)
-                                .padding(5)
-                                .font(.system(size: 24.0))
-                                .padding(.all, 16.0)
-                                .background(Color("Color2"))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.gray, lineWidth: 15)
-                                )
-                                .cornerRadius(20)
-                                .padding(.horizontal, 16)
-                                .foregroundColor(Color("fontGray"))
-                                .shadow(radius: 10)
+                    QuizTutorialOverlayView(
+                        spotlightRect: buttonRect1,
+                        cornerRadius: currentQuiz.tutorialStepStyle.cornerRadius,
+                        stepNumber: 2,
+                        icon: currentQuiz.tutorialStepStyle.icon,
+                        title: currentQuiz.tutorialStepStyle.title,
+                        description: currentQuiz.tutorialStepStyle.description,
+                        accentColors: currentQuiz.tutorialStepStyle.accentColors,
+                        messagePlacement: currentQuiz.tutorialStepStyle.messagePlacement,
+                        onSkip: {
+                            generateHapticFeedback()
+                            tutorialNum = 0
+                            authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { _ in }
                         }
-                        .background(GeometryReader { geometry in
-                            Path { _ in
-                                DispatchQueue.main.async {
-                                    if currentQuiz.question.count <= 19{
-                                        self.bubbleHeight = geometry.size.height - 240
-                                    }else if currentQuiz.question.count <= 38{
-                                        self.bubbleHeight = geometry.size.height - 260
-                                    }else{
-                                        self.bubbleHeight = geometry.size.height - 290
-                                    }
-                                }
-                            }
-                        })
-                        Spacer()
-                    }
-                    .ignoresSafeArea()
-                    VStack{
-                        HStack{
-                            Button(action: {
-                                generateHapticFeedback()
-                                tutorialNum = 0 // タップでチュートリアルを終了
-                                authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
-                                    // データベースのアップデートが成功したかどうかをハンドリング
-                                }
-                            }) {
-                                Image("スキップ")
-                                    .resizable()
-                                    .frame(width:200,height:60)
-                                    .padding(.top,20)
-                            }
-                            Spacer()
-                        }
-                        .padding(.leading)
-                        Spacer()
-                    }
+                    )
                 }
                 if tutorialNum == 5 && showTutorial == true{
-                    GeometryReader { geometry in
-                        Color.black.opacity(0.5)
-                        // スポットライトの領域をカットアウ
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .frame(width: buttonRect2.width, height: buttonRect2.height+10)
-                                    .position(x: buttonRect2.midX, y: buttonRect2.midY)
-                                    .blendMode(.destinationOut)
-                            )
-                            .ignoresSafeArea()
-                            .compositingGroup()
-                            .background(.clear)
-                    }
-                    VStack {
-                        Spacer()
-                            .frame(height: buttonRect.minY + 250)
-                        VStack(alignment: .trailing, spacing: .zero) {
-                            Text("正解すると相手モンスターにダメージ、不正解だと自分がダメージを受けます。\n相手のHPが０になれば次の相手に、自分のHPが０になればゲームオーバーです。")
-                                .font(.callout)
-                                .padding(5)
-                                .font(.system(size: 24.0))
-                                .padding(.all, 16.0)
-                                .background(Color("Color2"))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.gray, lineWidth: 15)
-                                )
-                                .cornerRadius(20)
-                                .padding(.horizontal, 16)
-                                .foregroundColor(Color("fontGray"))
-                                .shadow(radius: 10)
-                            //                        Image("下矢印")
-                            //                            .resizable()
-                            //                            .frame(width: 20, height: 20)
-                            //                            .padding(.trailing, 236.0)
-                        }  .background(GeometryReader { geometry in
-                            Path { _ in
-                                DispatchQueue.main.async {
-                                    if currentQuiz.question.count <= 19{
-                                        self.bubbleHeight = geometry.size.height - 150
-                                    }else if currentQuiz.question.count <= 38{
-                                        self.bubbleHeight = geometry.size.height - 180
-                                    }else{
-                                        self.bubbleHeight = geometry.size.height - 190
-                                    }
-                                }
-                            }
-                        })
-                        Spacer()
-                    }
-                    .ignoresSafeArea()
-                    VStack{
-                        Spacer()
-                        HStack{
-                            Button(action: {
-                                generateHapticFeedback()
-                                tutorialNum = 0 // タップでチュートリアルを終了
-                                authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
-                                    // データベースのアップデートが成功したかどうかをハンドリング
-                                }
-                            }) {
-                                Image("スキップ")
-                                    .resizable()
-                                    .frame(width:200,height:60)
-                                    .padding(.top,20)
-                            }
-                            Spacer()
+                    QuizTutorialOverlayView(
+                        spotlightRect: buttonRect2,
+                        cornerRadius: 16,
+                        stepNumber: 3,
+                        icon: "heart.fill",
+                        title: "バトルのルール",
+                        description: "正解で敵にダメージ、不正解で自分がダメージ\nHPが0になるとゲームオーバーです",
+                        accentColors: [Color(hex: "fa709a"), Color(hex: "fee140")],
+                        messagePlacement: .below,
+                        onSkip: {
+                            generateHapticFeedback()
+                            tutorialNum = 0
+                            authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { _ in }
                         }
-                        .padding()
-                    }
+                    )
                 }
                 if tutorialNum == 6 && showTutorial == true{
-                    GeometryReader { geometry in
-                        Color.black.opacity(0.5)
-                        // スポットライトの領域をカットアウ
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .frame(width: buttonRect3.width, height: buttonRect3.height+20)
-                                    .frame(
-                                        width: currentQuiz.question.count <= 19 ? buttonRect3.width : buttonRect3.width,
-                                        //                                        height: currentQuiz.question.count <= 19 ? buttonRect3.height + 20 : buttonRect3.height+20
-                                        height: currentQuiz.question.count <= 19 ? buttonRect3.height + 20 :
-                                            (currentQuiz.question.count <= 29 ? buttonRect3.height - 20 : buttonRect3.height + 40)
-                                    )
-                                    .position(x: buttonRect3.midX+8, y: buttonRect3.midY+1)
-                                    .blendMode(.destinationOut)
-                            )
-                            .ignoresSafeArea()
-                            .compositingGroup()
-                            .background(.clear)
-                    }
-                    VStack {
-                        Spacer()
-                            .frame(height: buttonRect.minY - bubbleHeight - 30)
-                        VStack(alignment: .trailing, spacing: .zero) {
-                            Text("30秒経つと自分がダメージを受けることになります。")
-                                .font(.callout)
-                                .padding(5)
-                                .font(.system(size: 24.0))
-                                .padding(.all, 16.0)
-                                .background(Color("Color2"))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.gray, lineWidth: 15)
-                                )
-                                .cornerRadius(20)
-                                .padding(.horizontal, 16)
-                                .foregroundColor(Color("fontGray"))
-                                .shadow(radius: 10)
-                        } .background(GeometryReader { geometry in
-                            Path { _ in
-                                DispatchQueue.main.async {
-                                    self.bubbleHeight = geometry.size.height - 130
-                                }
-                            }
-                        })
-                        Spacer()
-                    }
-                    .ignoresSafeArea()
-                    VStack{
-                        Spacer()
-                        HStack{
-                            Button(action: {
-                                generateHapticFeedback()
-                                tutorialNum = 0 // タップでチュートリアルを終了
-                                authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
-                                    // データベースのアップデートが成功したかどうかをハンドリング
-                                }
-                            }) {
-                                Image("スキップ")
-                                    .resizable()
-                                    .frame(width:200,height:60)
-                                
-                            }
-                            Spacer()
+                    QuizTutorialOverlayView(
+                        spotlightRect: buttonRect3,
+                        cornerRadius: 30,
+                        stepNumber: 4,
+                        icon: "timer",
+                        title: "制限時間に注意",
+                        description: "30秒経つと自分がダメージを受けます",
+                        accentColors: [Color(hex: "f093fb"), Color(hex: "f5576c")],
+                        messagePlacement: .below,
+                        onSkip: {
+                            generateHapticFeedback()
+                            tutorialNum = 0
+                            authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { _ in }
                         }
-                        .padding()
-                    }
+                    )
                 }
                 if showCountdown {
                     ZStack {
@@ -2924,6 +3634,7 @@ struct QuestionCardView: View {
     let question: String
     let selectedAnswerIndex: Int?
     let correctAnswerIndex: Int
+    var compactMode: Bool = false
     @State private var appearAnimation = false
     
     var body: some View {
@@ -2936,12 +3647,13 @@ struct QuestionCardView: View {
             // 問題テキスト
             VStack(spacing: 0) {
                 Text(question)
-                    .font(.system(size: isSmallDevice() ? 15 : 17, weight: .semibold))
+                    .font(.system(size: compactMode ? (isSmallDevice() ? 13 : 15) : (isSmallDevice() ? 15 : 17), weight: .semibold))
                     .foregroundColor(Color("fontGray"))
                     .lineSpacing(4)
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 16)
+                    .padding(.horizontal, compactMode ? 16 : 20)
+                    .padding(.vertical, compactMode ? 12 : 16)
                     .frame(maxWidth: .infinity, alignment: .center)
+                    .frame(minHeight: compactMode ? 72 : nil)
                     .fixedSize(horizontal: false, vertical: true)
                     .lineLimit(nil)
                     .minimumScaleFactor(0.75)
@@ -2982,4 +3694,3 @@ struct QuizView_Previews: PreviewProvider {
 //        TopView()
     }
 }
-

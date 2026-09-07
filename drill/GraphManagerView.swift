@@ -33,64 +33,31 @@ struct GraphManagerView: View {
     @State private var selectedTab: Int = 0
     @State private var preFlag: Bool = false
     @State private var userPreFlag: Int = 0
+    private let isGraphPremiumTemporarilyUnlocked = true
+
+    private var hasGraphPremiumAccess: Bool {
+        isGraphPremiumTemporarilyUnlocked || userPreFlag == 1
+    }
 
     var body: some View {
         ZStack{
-            if userPreFlag != 1 {
-                VStack{
-                    TopTabView(list: list, selectedTab: $selectedTab)
-                    TabView(selection: $selectedTab,
-                            content: {
-                        
-                        BarChartView(authManager: authManager, data: sampleData)
-                            .navigationViewStyle(StackNavigationViewStyle())
-                            .tag(0)
-                        
-                        //    PentagonView(authManager: authManager, flag: .constant(false))
-                        PentagonManagerView()
-                            .tag(1)
-                    })
-                    .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                }
-                Color.black.opacity(0.45)
-                .onTapGesture {
-                    preFlag = true
-                }
-                VStack{
-                    Image(systemName: "lock.fill")
-                        .font(.system(size: 44))
-                        .foregroundStyle(.white)
-                    Text("プレミアムプランに登録すると\n毎日の回答数や問題の正答率をグラフで確認することができます")
-                        .bold()
-                        .foregroundStyle(.white)
-                }
-            }else {
-                VStack{
-                    TopTabView(list: list, selectedTab: $selectedTab)
-                    TabView(selection: $selectedTab,
-                            content: {
-                        
-                        BarChartView(authManager: authManager, data: sampleData)
-                            .navigationViewStyle(StackNavigationViewStyle())
-                            .tag(0)
-                        
-                        //    PentagonView(authManager: authManager, flag: .constant(false))
-                        PentagonManagerView()
-                            .tag(1)
-                    })
-                    .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                }
+            AnalysisTheme.backgroundGradient
+                .ignoresSafeArea()
+            if hasGraphPremiumAccess {
+                analyticsContent
+            } else {
+                lockedContent
             }
         }
         .fullScreenCover(isPresented: $preFlag) {
                 PreView(audioManager: audioManager)
             }
         .frame(maxWidth:.infinity,maxHeight: .infinity)
-        .background(Color("Color2"))
+        .navigationTitle("分析")
+        .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            authManager.fetchPreFlag()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                userPreFlag = authManager.userPreFlag
+            authManager.fetchPreFlag { preFlag in
+                userPreFlag = preFlag
             }
             if let soundURL = Bundle.main.url(forResource: "soundKettei", withExtension: "mp3") {
                 do {
@@ -106,6 +73,56 @@ struct GraphManagerView: View {
             }
         }
     }
+
+    private var analyticsContent: some View {
+        VStack(spacing: 0) {
+            AnalysisTopTabView(list: list, selectedTab: $selectedTab)
+                .padding(.top, 8)
+            TabView(selection: $selectedTab) {
+                BarChartView(authManager: authManager, data: sampleData)
+                    .navigationViewStyle(StackNavigationViewStyle())
+                    .tag(0)
+
+                PentagonManagerView()
+                    .tag(1)
+            }
+            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+        }
+    }
+
+    private var lockedContent: some View {
+        ZStack {
+            AnalysisTheme.backgroundGradient
+                .ignoresSafeArea()
+
+            VStack(spacing: 16) {
+                ZStack {
+                    Circle()
+                        .fill(AnalysisTheme.primaryGradient)
+                        .frame(width: 74, height: 74)
+                    Image(systemName: "lock.fill")
+                        .font(.system(size: 32, weight: .bold))
+                        .foregroundStyle(.white)
+                }
+
+                Text("分析機能")
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundStyle(AnalysisTheme.ink)
+
+                Text("プレミアムプランに登録すると\n毎日の回答数や問題の正答率をグラフで確認できます")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            .padding(24)
+            .frame(maxWidth: 340)
+            .background(AnalysisTheme.card, in: RoundedRectangle(cornerRadius: 24))
+            .shadow(color: AnalysisTheme.primary.opacity(0.14), radius: 18, x: 0, y: 10)
+            .onTapGesture {
+                preFlag = true
+            }
+        }
+    }
     static func createSampleData() -> [DailyData] {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
@@ -117,10 +134,65 @@ struct GraphManagerView: View {
     }
 }
 
+enum AnalysisTheme {
+    static let primary = Color(hex: "667eea")
+    static let secondary = Color(hex: "764ba2")
+    static let green = Color(hex: "11998e")
+    static let ink = Color(hex: "303443")
+    static let card = Color.white.opacity(0.94)
+
+    static let primaryGradient = LinearGradient(
+        colors: [primary, secondary],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    static let backgroundGradient = LinearGradient(
+        colors: [
+            Color(red: 0.95, green: 0.97, blue: 1.0),
+            Color(red: 0.98, green: 0.95, blue: 1.0)
+        ],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+}
+
+struct AnalysisTopTabView: View {
+    let list: [String]
+    @Binding var selectedTab: Int
+
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach(list.indices, id: \.self) { index in
+                Button {
+                    generateHapticFeedback()
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        selectedTab = index
+                    }
+                } label: {
+                    VStack(spacing: 6) {
+                        Text(list[index])
+                            .font(.system(size: 14, weight: selectedTab == index ? .bold : .medium))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.75)
+                        RoundedRectangle(cornerRadius: 2)
+                            .fill(selectedTab == index ? AnalysisTheme.primary : .clear)
+                            .frame(height: 3)
+                    }
+                    .foregroundStyle(selectedTab == index ? AnalysisTheme.ink : .secondary)
+                    .padding(.vertical, 10)
+                }
+                .buttonStyle(.plain)
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .padding(.horizontal, 16)
+    }
+}
+
 struct GraphManagerView_Previews: PreviewProvider {
     static var previews: some View {
         GraphManagerView()
     }
 }
-
-

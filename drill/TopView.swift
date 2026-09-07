@@ -26,6 +26,7 @@ struct TopView: View {
     @State private var bubbleHeight: CGFloat = 0.0
     @State var isAlert: Bool = false
     @StateObject private var storyViewModel = PositionViewModel.shared
+    @StateObject private var missionManager = MissionManager.shared
     @Environment(\.scenePhase) var scenePhase
     
     var body: some View {
@@ -45,14 +46,11 @@ struct TopView: View {
                             Text("ホーム")
                                 .padding()
                         }
-                        ZStack {
-                            StoryView(isReturnActive: .constant(false), isPresented: .constant(false))
-                        }
+
+                    ManagerView(showsBackButton: false)
                         .tabItem {
-                            Image(systemName: "map")
-                            //                        .resizable()
-                                .frame(width:1,height:1)
-                            Text("ダンジョン")
+                            Image(systemName: "book.closed.fill")
+                            Text("学習モード")
                         }
                         
                         AvatarListView(isPresenting: $isPresentingAvatarList)
@@ -79,12 +77,33 @@ struct TopView: View {
              switch newPhase {
              case .background:
                  storyViewModel.handleAppWentToBackground()
+                 missionManager.flushPendingProgressSave()
              case .active:
                  storyViewModel.handleAppBecameActive()
+                 authManager.syncRewardBoostState()
+                 if missionManager.missions.isEmpty {
+                     missionManager.fetchMissions { success in
+                         guard success else { return }
+                         missionManager.refreshAllMissions()
+                     }
+                 } else {
+                     missionManager.refreshAllMissions()
+                 }
              default:
                  break
              }
          }
+        .onAppear {
+            authManager.syncRewardBoostState()
+            if missionManager.missions.isEmpty {
+                missionManager.fetchMissions { success in
+                    guard success else { return }
+                    missionManager.refreshAllMissions()
+                }
+            } else {
+                missionManager.refreshAllMissions()
+            }
+        }
     }
 }
 

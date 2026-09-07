@@ -9,2124 +9,1472 @@ import SwiftUI
 
 struct Kokugo3ListView: View {
     @Binding var isPresenting: Bool
-    
+
     let quizBeginnerList: [QuizQuestion] = [
-        QuizQuestion(
-            question: "次の文で正しい『はなす』の漢字はどれですか？『友達と＿＿』",
-            choices: [
-                "放す",
-                "話す",
-                "離す",
-                "指す"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『友達と話す』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『ふく』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "書く",
-                "拭く",
-                "折る",
-                "払う"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『ふく』は『拭く』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『空がだんだん暗くなってきたので…』",
-            choices: [
-                "風が吹き始めた",
-                "雨が降り出した",
-                "鳥が飛び始めた",
-                "星が出始めた"
-            ],
-            correctAnswerIndex: 3,
-            explanation: "『星が出始めた』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『つかう』の漢字はどれですか？『道具を＿＿』",
-            choices: [
-                "伝う",
-                "作う",
-                "使う",
-                "消う"
-            ],
-            correctAnswerIndex: 2,
-            explanation: "『道具を使う』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『わらう』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "泣く",
-                "怒る",
-                "笑う",
-                "走る"
-            ],
-            correctAnswerIndex: 2,
-            explanation: "『わらう』は『笑う』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『公園で遊んでいたら、突然…』",
-            choices: [
-                "友達が来た",
-                "風が強くなった",
-                "雨が降り出した",
-                "犬が吠え出した"
-            ],
-            correctAnswerIndex: 2,
-            explanation: "『雨が降り出した』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『はこぶ』の漢字はどれですか？『荷物を＿＿』",
-            choices: [
-                "掃ぶ",
-                "進ぶ",
-                "運ぶ",
-                "走ぶ"
-            ],
-            correctAnswerIndex: 2,
-            explanation: "『荷物を運ぶ』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『あける』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "閉める",
-                "開ける",
-                "止める",
-                "曲げる"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『あける』は『開ける』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『今日はとても暑いので…』",
-            choices: [
-                "暖かい服を着た",
-                "冷たい飲み物を飲んだ",
-                "外で遊んだ",
-                "窓を閉めた"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『冷たい飲み物を飲んだ』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『のぼる』の漢字はどれですか？『山に＿＿』",
-            choices: [
-                "昇る",
-                "登る",
-                "伸る",
-                "上る"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『山に登る』が正解です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『たつ』の漢字はどれですか？『時間が＿＿』",
-            choices: [
-                "立つ",
-                "経つ",
-                "発つ",
-                "建つ"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『時間が経つ』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『しめる』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "閉める",
-                "開ける",
-                "走る",
-                "止まる"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『しめる』は『閉める』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『友達と遊んでいたら、突然…』",
-            choices: [
-                "風が吹いてきた",
-                "雨が降り出した",
-                "先生が来た",
-                "お腹が空いた"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『雨が降り出した』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『はしる』の漢字はどれですか？『道を＿＿』",
-            choices: [
-                "歩く",
-                "走る",
-                "登る",
-                "飛ぶ"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『道を走る』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『つなぐ』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "切る",
-                "結ぶ",
-                "離す",
-                "引っ張る"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『つなぐ』は『結ぶ』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『今日はとても寒いので…』",
-            choices: [
-                "暖かい服を着た",
-                "外で遊んだ",
-                "窓を開けた",
-                "冷たい飲み物を飲んだ"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『暖かい服を着た』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『おしえる』の漢字はどれですか？『道を＿＿』",
-            choices: [
-                "教える",
-                "聞える",
-                "伝える",
-                "知らせる"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『道を教える』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『みつける』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "探す",
-                "見つける",
-                "落とす",
-                "忘れる"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『みつける』は『見つける』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『空が暗くなり始めたので…』",
-            choices: [
-                "風が強くなった",
-                "星が出てきた",
-                "雨が降り出した",
-                "雷が鳴った"
-            ],
-            correctAnswerIndex: 2,
-            explanation: "『雨が降り出した』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『さく』の漢字はどれですか？『花が＿＿』",
-            choices: [
-                "裂く",
-                "割く",
-                "咲く",
-                "作く"
-            ],
-            correctAnswerIndex: 2,
-            explanation: "『花が咲く』が正解です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『あげる』の漢字はどれですか？『手を＿＿』",
-            choices: [
-                "上げる",
-                "挙げる",
-                "揚げる",
-                "明げる"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『手を上げる』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『とる』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "引く",
-                "取る",
-                "割る",
-                "進む"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『とる』は『取る』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『学校が終わって家に帰ると…』",
-            choices: [
-                "家族が迎えてくれた",
-                "友達が遊びに来た",
-                "鍵が閉まっていた",
-                "雨が降り出した"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『家族が迎えてくれた』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『みる』の漢字はどれですか？『先生に＿＿てもらう』",
-            choices: [
-                "見てもらう",
-                "診てもらう",
-                "視てもらう",
-                "観てもらう"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『先生に診てもらう』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『たすける』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "助ける",
-                "見守る",
-                "追いかける",
-                "話しかける"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『たすける』は『助ける』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『公園で遊んでいたら、急に…』",
-            choices: [
-                "雨が降り出した",
-                "友達が来た",
-                "風が吹き始めた",
-                "先生が来た"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『雨が降り出した』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『のぼる』の漢字はどれですか？『山に＿＿』",
-            choices: [
-                "登る",
-                "上る",
-                "昇る",
-                "伸る"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『山に登る』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『つなぐ』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "離す",
-                "結ぶ",
-                "倒す",
-                "引っ張る"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『つなぐ』は『結ぶ』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『風が強くなってきたので…』",
-            choices: [
-                "傘を閉じた",
-                "窓を開けた",
-                "道を歩き続けた",
-                "外で遊んだ"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『傘を閉じた』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『あらう』の漢字はどれですか？『手を＿＿』",
-            choices: [
-                "洗う",
-                "荒う",
-                "拭う",
-                "削う"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『手を洗う』が正解です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『みる』の漢字はどれですか？『映画を＿＿』",
-            choices: [
-                "観る",
-                "診る",
-                "看る",
-                "視る"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『映画を観る』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『おこる』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "泣く",
-                "怒る",
-                "笑う",
-                "遊ぶ"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『おこる』は『怒る』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『今日は学校が休みなので…』",
-            choices: [
-                "友達と遊びに行った",
-                "宿題をした",
-                "家でのんびりした",
-                "お昼寝をした"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『友達と遊びに行った』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『おりる』の漢字はどれですか？『階段を＿＿』",
-            choices: [
-                "降りる",
-                "折りる",
-                "下りる",
-                "跳りる"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『階段を降りる』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『おしえる』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "書く",
-                "教える",
-                "聞く",
-                "見る"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『おしえる』は『教える』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『雨が止んだので…』",
-            choices: [
-                "散歩に出かけた",
-                "窓を閉めた",
-                "傘をさした",
-                "テレビを見た"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『散歩に出かけた』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『はしる』の漢字はどれですか？『道を＿＿』",
-            choices: [
-                "走る",
-                "飛ぶ",
-                "滑る",
-                "歩く"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『道を走る』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『みつける』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "逃げる",
-                "見つける",
-                "拾う",
-                "追いかける"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『みつける』は『見つける』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『太陽が沈み始めたので…』",
-            choices: [
-                "星が出始めた",
-                "雨が降ってきた",
-                "風が強くなった",
-                "雲が広がった"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『星が出始めた』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『きく』の漢字はどれですか？『音楽を＿＿』",
-            choices: [
-                "聞く",
-                "訊く",
-                "効く",
-                "利く"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『音楽を聞く』が正解です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『きく』の漢字はどれですか？『音楽を＿＿』",
-            choices: [
-                "聞く",
-                "効く",
-                "利く",
-                "訊く"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『音楽を聞く』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『しる』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "歩く",
-                "知る",
-                "忘れる",
-                "書く"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『しる』は『知る』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『外は強い風が吹いていて…』",
-            choices: [
-                "木が大きく揺れていた",
-                "猫が寝ていた",
-                "鳥が飛んでいた",
-                "誰もいなかった"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『木が大きく揺れていた』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『あける』の漢字はどれですか？『窓を＿＿』",
-            choices: [
-                "開ける",
-                "明ける",
-                "挙ける",
-                "空ける"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『窓を開ける』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『ふく』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "拭く",
-                "書く",
-                "進む",
-                "折る"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『ふく』は『拭く』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『今日は暑いので…』",
-            choices: [
-                "冷たい飲み物を飲んだ",
-                "外で遊んだ",
-                "上着を着た",
-                "窓を閉めた"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『冷たい飲み物を飲んだ』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『みる』の漢字はどれですか？『テレビを＿＿』",
-            choices: [
-                "観る",
-                "診る",
-                "看る",
-                "視る"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『テレビを観る』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『もどる』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "進む",
-                "戻る",
-                "走る",
-                "出る"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『もどる』は『戻る』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『電車が遅れて…』",
-            choices: [
-                "駅にたくさんの人がいた",
-                "みんなが帰った",
-                "誰もいなかった",
-                "車が止まっていた"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『駅にたくさんの人がいた』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『たべる』の漢字はどれですか？『朝ごはんを＿＿』",
-            choices: [
-                "食べる",
-                "飲べる",
-                "吸べる",
-                "消べる"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『朝ごはんを食べる』が正解です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『さがす』の漢字はどれですか？『友達を＿＿』",
-            choices: [
-                "探す",
-                "捜す",
-                "査す",
-                "覗す"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『友達を探す』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『あつめる』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "散らばる",
-                "集める",
-                "逃げる",
-                "減る"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『あつめる』は『集める』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『家の前に大きな犬が…』",
-            choices: [
-                "座っていた",
-                "吠えていた",
-                "走っていた",
-                "寝ていた"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『吠えていた』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『あう』の漢字はどれですか？『事故に＿＿』",
-            choices: [
-                "会う",
-                "合う",
-                "遭う",
-                "遇う"
-            ],
-            correctAnswerIndex: 2,
-            explanation: "『事故に遭う』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『ふる』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "降る",
-                "登る",
-                "広がる",
-                "乾く"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『ふる』は『降る』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『太郎は学校から帰るとすぐに…』",
-            choices: [
-                "宿題を始めた",
-                "テレビを見た",
-                "友達に会った",
-                "お菓子を食べた"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『宿題を始めた』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『ひく』の漢字はどれですか？『ピアノを＿＿』",
-            choices: [
-                "弾く",
-                "引く",
-                "轢く",
-                "走く"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『ピアノを弾く』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『わらう』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "怒る",
-                "笑う",
-                "泣く",
-                "叫ぶ"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『わらう』は『笑う』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『家を出ると、すぐに…』",
-            choices: [
-                "雨が降り始めた",
-                "友達が待っていた",
-                "車が走っていた",
-                "風が強くなった"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『友達が待っていた』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『とまる』の漢字はどれですか？『バスが＿＿』",
-            choices: [
-                "止まる",
-                "泊まる",
-                "留まる",
-                "泊める"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『バスが止まる』が正解です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『あう』の漢字はどれですか？『友達に＿＿』",
-            choices: [
-                "会う",
-                "合う",
-                "遭う",
-                "遇う"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『友達に会う』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『ながれる』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "止まる",
-                "流れる",
-                "上がる",
-                "広がる"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『ながれる』は『流れる』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『今日は空がとても青いです。だから…』",
-            choices: [
-                "外で遊びたい",
-                "部屋で休みたい",
-                "早く寝たい",
-                "宿題をしたい"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『外で遊びたい』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『ひく』の漢字はどれですか？『車を＿＿』",
-            choices: [
-                "引く",
-                "弾く",
-                "轢く",
-                "低く"
-            ],
-            correctAnswerIndex: 2,
-            explanation: "『車を轢く』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『つづける』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "終わる",
-                "休む",
-                "続ける",
-                "止める"
-            ],
-            correctAnswerIndex: 2,
-            explanation: "『つづける』は『続ける』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『お店に入ってみると、そこには…』",
-            choices: [
-                "たくさんの商品が並んでいた",
-                "誰もいなかった",
-                "大きな声が聞こえた",
-                "店員が話しかけてきた"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『たくさんの商品が並んでいた』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『みる』の漢字はどれですか？『映画を＿＿』",
-            choices: [
-                "観る",
-                "診る",
-                "看る",
-                "視る"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『映画を観る』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『まもる』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "守る",
-                "破る",
-                "攻める",
-                "忘れる"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『まもる』は『守る』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『太郎は学校が終わると、すぐに…』",
-            choices: [
-                "公園で遊んだ",
-                "宿題をした",
-                "先生に挨拶した",
-                "本を読んだ"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『公園で遊んだ』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『つかう』の漢字はどれですか？『道具を＿＿』",
-            choices: [
-                "使う",
-                "作う",
-                "捌う",
-                "運う"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『道具を使う』が正解です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『まつ』の漢字はどれですか？『友達を＿＿』",
-            choices: [
-                "待つ",
-                "持つ",
-                "末つ",
-                "待う"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『友達を待つ』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『とぶ』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "走る",
-                "跳ねる",
-                "飛ぶ",
-                "泳ぐ"
-            ],
-            correctAnswerIndex: 2,
-            explanation: "『とぶ』は『飛ぶ』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『朝早く起きて、外に出ると…』",
-            choices: [
-                "新鮮な空気が気持ちよかった",
-                "風が強くなってきた",
-                "雨が降り出した",
-                "車がたくさん走っていた"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『新鮮な空気が気持ちよかった』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『のる』の漢字はどれですか？『電車に＿＿』",
-            choices: [
-                "乗る",
-                "登る",
-                "載る",
-                "延る"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『電車に乗る』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『はしる』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "歩く",
-                "飛ぶ",
-                "走る",
-                "座る"
-            ],
-            correctAnswerIndex: 2,
-            explanation: "『はしる』は『走る』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『今日はとても寒いです。だから…』",
-            choices: [
-                "暖かい服を着た",
-                "窓を開けた",
-                "川で泳いだ",
-                "冷たい飲み物を飲んだ"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『暖かい服を着た』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『ひく』の漢字はどれですか？『車を＿＿』",
-            choices: [
-                "引く",
-                "弾く",
-                "轢く",
-                "低く"
-            ],
-            correctAnswerIndex: 2,
-            explanation: "『車を轢く』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『ふく』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "拭く",
-                "蹴る",
-                "投げる",
-                "振る"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『ふく』は『拭く』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『夜になって、街の明かりが…』",
-            choices: [
-                "だんだん消えていった",
-                "明るくなった",
-                "静かになった",
-                "大きな音が聞こえた"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『明るくなった』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『はらう』の漢字はどれですか？『お金を＿＿』",
-            choices: [
-                "拾う",
-                "払う",
-                "張る",
-                "放つ"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『お金を払う』が正解です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『つくる』の漢字はどれですか？『料理を＿＿』",
-            choices: [
-                "造る",
-                "創る",
-                "作る",
-                "築る"
-            ],
-            correctAnswerIndex: 2,
-            explanation: "『料理を作る』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『おちる』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "昇る",
-                "飛ぶ",
-                "落ちる",
-                "上がる"
-            ],
-            correctAnswerIndex: 2,
-            explanation: "『おちる』は『落ちる』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『学校から帰ってくると、そこには…』",
-            choices: [
-                "お母さんが迎えてくれた",
-                "犬が寝ていた",
-                "友達が遊びに来ていた",
-                "部屋が散らかっていた"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『お母さんが迎えてくれた』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『かける』の漢字はどれですか？『メガネを＿＿』",
-            choices: [
-                "掛ける",
-                "架ける",
-                "欠ける",
-                "賭ける"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『メガネを掛ける』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『わらう』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "泣く",
-                "叫ぶ",
-                "笑う",
-                "怒る"
-            ],
-            correctAnswerIndex: 2,
-            explanation: "『わらう』は『笑う』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『突然、強い風が吹いてきた。すると…』",
-            choices: [
-                "傘が飛ばされた",
-                "家に帰った",
-                "道を歩き続けた",
-                "誰かが叫んだ"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『傘が飛ばされた』が自然な展開です。"
-        ),
-        QuizQuestion(
-            question: "次の文で正しい『とおる』の漢字はどれですか？『道を＿＿』",
-            choices: [
-                "取る",
-                "通る",
-                "飛る",
-                "走る"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "『道を通る』が正解です。"
-        ),
-        QuizQuestion(
-            question: "『あける』という言葉の意味として適切なものはどれですか？",
-            choices: [
-                "開ける",
-                "閉める",
-                "飛ぶ",
-                "止める"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『あける』は『開ける』という意味です。"
-        ),
-        QuizQuestion(
-            question: "次の文に続く内容として最も適切なものはどれですか？『太陽が沈み始めた。すると…』",
-            choices: [
-                "星が出てきた",
-                "雨が降り出した",
-                "風が強くなった",
-                "誰かが叫んだ"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "『星が出てきた』が自然な展開です。"
-        ),
-           
-            QuizQuestion(
-                question: "次の文で正しい『かける』の漢字はどれですか？『電話を＿＿』",
+        QuizQuestion.fillInBlank(
+            question: "【穴うめ】つぎの文の ＿＿ に入ることばを答えましょう。\n『その日に あったことを 日ごとに 書きのこすものを ＿＿ といいます。』",
+            answer: "日記",
+            acceptableAnswers: ["にっき"],
+            explanation: "その日にあったことを日ごとに書きのこすものは『日記』です。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【穴うめ】つぎの文の ＿＿ に入ることばを答えましょう。\n『ことばの いみや つかい方を しらべる 本を ＿＿ といいます。』",
+            answer: "辞典",
+            acceptableAnswers: ["じてん"],
+            explanation: "ことばの意味や使い方を調べる本は『辞典』です。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『坂』",
+            answer: "さか",
+            explanation: "『坂』の読みは『さか』です。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『深い』",
+            answer: "ふかい",
+            explanation: "『深い』の読みは『ふかい』です。"
+        ),
+
+        QuizQuestion.extractText(
+            question: "【抜き出し】つぎの文を読み、しょうたが 見つけたものを そのまま ぬき出しましょう。\n『しょうたは 雨上がりの 校庭で 大きな みずたまりを 見つけました。』",
+            answer: "大きな みずたまり",
+            acceptableAnswers: ["大きなみずたまり", "みずたまり", "水たまり", "大きな水たまり"],
+            explanation: "しょうたが見つけたものは『大きな みずたまり』です。"
+        ),
+
+        QuizQuestion.extractText(
+            question: "【抜き出し】つぎの文を読み、「どこで」に あたることばを そのまま ぬき出しましょう。\n『朝早く、あやさんは ベランダで あさがおに 水を やりました。』",
+            answer: "ベランダで",
+            explanation: "『どこで』にあたることばは『ベランダで』です。"
+        ),
+
+        QuizQuestion.extractText(
+            question: "【抜き出し】つぎの文を読み、弟の ようすが 分かることばを そのまま ぬき出しましょう。\n『弟は うれしそうに 新しい じてん車を おしました。』",
+            answer: "うれしそうに",
+            explanation: "弟のようすが分かることばは『うれしそうに』です。"
+        ),
+
+        QuizQuestion.extractText(
+            question: "【抜き出し】つぎの文を読み、先生が 書いたものを そのまま ぬき出しましょう。\n『先生は 黒板に 大切な 言葉を 赤い チョークで 書きました。』",
+            answer: "大切な 言葉",
+            acceptableAnswers: ["大切な言葉", "たいせつなことば", "たいせつな 言葉"],
+            explanation: "先生が書いたものは『大切な 言葉』です。"
+        ),
+
+        QuizQuestion.reorder(
+            question: "【並べ替え】ことばを ただしい じゅんに ならべて 文を つくりましょう。",
+            choices: ["本を", "読みました", "わたしは", "しずかに", "図書館で"],
+            orderedChoices: ["わたしは", "図書館で", "しずかに", "本を", "読みました"],
+            explanation: "『わたしは 図書館で しずかに 本を 読みました。』が正しい順番です。"
+        ),
+
+        QuizQuestion.reorder(
+            question: "【並べ替え】ことばを ただしい じゅんに ならべて 文を つくりましょう。",
+            choices: ["しました", "理科の じっけんを", "ぼくは", "教室で", "昨日"],
+            orderedChoices: ["ぼくは", "昨日", "教室で", "理科の じっけんを", "しました"],
+            explanation: "『ぼくは 昨日 教室で 理科の じっけんを しました。』が正しい順番です。"
+        ),
+
+        QuizQuestion.reorder(
+            question: "【並べ替え】ことばを ただしい じゅんに ならべて 文を つくりましょう。",
+            choices: ["見えました", "大きな", "やんだあと", "にじが", "雨が"],
+            orderedChoices: ["雨が", "やんだあと", "大きな", "にじが", "見えました"],
+            explanation: "『雨が やんだあと 大きな にじが 見えました。』が正しい順番です。"
+        ),
+
+        QuizQuestion.reorder(
+            question: "【並べ替え】ことばを ただしい じゅんに ならべて 文を つくりましょう。",
+            choices: ["しました", "友だちと", "楽しく", "おにごっこを", "公園で"],
+            orderedChoices: ["友だちと", "公園で", "楽しく", "おにごっこを", "しました"],
+            explanation: "『友だちと 公園で 楽しく おにごっこを しました。』が正しい順番です。"
+        ),
+
+        QuizQuestion.matching(
+            question: "【組み合わせ】ことばと いみが 合うように えらびましょう。",
+            pairs: [
+                QuizMatchingPair(prompt: "しずか", match: "音が少ない"),
+                QuizMatchingPair(prompt: "うれしい", match: "心が明るい"),
+                QuizMatchingPair(prompt: "すばやい", match: "とても速い")
+            ],
+            choices: ["心が明るい", "とても速い", "音が少ない"],
+            explanation: "『しずか=音が少ない』『うれしい=心が明るい』『すばやい=とても速い』が正しい組み合わせです。"
+        ),
+
+        QuizQuestion.matching(
+            question: "【組み合わせ】漢字と 読みが 合うように えらびましょう。",
+            pairs: [
+                QuizMatchingPair(prompt: "坂", match: "さか"),
+                QuizMatchingPair(prompt: "島", match: "しま"),
+                QuizMatchingPair(prompt: "深い", match: "ふかい")
+            ],
+            choices: ["ふかい", "しま", "さか"],
+            explanation: "『坂=さか』『島=しま』『深い=ふかい』が正しい組み合わせです。"
+        ),
+
+        QuizQuestion.matching(
+            question: "【組み合わせ】国語の ことばと いみが 合うように えらびましょう。",
+            pairs: [
+                QuizMatchingPair(prompt: "題名", match: "話や文の 名前"),
+                QuizMatchingPair(prompt: "段落", match: "内容の まとまり"),
+                QuizMatchingPair(prompt: "会話文", match: "かぎかっこで 書く 文")
+            ],
+            choices: ["内容の まとまり", "かぎかっこで 書く 文", "話や文の 名前"],
+            explanation: "『題名=話や文の 名前』『段落=内容の まとまり』『会話文=かぎかっこで 書く 文』が正しい組み合わせです。"
+        ),
+
+        QuizQuestion.matching(
+            question: "【組み合わせ】つなぎ言葉と はたらきが 合うように えらびましょう。",
+            pairs: [
+                QuizMatchingPair(prompt: "まず", match: "はじめに いうとき"),
+                QuizMatchingPair(prompt: "つぎに", match: "順番を つづけるとき"),
+                QuizMatchingPair(prompt: "たとえば", match: "れいを 出すとき")
+            ],
+            choices: ["順番を つづけるとき", "れいを 出すとき", "はじめに いうとき"],
+            explanation: "つなぎ言葉は、文と文のつながりを分かりやすくします。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【穴うめ】つぎの説明に 合うことばを答えましょう。\n『人が かぎかっこの中で しゃべっている文を ＿＿ といいます。』",
+            answer: "会話文",
+            acceptableAnswers: ["かいわぶん"],
+            explanation: "人がかぎかっこの中でしゃべっている文を『会話文』といいます。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『港』",
+            answer: "みなと",
+            explanation: "『港』の読みは『みなと』です。"
+        ),
+
+        QuizQuestion.extractText(
+            question: "【抜き出し】つぎの文を読み、かおりさんが ひろったものを そのまま ぬき出しましょう。\n『かおりさんは 理科室で 光る 石を 大事そうに ひろった。』",
+            answer: "光る 石",
+            acceptableAnswers: ["光る石", "ひかる石", "ひかる 石"],
+            explanation: "かおりさんがひろったものは『光る 石』です。"
+        ),
+
+        QuizQuestion.extractText(
+            question: "【抜き出し】つぎの文を読み、おじいさんの ようすが分かることばを そのまま ぬき出しましょう。\n『おじいさんは ゆっくり うなずいて、むかしの話を はじめた。』",
+            answer: "ゆっくり うなずいて",
+            acceptableAnswers: ["ゆっくりうなずいて"],
+            explanation: "おじいさんのようすが分かることばは『ゆっくり うなずいて』です。"
+        ),
+
+        QuizQuestion.reorder(
+            question: "【並べ替え】ことばを ただしい じゅんに ならべて 文を つくりましょう。",
+            choices: ["校庭で", "わたしたちは", "元気よく", "長なわを", "しました"],
+            orderedChoices: ["わたしたちは", "校庭で", "元気よく", "長なわを", "しました"],
+            explanation: "『わたしたちは 校庭で 元気よく 長なわを しました。』が正しい順番です。"
+        ),
+
+        QuizQuestion.reorder(
+            question: "【並べ替え】ことばを ただしい じゅんに ならべて 文を つくりましょう。",
+            choices: ["きらきらと", "光っていた", "夜空に", "星が"],
+            orderedChoices: ["夜空に", "星が", "きらきらと", "光っていた"],
+            explanation: "『夜空に 星が きらきらと 光っていた。』が正しい順番です。"
+        ),
+
+        QuizQuestion.matching(
+            question: "【組み合わせ】国語の ことばと いみが 合うように えらびましょう。",
+            pairs: [
+                QuizMatchingPair(prompt: "主語", match: "文の中心となる 人やもの"),
+                QuizMatchingPair(prompt: "修飾語", match: "ようすを くわしくする ことば"),
+                QuizMatchingPair(prompt: "段落", match: "内容の まとまり")
+            ],
+            choices: ["内容の まとまり", "文の中心となる 人やもの", "ようすを くわしくする ことば"],
+            explanation: "『主語=文の中心となる 人やもの』『修飾語=ようすを くわしくする ことば』『段落=内容の まとまり』が正しい組み合わせです。"
+        ),
+
+        QuizQuestion.matching(
+            question: "【組み合わせ】本の 名前と つかい方が 合うように えらびましょう。",
+            pairs: [
+                QuizMatchingPair(prompt: "国語辞典", match: "ことばの意味を 調べる"),
+                QuizMatchingPair(prompt: "漢字辞典", match: "漢字の 読みや意味を 調べる"),
+                QuizMatchingPair(prompt: "図かん", match: "絵や写真で くわしく 調べる")
+            ],
+            choices: ["絵や写真で くわしく 調べる", "ことばの意味を 調べる", "漢字の 読みや意味を 調べる"],
+            explanation: "それぞれの本には、ちがう調べ方があります。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『湖』",
+            answer: "みずうみ",
+            explanation: "『湖』の読みは『みずうみ』です。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『調べる』",
+            answer: "しらべる",
+            explanation: "『調べる』の読みは『しらべる』です。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『温かい』",
+            answer: "あたたかい",
+            acceptableAnswers: ["暖かい"],
+            explanation: "『温かい』の読みは『あたたかい』です。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『植物』",
+            answer: "しょくぶつ",
+            explanation: "『植物』の読みは『しょくぶつ』です。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『動物』",
+            answer: "どうぶつ",
+            explanation: "『動物』の読みは『どうぶつ』です。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『練習』",
+            answer: "れんしゅう",
+            explanation: "『練習』の読みは『れんしゅう』です。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『世界』",
+            answer: "せかい",
+            explanation: "『世界』の読みは『せかい』です。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『橋』",
+            answer: "はし",
+            explanation: "『橋』の読みは『はし』です。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『遠足』",
+            answer: "えんそく",
+            explanation: "『遠足』の読みは『えんそく』です。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『発表』",
+            answer: "はっぴょう",
+            explanation: "『発表』の読みは『はっぴょう』です。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『着る』",
+            answer: "きる",
+            explanation: "『着る』の読みは『きる』です。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『待つ』",
+            answer: "まつ",
+            explanation: "『待つ』の読みは『まつ』です。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【穴うめ】つぎの文の ＿＿ に入ることばを答えましょう。\n『文の中で、誰が・何が にあたることばを ＿＿ といいます。』",
+            answer: "主語",
+            acceptableAnswers: ["しゅご"],
+            explanation: "文の中の『誰が・何が』にあたることばを『主語』といいます。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【穴うめ】つぎの文の ＿＿ に入ることばを答えましょう。\n『文の中で、どうする・どんなだ にあたることばを ＿＿ といいます。』",
+            answer: "述語",
+            acceptableAnswers: ["じゅつご"],
+            explanation: "文の中の『どうする・どんなだ』にあたることばを『述語』といいます。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【穴うめ】つぎの文の ＿＿ に入ることばを答えましょう。\n『接続語で、前と反対の内容を続けるときは ＿＿ を使います。』",
+            answer: "しかし",
+            explanation: "前と反対の内容を続けるときは『しかし』を使います。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【穴うめ】つぎの文の ＿＿ に入ることばを答えましょう。\n『接続語で、前の内容の結果を続けるときは ＿＿ を使います。』",
+            answer: "だから",
+            acceptableAnswers: ["そのため"],
+            explanation: "前の内容の結果を続けるときは『だから』『そのため』を使います。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【穴うめ】つぎの文の ＿＿ に入ることばを答えましょう。\n『手紙の書き方で、相手への気持ちを伝えるまとめの部分を ＿＿ といいます。』",
+            answer: "むすび",
+            acceptableAnswers: ["結び"],
+            explanation: "手紙の最後のまとめの部分を『むすび（結び）』といいます。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【穴うめ】つぎの文の ＿＿ に入ることばを答えましょう。\n『詩で、同じ言葉やリズムを繰り返すことを ＿＿ といいます。』",
+            answer: "くりかえし",
+            acceptableAnswers: ["反復", "はんぷく"],
+            explanation: "詩で同じ言葉を繰り返すことを『くりかえし（反復）』といいます。"
+        ),
+
+        QuizQuestion.extractText(
+            question: "【抜き出し】つぎの文を読み、主語を そのまま ぬき出しましょう。\n『たかしは 毎朝 早くおきて、犬と 元気よく 散歩をします。』",
+            answer: "たかしは",
+            acceptableAnswers: ["たかし"],
+            explanation: "この文の主語は『たかしは』です。"
+        ),
+
+        QuizQuestion.extractText(
+            question: "【抜き出し】つぎの文を読み、述語を そのまま ぬき出しましょう。\n『あかねさんは 放課後、図書室で ていねいに 日記を 書いた。』",
+            answer: "書いた",
+            acceptableAnswers: ["日記を 書いた", "日記を書いた"],
+            explanation: "この文の述語は『書いた』です。"
+        ),
+
+        QuizQuestion.extractText(
+            question: "【抜き出し】つぎの文を読み、「どこで」に あたることばを そのまま ぬき出しましょう。\n『校庭のすみに、先生が植えた 小さな 花が さいていた。』",
+            answer: "校庭のすみに",
+            acceptableAnswers: ["校庭のすみ"],
+            explanation: "『どこで』にあたることばは『校庭のすみに』です。"
+        ),
+
+        QuizQuestion.extractText(
+            question: "【抜き出し】つぎの文を読み、「いつ」に あたることばを そのまま ぬき出しましょう。\n『雨の日の朝、ゆいは かさをさして 学校へ むかった。』",
+            answer: "雨の日の朝",
+            acceptableAnswers: ["雨の日の 朝"],
+            explanation: "『いつ』にあたることばは『雨の日の朝』です。"
+        ),
+
+        QuizQuestion.extractText(
+            question: "【抜き出し】つぎの文を読み、「だれと」に あたることばを そのまま ぬき出しましょう。\n『たろうは 兄と いっしょに、大きな声で 音読の れんしゅうをした。』",
+            answer: "兄と",
+            acceptableAnswers: ["お兄さんと", "おにいさんと"],
+            explanation: "『だれと』にあたることばは『兄と』です。"
+        ),
+
+        QuizQuestion.extractText(
+            question: "【抜き出し】つぎの文を読み、修飾語（どのように）を そのまま ぬき出しましょう。\n『先生が 大切なことを 黒板に 赤い チョークで 書いた。』",
+            answer: "赤い チョークで",
+            acceptableAnswers: ["赤いチョークで"],
+            explanation: "修飾語（どのように）は『赤い チョークで』です。"
+        ),
+
+        QuizQuestion.reorder(
+            question: "【並べ替え】ことばを ただしい じゅんに ならべて 文を つくりましょう。",
+            choices: ["作りました", "わたしたちは", "工作で", "ていねいに", "木の船を"],
+            orderedChoices: ["わたしたちは", "工作で", "ていねいに", "木の船を", "作りました"],
+            explanation: "『わたしたちは 工作で ていねいに 木の船を 作りました。』が正しい順番です。"
+        ),
+
+        QuizQuestion.reorder(
+            question: "【並べ替え】ことばを ただしい じゅんに ならべて 文を つくりましょう。",
+            choices: ["見えた", "山の向こうに", "夕日が", "美しい", "大きな"],
+            orderedChoices: ["山の向こうに", "大きな", "美しい", "夕日が", "見えた"],
+            explanation: "『山の向こうに 大きな 美しい 夕日が 見えた。』が正しい順番です。"
+        ),
+
+        QuizQuestion.reorder(
+            question: "【並べ替え】ことばを ただしい じゅんに ならべて 文を つくりましょう。",
+            choices: ["読みました", "先生の", "クラスで", "はじめに", "好きな本を"],
+            orderedChoices: ["クラスで", "はじめに", "先生の", "好きな本を", "読みました"],
+            explanation: "『クラスで はじめに 先生の 好きな本を 読みました。』が正しい順番です。"
+        ),
+
+        QuizQuestion.reorder(
+            question: "【並べ替え】ことばを ただしい じゅんに ならべて 文を つくりましょう。",
+            choices: ["しました", "公園で", "みんなで", "楽しく", "虫とりを"],
+            orderedChoices: ["みんなで", "公園で", "楽しく", "虫とりを", "しました"],
+            explanation: "『みんなで 公園で 楽しく 虫とりを しました。』が正しい順番です。"
+        ),
+
+        QuizQuestion.reorder(
+            question: "【並べ替え】ことばを ただしい じゅんに ならべて 文を つくりましょう。",
+            choices: ["かりました", "図書館で", "ぼくは", "昨日", "図かんを"],
+            orderedChoices: ["ぼくは", "昨日", "図書館で", "図かんを", "かりました"],
+            explanation: "『ぼくは 昨日 図書館で 図かんを かりました。』が正しい順番です。"
+        ),
+
+        QuizQuestion.reorder(
+            question: "【並べ替え】ことばを ただしい じゅんに ならべて 文を つくりましょう。",
+            choices: ["書いた", "手紙を", "友だちへ", "ていねいに", "わたしは"],
+            orderedChoices: ["わたしは", "友だちへ", "ていねいに", "手紙を", "書いた"],
+            explanation: "『わたしは 友だちへ ていねいに 手紙を 書いた。』が正しい順番です。"
+        ),
+
+        QuizQuestion.matching(
+            question: "【組み合わせ】接続語と はたらきが 合うように えらびましょう。",
+            pairs: [
+                QuizMatchingPair(prompt: "しかし", match: "反対のことを言う"),
+                QuizMatchingPair(prompt: "だから", match: "理由からの結果"),
+                QuizMatchingPair(prompt: "そして", match: "つけたして言う")
+            ],
+            choices: ["つけたして言う", "反対のことを言う", "理由からの結果"],
+            explanation: "接続語のはたらきを確かめましょう。"
+        ),
+
+        QuizQuestion.matching(
+            question: "【組み合わせ】漢字と 読みが 合うように えらびましょう。",
+            pairs: [
+                QuizMatchingPair(prompt: "植物", match: "しょくぶつ"),
+                QuizMatchingPair(prompt: "動物", match: "どうぶつ"),
+                QuizMatchingPair(prompt: "温かい", match: "あたたかい")
+            ],
+            choices: ["あたたかい", "しょくぶつ", "どうぶつ"],
+            explanation: "『植物=しょくぶつ』『動物=どうぶつ』『温かい=あたたかい』が正しい組み合わせです。"
+        ),
+
+        QuizQuestion.matching(
+            question: "【組み合わせ】国語の ことばと いみが 合うように えらびましょう。",
+            pairs: [
+                QuizMatchingPair(prompt: "主語", match: "文の中心となる人やもの"),
+                QuizMatchingPair(prompt: "述語", match: "どうする・どんなだを表す"),
+                QuizMatchingPair(prompt: "修飾語", match: "ようすをくわしくする")
+            ],
+            choices: ["ようすをくわしくする", "文の中心となる人やもの", "どうする・どんなだを表す"],
+            explanation: "国語の文法ことばの意味を確かめましょう。"
+        ),
+
+        QuizQuestion.matching(
+            question: "【組み合わせ】ことばと なかまが 合うように えらびましょう。",
+            pairs: [
+                QuizMatchingPair(prompt: "辞典", match: "調べる本"),
+                QuizMatchingPair(prompt: "物語", match: "楽しむ本"),
+                QuizMatchingPair(prompt: "図かん", match: "絵で見る本")
+            ],
+            choices: ["絵で見る本", "調べる本", "楽しむ本"],
+            explanation: "『辞典=調べる本』『物語=楽しむ本』『図かん=絵で見る本』が正しい組み合わせです。"
+        ),
+
+        QuizQuestion.matching(
+            question: "【組み合わせ】漢字と 読みが 合うように えらびましょう。",
+            pairs: [
+                QuizMatchingPair(prompt: "橋", match: "はし"),
+                QuizMatchingPair(prompt: "遠足", match: "えんそく"),
+                QuizMatchingPair(prompt: "発表", match: "はっぴょう")
+            ],
+            choices: ["はっぴょう", "はし", "えんそく"],
+            explanation: "『橋=はし』『遠足=えんそく』『発表=はっぴょう』が正しい組み合わせです。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『音読』",
+            answer: "おんどく",
+            explanation: "『音読』の読みは『おんどく』です。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『感想』",
+            answer: "かんそう",
+            explanation: "『感想』の読みは『かんそう』です。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『説明』",
+            answer: "せつめい",
+            explanation: "『説明』の読みは『せつめい』です。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『問題』",
+            answer: "もんだい",
+            explanation: "『問題』の読みは『もんだい』です。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【穴うめ】つぎの文の ＿＿ に入ることばを答えましょう。\n『文章の内容が変わるまとまりの単位を ＿＿ といいます。』",
+            answer: "段落",
+            acceptableAnswers: ["だんらく"],
+            explanation: "内容のまとまりを『段落（だんらく）』といいます。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【穴うめ】つぎの文の ＿＿ に入ることばを答えましょう。\n『詩で、言葉を人がするように表すことを ＿＿ といいます。』",
+            answer: "ぎじんほう",
+            acceptableAnswers: ["擬人法"],
+            explanation: "物を人のように表す表現を『擬人法（ぎじんほう）』といいます。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【穴うめ】つぎの文の ＿＿ に入ることばを答えましょう。\n『何かにたとえる表現を ＿＿ といいます。』",
+            answer: "ひゆ",
+            acceptableAnswers: ["比喩", "たとえ"],
+            explanation: "何かにたとえる表現を『比喩（ひゆ）』といいます。"
+        ),
+
+        QuizQuestion.extractText(
+            question: "【抜き出し】つぎの文を読み、みちこさんの ようすが 分かることばを そのまま ぬき出しましょう。\n『みちこさんは、きれいな声で いっしょうけんめい 歌を 歌った。』",
+            answer: "いっしょうけんめい",
+            acceptableAnswers: ["一生けんめい", "いっしょうけんめいに"],
+            explanation: "みちこさんのようすが分かることばは『いっしょうけんめい』です。"
+        ),
+
+        QuizQuestion.extractText(
+            question: "【抜き出し】つぎの文を読み、「いつ」に あたることばを そのまま ぬき出しましょう。\n『午後から、みんなで 学校の花だんの 草むしりを した。』",
+            answer: "午後から",
+            acceptableAnswers: ["午後"],
+            explanation: "『いつ』にあたることばは『午後から』です。"
+        ),
+
+        QuizQuestion.reorder(
+            question: "【並べ替え】ことばを ただしい じゅんに ならべて 文を つくりましょう。",
+            choices: ["かきました", "みんなの前で", "はっきりと", "黒板に", "先生が"],
+            orderedChoices: ["先生が", "みんなの前で", "黒板に", "はっきりと", "かきました"],
+            explanation: "『先生が みんなの前で 黒板に はっきりと かきました。』が正しい順番です。"
+        ),
+
+        QuizQuestion.reorder(
+            question: "【並べ替え】ことばを ただしい じゅんに ならべて 文を つくりましょう。",
+            choices: ["した", "教室の外で", "みんなで", "春に", "植物かんさつを"],
+            orderedChoices: ["みんなで", "春に", "教室の外で", "植物かんさつを", "した"],
+            explanation: "『みんなで 春に 教室の外で 植物かんさつを した。』が正しい順番です。"
+        ),
+
+        QuizQuestion.matching(
+            question: "【組み合わせ】漢字と 読みが 合うように えらびましょう。",
+            pairs: [
+                QuizMatchingPair(prompt: "感想", match: "かんそう"),
+                QuizMatchingPair(prompt: "説明", match: "せつめい"),
+                QuizMatchingPair(prompt: "音読", match: "おんどく")
+            ],
+            choices: ["おんどく", "かんそう", "せつめい"],
+            explanation: "『感想=かんそう』『説明=せつめい』『音読=おんどく』が正しい組み合わせです。"
+        ),
+
+        QuizQuestion.matching(
+            question: "【組み合わせ】ことばと はんたいの ことばが 合うように えらびましょう。",
+            pairs: [
+                QuizMatchingPair(prompt: "明るい", match: "暗い"),
+                QuizMatchingPair(prompt: "広い", match: "せまい"),
+                QuizMatchingPair(prompt: "速い", match: "おそい")
+            ],
+            choices: ["おそい", "暗い", "せまい"],
+            explanation: "『明るい=暗い』『広い=せまい』『速い=おそい』が正しい組み合わせです。"
+        ),
+
+        QuizQuestion.matching(
+            question: "【組み合わせ】国語の ことばと いみが 合うように えらびましょう。",
+            pairs: [
+                QuizMatchingPair(prompt: "題名", match: "文章の名前"),
+                QuizMatchingPair(prompt: "会話文", match: "かぎかっこで書く文"),
+                QuizMatchingPair(prompt: "まとめ", match: "全体をたばねる部分")
+            ],
+            choices: ["全体をたばねる部分", "文章の名前", "かぎかっこで書く文"],
+            explanation: "国語のことばの意味を確かめましょう。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『屋根』",
+            answer: "やね",
+            explanation: "『屋根』の読みは『やね』です。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『礼儀』",
+            answer: "れいぎ",
+            explanation: "『礼儀』の読みは『れいぎ』です。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『根元』",
+            answer: "ねもと",
+            explanation: "『根元』の読みは『ねもと』です。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『農業』",
+            answer: "のうぎょう",
+            explanation: "『農業』の読みは『のうぎょう』です。"
+        ),
+
+        QuizQuestion.fillInBlank(
+            question: "【漢字の読み】つぎの 漢字の 読みを ひらがなで答えましょう。\n『昭和』",
+            answer: "しょうわ",
+            explanation: "『昭和』の読みは『しょうわ』です。"
+        ),
+
+        QuizQuestion(
+                question: "【漢字】つぎの文の『こおり』を漢字で書いたものはどれですか。\n『池の こおりが とけました。』",
                 choices: [
-                    "駆ける",
-                    "掛ける",
-                    "欠ける",
-                    "賭ける"
-                ],
-                correctAnswerIndex: 1,
-                explanation: "『電話を掛ける』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『まがる』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "曲がる",
-                    "伸びる",
-                    "切る",
-                    "折れる"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『まがる』は『曲がる』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『窓の外を見ると、そこには…』",
-                choices: [
-                    "大きな虹が見えた",
-                    "友達が立っていた",
-                    "猫が走っていた",
-                    "空が真っ暗だった"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『大きな虹が見えた』が自然な展開です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『たつ』の漢字はどれですか？『時間が＿＿』",
-                choices: [
-                    "経つ",
-                    "立つ",
-                    "建つ",
-                    "発つ"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『時間が経つ』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『かたむく』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "傾く",
-                    "起きる",
-                    "進む",
-                    "走る"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『かたむく』は『傾く』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『今日はお祭りの日です。そこで…』",
-                choices: [
-                    "たくさんの人が集まった",
-                    "静かな一日が過ぎた",
-                    "雨が降り始めた",
-                    "家でのんびりした"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『たくさんの人が集まった』が自然な展開です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『はこぶ』の漢字はどれですか？『荷物を＿＿』",
-                choices: [
-                    "運ぶ",
-                    "進ぶ",
-                    "搬ぶ",
-                    "送ぶ"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『荷物を運ぶ』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『はしる』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "歩く",
-                    "走る",
-                    "飛ぶ",
-                    "登る"
-                ],
-                correctAnswerIndex: 1,
-                explanation: "『はしる』は『走る』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『空が真っ黒になった。すると…』",
-                choices: [
-                    "雷が鳴り始めた",
-                    "星が見えた",
-                    "雨が止んだ",
-                    "風が強くなった"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『雷が鳴り始めた』が自然な展開です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『さす』の漢字はどれですか？『傘を＿＿』",
-                choices: [
-                    "挿す",
-                    "指す",
-                    "差す",
-                    "刺す"
-                ],
-                correctAnswerIndex: 2,
-                explanation: "『傘を差す』が正解です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『きる』の漢字はどれですか？『服を＿＿』",
-                choices: [
-                    "切る",
-                    "着る",
-                    "割る",
-                    "裂く"
-                ],
-                correctAnswerIndex: 1,
-                explanation: "『服を着る』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『みず』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "火",
+                    "氷",
                     "水",
-                    "風",
-                    "土"
-                ],
-                correctAnswerIndex: 1,
-                explanation: "『みず』は『水』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『試験が終わって、太郎は…』",
-                choices: [
-                    "公園で遊んだ",
-                    "友達と話した",
-                    "家に帰った",
-                    "泣いてしまった"
+                    "雪",
+                    "池"
                 ],
                 correctAnswerIndex: 0,
-                explanation: "『公園で遊んだ』が自然な展開です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『かえる』の漢字はどれですか？『家に＿＿』",
-                choices: [
-                    "変える",
-                    "返る",
-                    "帰る",
-                    "替える"
-                ],
-                correctAnswerIndex: 2,
-                explanation: "『家に帰る』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『たのしい』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "悲しい",
-                    "嬉しい",
-                    "楽しい",
-                    "寂しい"
-                ],
-                correctAnswerIndex: 2,
-                explanation: "『たのしい』は『楽しい』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『山の頂上に登ったら、そこには…』",
-                choices: [
-                    "美しい景色が広がっていた",
-                    "大きな岩があった",
-                    "湖が見えた",
-                    "風が強く吹いていた"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『美しい景色が広がっていた』が自然な展開です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『おりる』の漢字はどれですか？『階段を＿＿』",
-                choices: [
-                    "降りる",
-                    "下りる",
-                    "折りる",
-                    "割りる"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『階段を降りる』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『きこえる』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "聞こえる",
-                    "見える",
-                    "感じる",
-                    "触れる"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『きこえる』は『聞こえる』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『学校が終わると、子供たちは…』",
-                choices: [
-                    "友達と遊び始めた",
-                    "宿題をした",
-                    "家に帰った",
-                    "先生に挨拶した"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『友達と遊び始めた』が自然な展開です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『たつ』の漢字はどれですか？『＿＿を取る』",
-                choices: [
-                    "立つ",
-                    "建つ",
-                    "経つ",
-                    "発つ"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『立つを取る』が正解です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『かぜ』の漢字はどれですか？『＿＿をひいた』",
-                choices: [
-                    "風",
-                    "風邪",
-                    "風速",
-                    "風力"
-                ],
-                correctAnswerIndex: 1,
-                explanation: "『風邪をひいた』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『あつい』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "冷たい",
-                    "温かい",
-                    "熱い",
-                    "涼しい"
-                ],
-                correctAnswerIndex: 2,
-                explanation: "『あつい』は『熱い』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『みんなで遠足に行きました。すると…』",
-                choices: [
-                    "バスが出発した",
-                    "家に帰った",
-                    "先生が怒った",
-                    "雨が降り出した"
-                ],
-                correctAnswerIndex: 3,
-                explanation: "『雨が降り出した』が自然な展開です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『かみ』の漢字はどれですか？『＿＿を切る』",
-                choices: [
-                    "神",
-                    "紙",
-                    "髪",
-                    "上"
-                ],
-                correctAnswerIndex: 2,
-                explanation: "『髪を切る』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『まもる』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "破る",
-                    "攻める",
-                    "守る",
-                    "逃げる"
-                ],
-                correctAnswerIndex: 2,
-                explanation: "『まもる』は『守る』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『先生が教室に入ってきました。すると…』",
-                choices: [
-                    "みんなが座った",
-                    "誰もいなくなった",
-                    "ベルが鳴った",
-                    "電気が消えた"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『みんなが座った』が自然な展開です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『みる』の漢字はどれですか？『テレビを＿＿』",
-                choices: [
-                    "観る",
-                    "診る",
-                    "看る",
-                    "視る"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『テレビを観る』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『あつまる』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "散らばる",
-                    "集まる",
-                    "消える",
-                    "走る"
-                ],
-                correctAnswerIndex: 1,
-                explanation: "『あつまる』は『集まる』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『公園で遊んでいたら、急に…』",
-                choices: [
-                    "お腹が空いた",
-                    "風が強くなった",
-                    "友達が帰った",
-                    "遊具が壊れた"
-                ],
-                correctAnswerIndex: 1,
-                explanation: "『風が強くなった』が自然な展開です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『そと』の漢字はどれですか？『＿＿に出る』",
-                choices: [
-                    "家",
-                    "外",
-                    "空",
-                    "川"
-                ],
-                correctAnswerIndex: 1,
-                explanation: "『外に出る』が正解です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『はやし』の漢字はどれですか？『＿＿の中を歩く』",
-                choices: [
-                    "林",
-                    "早",
-                    "走",
-                    "晴"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『林の中を歩く』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『さけぶ』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "叫ぶ",
-                    "笑う",
-                    "走る",
-                    "聞く"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『さけぶ』は『叫ぶ』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『太郎は一生懸命勉強しました。すると…』",
-                choices: [
-                    "テストで良い点を取った",
-                    "眠くなった",
-                    "お腹が空いた",
-                    "友達と遊びに行った"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『テストで良い点を取った』が自然な流れです。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『おおきい』の漢字はどれですか？『＿＿家を建てる』",
-                choices: [
-                    "大きい",
-                    "太い",
-                    "多い",
-                    "強い"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『大きい家を建てる』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『たつ』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "立つ",
-                    "座る",
-                    "寝る",
-                    "食べる"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『たつ』は『立つ』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『お店でりんごを買いました。すると…』",
-                choices: [
-                    "友達に会った",
-                    "雨が降り出した",
-                    "財布を忘れた",
-                    "お店が閉まった"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『友達に会った』が自然な展開です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『うまれる』の漢字はどれですか？『赤ちゃんが＿＿』",
-                choices: [
-                    "生まれる",
-                    "動まれる",
-                    "成まれる",
-                    "生える"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『赤ちゃんが生まれる』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『おしえる』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "教える",
-                    "聞く",
-                    "書く",
-                    "話す"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『おしえる』は『教える』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『家族でピクニックに出かけました。すると…』",
-                choices: [
-                    "お弁当を広げた",
-                    "雨が降り出した",
-                    "お店に寄った",
-                    "友達に会った"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『お弁当を広げた』が自然な展開です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『そら』の漢字はどれですか？『＿＿が青い』",
-                choices: [
-                    "空",
-                    "星",
-                    "川",
-                    "草"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『空が青い』が正解です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『こう』の漢字はどれですか？『＿＿園に行く』",
-                choices: [
-                    "公",
-                    "交",
-                    "講",
-                    "光"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『公園に行く』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『まもる』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "守る",
-                    "破る",
-                    "無視する",
-                    "攻める"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『まもる』は『守る』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『おばあちゃんは庭の花を見ていました。すると…』",
-                choices: [
-                    "鳥が花に止まった",
-                    "風が吹き始めた",
-                    "電話が鳴り出した",
-                    "犬が吠えた"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『鳥が花に止まった』が自然な流れです。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『しん』の漢字はどれですか？『友達を＿＿じる』",
-                choices: [
-                    "信",
-                    "真",
-                    "進",
-                    "新"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『友達を信じる』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『おさえる』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "押さえる",
-                    "引く",
-                    "転がす",
-                    "曲げる"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『おさえる』は『押さえる』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『夏休みの宿題が終わった。すると…』",
-                choices: [
-                    "遊びに行った",
-                    "お昼ご飯を食べた",
-                    "散歩に出かけた",
-                    "テレビを見始めた"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『遊びに行った』が自然な展開です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『ひかり』の漢字はどれですか？『太陽の＿＿』",
-                choices: [
-                    "光",
-                    "響",
-                    "灯",
-                    "影"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『太陽の光』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『かぞえる』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "数える",
-                    "飛ぶ",
-                    "消す",
-                    "運ぶ"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『かぞえる』は『数える』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『子どもたちは運動場で遊んでいました。すると…』",
-                choices: [
-                    "ベルが鳴った",
-                    "雨が降り出した",
-                    "お弁当を食べた",
-                    "犬が走ってきた"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『ベルが鳴った』が自然な流れです。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『せん』の漢字はどれですか？『勝負に＿＿する』",
-                choices: [
-                    "戦",
-                    "選",
-                    "線",
-                    "船"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『勝負に戦する』が正解です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『あう』の漢字はどれですか？『友達に＿＿』",
-                choices: [
-                    "会う",
-                    "合う",
-                    "遭う",
-                    "遇う"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『友達に会う』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『さがす』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "探す",
-                    "減らす",
-                    "学ぶ",
-                    "止める"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『さがす』は『探す』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『空はだんだん暗くなってきました。すると…』",
-                choices: [
-                    "星が見え始めた",
-                    "雨が降ってきた",
-                    "鳥が飛び始めた",
-                    "風が吹き始めた"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『星が見え始めた』が自然な展開です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『かん』の漢字はどれですか？『時間＿＿を守る』",
-                choices: [
-                    "完",
-                    "官",
-                    "感",
-                    "間"
-                ],
-                correctAnswerIndex: 3,
-                explanation: "『時間間を守る』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『のばす』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "延ばす",
-                    "縮める",
-                    "削る",
-                    "割る"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『のばす』は『延ばす』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『朝起きたら、雪が積もっていました。すると…』",
-                choices: [
-                    "雪だるまを作り始めた",
-                    "雨が降ってきた",
-                    "すぐに学校に行った",
-                    "友達に電話をした"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『雪だるまを作り始めた』が自然な展開です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『たび』の漢字はどれですか？『＿＿に出る』",
-                choices: [
-                    "旅",
-                    "度",
-                    "鍛",
-                    "扉"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『旅に出る』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『あつめる』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "集める",
-                    "減らす",
-                    "消す",
-                    "並べる"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『あつめる』は『集める』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『夕食の準備ができました。すると…』",
-                choices: [
-                    "みんなが食卓に集まった",
-                    "犬が吠え始めた",
-                    "窓を開けた",
-                    "テレビをつけた"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『みんなが食卓に集まった』が自然な流れです。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『せん』の漢字はどれですか？『＿＿を引く』",
-                choices: [
-                    "線",
-                    "戦",
-                    "選",
-                    "船"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『線を引く』が正解です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『はな』の漢字はどれですか？『＿＿が咲いた』",
-                choices: [
-                    "花",
-                    "鼻",
-                    "羽",
-                    "話"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『花が咲いた』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『さわぐ』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "静かになる",
-                    "騒がしくする",
-                    "歩く",
-                    "笑う"
-                ],
-                correctAnswerIndex: 1,
-                explanation: "『さわぐ』は『騒がしくする』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『弟はケーキを食べ終わった。すると…』",
-                choices: [
-                    "さらにおかわりをした",
-                    "宿題を始めた",
-                    "外で遊び始めた",
-                    "テレビを見た"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『さらにおかわりをした』が自然な展開です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『しゅう』の漢字はどれですか？『学＿＿を終える』",
-                choices: [
-                    "終",
-                    "収",
-                    "習",
-                    "修"
-                ],
-                correctAnswerIndex: 3,
-                explanation: "『学修を終える』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『しんじる』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "疑う",
-                    "信じる",
-                    "待つ",
-                    "隠す"
-                ],
-                correctAnswerIndex: 1,
-                explanation: "『しんじる』は『信じる』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『学校が終わって、みんなが帰った。すると…』",
-                choices: [
-                    "先生が教室に残った",
-                    "雨が降り出した",
-                    "友達が遊びに来た",
-                    "お店に寄った"
-                ],
-                correctAnswerIndex: 1,
-                explanation: "『雨が降り出した』が自然な展開です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『てい』の漢字はどれですか？『＿＿度の天気』",
-                choices: [
-                    "停",
-                    "定",
-                    "低",
-                    "邸"
-                ],
-                correctAnswerIndex: 2,
-                explanation: "『低度の天気』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『たすける』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "助ける",
-                    "攻撃する",
-                    "笑う",
-                    "動かす"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『たすける』は『助ける』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『授業中、急に先生が立ち上がった。すると…』",
-                choices: [
-                    "黒板に何かを書き始めた",
-                    "窓を開けた",
-                    "みんなに話をした",
-                    "教室を出て行った"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『黒板に何かを書き始めた』が自然な展開です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『そう』の漢字はどれですか？『計画＿＿に従う』",
-                choices: [
-                    "層",
-                    "想",
-                    "操",
-                    "走"
-                ],
-                correctAnswerIndex: 2,
-                explanation: "『計画操に従う』が正解です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『かい』の漢字はどれですか？『＿＿を開く』",
-                choices: [
-                    "会",
-                    "海",
-                    "階",
-                    "解"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『会を開く』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『そだつ』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "大きくなる",
-                    "小さくなる",
-                    "遠くなる",
-                    "近くなる"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『そだつ』は『大きくなる』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『花子は家に帰って宿題を始めました。すると…』",
-                choices: [
-                    "お母さんが部屋に入ってきた",
-                    "友達が遊びに来た",
-                    "雨が降ってきた",
-                    "猫が鳴きだした"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『お母さんが部屋に入ってきた』が自然な流れです。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『しん』の漢字はどれですか？『新しい＿＿を買う』",
-                choices: [
-                    "信",
-                    "進",
-                    "心",
-                    "新"
-                ],
-                correctAnswerIndex: 3,
-                explanation: "『新しい新を買う』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『くわしい』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "大まか",
-                    "詳細",
-                    "簡単",
-                    "難しい"
-                ],
-                correctAnswerIndex: 1,
-                explanation: "『くわしい』は『詳細』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『お店に着いたが、店内は真っ暗だった。すると…』",
-                choices: [
-                    "電気がついた",
-                    "お客さんが増えた",
-                    "風が吹いた",
-                    "店員が出てきた"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『電気がついた』が自然な展開です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『せい』の漢字はどれですか？『学＿＿を取る』",
-                choices: [
-                    "精",
-                    "生",
-                    "成",
-                    "姓"
-                ],
-                correctAnswerIndex: 1,
-                explanation: "『学生を取る』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『もえる』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "燃える",
-                    "冷える",
-                    "濡れる",
-                    "固まる"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『もえる』は『燃える』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『夏休みが終わって、学校が始まった。すると…』",
-                choices: [
-                    "友達と再会した",
-                    "試験が行われた",
-                    "雨が降ってきた",
-                    "家に帰った"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『友達と再会した』が自然な流れです。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『かん』の漢字はどれですか？『＿＿を感じる』",
-                choices: [
-                    "管",
-                    "完",
-                    "官",
-                    "感"
-                ],
-                correctAnswerIndex: 3,
-                explanation: "『感を感じる』が正解です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『かん』の漢字はどれですか？『試験＿＿を終えた』",
-                choices: [
-                    "完",
-                    "官",
-                    "感",
-                    "漢"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『試験完を終えた』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『ふえる』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "減る",
-                    "多くなる",
-                    "速くなる",
-                    "少なくなる"
-                ],
-                correctAnswerIndex: 1,
-                explanation: "『ふえる』は『多くなる』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『今日の天気はとても良いです。なので…』",
-                choices: [
-                    "外で遊びたい",
-                    "家で寝たい",
-                    "宿題をしたい",
-                    "映画を見たい"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『外で遊びたい』が自然な流れです。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『せい』の漢字はどれですか？『＿＿がつく』",
-                choices: [
-                    "正",
-                    "性",
-                    "成",
-                    "星"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『正がつく』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『しごと』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "遊び",
-                    "仕事",
-                    "趣味",
-                    "休み"
-                ],
-                correctAnswerIndex: 1,
-                explanation: "『しごと』は『仕事』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『猫が窓の外を見ていました。すると…』",
-                choices: [
-                    "鳥が飛んできた",
-                    "雨が降ってきた",
-                    "ご飯ができた",
-                    "友達が来た"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『鳥が飛んできた』が自然な展開です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『かん』の漢字はどれですか？『図書＿＿に行く』",
-                choices: [
-                    "館",
-                    "間",
-                    "感",
-                    "完"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『図書館に行く』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『はたらく』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "休む",
-                    "働く",
-                    "遊ぶ",
-                    "学ぶ"
-                ],
-                correctAnswerIndex: 1,
-                explanation: "『はたらく』は『働く』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『兄は本を読んでいました。すると…』",
-                choices: [
-                    "眠くなった",
-                    "お腹が空いた",
-                    "電話が鳴った",
-                    "遊びに行った"
-                ],
-                correctAnswerIndex: 2,
-                explanation: "『電話が鳴った』が自然な流れです。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『たん』の漢字はどれですか？『＿＿を探す』",
-                choices: [
-                    "短",
-                    "単",
-                    "炭",
-                    "探"
-                ],
-                correctAnswerIndex: 1,
-                explanation: "『単を探す』が正解です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『しろ』の漢字はどれですか？『＿＿を見に行った』",
-                choices: [
-                    "城",
-                    "白",
-                    "代",
-                    "仕"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『城を見に行った』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『つよい』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "弱い",
-                    "丈夫",
-                    "速い",
-                    "硬い"
-                ],
-                correctAnswerIndex: 1,
-                explanation: "『つよい』は『丈夫』という意味に近いです。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『花子はお母さんと買い物に行きました。すると…』",
-                choices: [
-                    "大雨が降ってきた",
-                    "野菜が安売りされていた",
-                    "お店が閉まっていた",
-                    "友達に会った"
-                ],
-                correctAnswerIndex: 3,
-                explanation: "『友達に会った』が自然な流れです。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『かき』の漢字はどれですか？『＿＿を食べた』",
-                choices: [
-                    "柿",
-                    "書き",
-                    "掻き",
-                    "火気"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『柿を食べた』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『広がる』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "縮む",
-                    "延びる",
-                    "増える",
-                    "広くなる"
-                ],
-                correctAnswerIndex: 3,
-                explanation: "『広がる』は『広くなる』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『犬が庭で吠えています。すると…』",
-                choices: [
-                    "郵便屋さんが来た",
-                    "雷が鳴った",
-                    "ごはんができた",
-                    "猫が逃げた"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『郵便屋さんが来た』が自然な展開です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『かぜ』の漢字はどれですか？『＿＿が強い』",
-                choices: [
-                    "風",
-                    "風邪",
-                    "家",
-                    "火事"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『風が強い』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『しずか』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "騒がしい",
-                    "静か",
-                    "忙しい",
-                    "寂しい"
-                ],
-                correctAnswerIndex: 1,
-                explanation: "『しずか』は『静か』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『今日の学校は楽しかったです。だから…』",
-                choices: [
-                    "明日も学校に行きたい",
-                    "宿題を忘れた",
-                    "先生に怒られた",
-                    "友達とケンカした"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『明日も学校に行きたい』が自然な流れです。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『うみ』の漢字はどれですか？『夏に＿＿に行く』",
-                choices: [
-                    "海",
-                    "梅",
-                    "膿",
-                    "産"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『夏に海に行く』が正解です。"
-            ),
-            QuizQuestion(
-                question: "次の文で正しい『はし』の漢字はどれですか？『あの＿＿をわたる』",
-                choices: [
-                    "橋",
-                    "箸",
-                    "端",
-                    "走"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『あの橋をわたる』が正解です。"
-            ),
-            QuizQuestion(
-                question: "『つながる』という言葉の意味として適切なものはどれですか？",
-                choices: [
-                    "結びつく",
-                    "離れる",
-                    "動く",
-                    "飛ぶ"
-                ],
-                correctAnswerIndex: 0,
-                explanation: "『つながる』は『結びつく』という意味です。"
-            ),
-            QuizQuestion(
-                question: "次の文に続く内容として最も適切なものはどれですか？『太郎は友達と公園で遊んでいました。すると…』",
-                choices: [
-                    "雨が降ってきた",
-                    "家に帰った",
-                    "遊具が壊れた",
-                    "犬がやってきた"
-                ],
-                correctAnswerIndex: 3,
-                explanation: "次の展開として『犬がやってきた』が自然な流れです。"
+                explanation: "『こおり』は『氷』と書きます。『池の氷がとけました。』が正しい文です。"
             ),
 
+            QuizQuestion(
+                question: "【修飾語】つぎの文で、『鳥』をくわしくしている言葉はどれですか。\n『青い 鳥が 高い 木に 止まりました。』",
+                choices: [
+                    "高い",
+                    "木に",
+                    "青い",
+                    "止まりました"
+                ],
+                correctAnswerIndex: 2,
+                explanation: "『青い』が、どのような鳥なのかをくわしくしています。"
+            ),
+
+            QuizQuestion(
+                question: "【指示語】つぎの文の『それ』が指しているものはどれですか。\n『わたしは 赤い おり紙で 船を 作りました。それを 水に 浮かべました。』",
+                choices: [
+                    "赤い色",
+                    "おり紙",
+                    "船を作ること",
+                    "おり紙で作った船"
+                ],
+                correctAnswerIndex: 3,
+                explanation: "水に浮かべたものは船なので、『それ』は『おり紙で作った船』を指しています。"
+            ),
+
+            QuizQuestion(
+                question: "【接続語】つぎの文の ＿＿ に入る接続語はどれですか。\n『雨が 強く ふっていました。＿＿、試合は 予定どおり 行われました。』",
+                choices: [
+                    "しかし",
+                    "だから",
+                    "そして",
+                    "たとえば"
+                ],
+                correctAnswerIndex: 0,
+                explanation: "雨が強いことと、試合が予定どおり行われたことは反対の関係なので、『しかし』が入ります。"
+            ),
+
+            QuizQuestion(
+                question: "【段落】つぎの文章で、新しい段落のはじめにするのがよい文はどれですか。\n①わたしの学校には大きな池があります。②池にはメダカが泳いでいます。③つぎに、図書館をしょうかいします。④図書館にはたくさんの本があります。",
+                choices: [
+                    "①",
+                    "③",
+                    "②",
+                    "④"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "話題が池から図書館に変わるので、『③』から新しい段落にするのがよいです。"
+            ),
+
+            QuizQuestion(
+                question: "【ことわざ】『善は急げ』の意味として正しいものはどれですか。",
+                choices: [
+                    "急ぐと必ず失敗すること",
+                    "よいことは人に任せること",
+                    "よいと思ったことはすぐに行うこと",
+                    "何事もゆっくり進めること"
+                ],
+                correctAnswerIndex: 2,
+                explanation: "正解は『よいと思ったことはすぐに行うこと』です。『善は急げ』は、よいと思ったことはためらわず、すぐに行うのがよいという意味です。"
+            ),
+
+            QuizQuestion(
+                question: "【物語文】つぎの文のとき、はるとの気持ちとしてもっとも合うものはどれですか。\n『発表を終えると、友だちが「とても分かりやすかったよ。」と言いました。はるとは、にっこり笑って席にもどりました。』",
+                choices: [
+                    "腹を立てている",
+                    "さびしくなっている",
+                    "困っている",
+                    "ほっとして、うれしくなっている"
+                ],
+                correctAnswerIndex: 3,
+                explanation: "友だちにほめられて、にっこり笑っているので、はるとは『ほっとして、うれしくなっている』と考えられます。"
+            ),
+
+            QuizQuestion(
+                question: "【漢字】つぎの文の『薬』の読みとして正しいものはどれですか。\n『食後に 薬を 飲みます。』",
+                choices: [
+                    "くすり",
+                    "ぐすり",
+                    "やく",
+                    "くす"
+                ],
+                correctAnswerIndex: 0,
+                explanation: "『薬』の読みは『くすり』です。"
+            ),
+
+            QuizQuestion(
+                question: "【修飾語】つぎの文で、『速く』をさらにくわしくしている言葉はどれですか。\n『弟は とても 速く 走りました。』",
+                choices: [
+                    "弟は",
+                    "走りました",
+                    "とても",
+                    "速く"
+                ],
+                correctAnswerIndex: 2,
+                explanation: "『とても』は、『速く』の程度をくわしくしています。"
+            ),
+
+            QuizQuestion(
+                question: "【指示語】先生が手に持っている地図を指して話すとき、＿＿ に入る言葉はどれですか。\n『＿＿ 地図を 見てください。』",
+                choices: [
+                    "あの",
+                    "その",
+                    "どの",
+                    "この"
+                ],
+                correctAnswerIndex: 3,
+                explanation: "話し手である先生の近くにある地図なので、『この地図』と言います。"
+            ),
+
+            QuizQuestion.fillInBlank(
+                question: "【漢字の読み】つぎの漢字の読みを、ひらがなで答えましょう。\n『係』",
+                answer: "かかり",
+                explanation: "『係』の読みは『かかり』です。"
+            ),
+
+            QuizQuestion.fillInBlank(
+                question: "【接続語】つぎの文の ＿＿ に入る、『その』で始まり『ため』で終わる接続語を答えましょう。\n『電車が おくれました。＿＿、集合時刻に 間に合いませんでした。』",
+                answer: "そのため",
+                explanation: "電車がおくれたことが原因で、集合時刻に間に合わなかったので、『そのため』が入ります。"
+            ),
+
+            QuizQuestion.fillInBlank(
+                question: "【段落】つぎの文の ＿＿ に入る言葉を答えましょう。\n『新しい段落のはじめは、行のはじめを ＿＿ 下げて書きます。』",
+                answer: "一字",
+                acceptableAnswers: ["1字"],
+                explanation: "新しい段落のはじめは、行のはじめを『一字』下げて書きます。"
+            ),
+
+            QuizQuestion.fillInBlank(
+                question: "【ことわざ】つぎのことわざの ＿＿ に入る言葉を答えましょう。\n『転ばぬ先の ＿＿ 』",
+                answer: "杖",
+                acceptableAnswers: ["つえ"],
+                explanation: "ことわざは『転ばぬ先の杖』です。失敗しないように、前もって用心することが大切だという意味です。"
+            ),
+
+            QuizQuestion.fillInBlank(
+                question: "【物語文】つぎの説明に合う言葉を答えましょう。\n『物語の中で、出来事が大きく動き、読む人がもっとも引きつけられるところを ＿＿ といいます。』",
+                answer: "山場",
+                acceptableAnswers: ["やまば"],
+                explanation: "物語の中で、出来事が大きく動くところを『山場』といいます。"
+            ),
+
+            QuizQuestion.extractText(
+                question: "【修飾語・抜き出し】つぎの文を読み、『桜』をくわしくしている言葉をそのまま抜き出しましょう。\n『校庭の 桜が、春の風に ゆれています。』",
+                answer: "校庭の",
+                explanation: "『校庭の』が、どこの桜なのかをくわしくしています。"
+            ),
+
+            QuizQuestion.extractText(
+                question: "【指示語・抜き出し】つぎの文を読み、『その本』が指している言葉をそのまま抜き出しましょう。\n『図書館で 科学の本を 借りました。その本には、星の写真が のっていました。』",
+                answer: "科学の本",
+                explanation: "『その本』は、前に出てきた『科学の本』を指しています。"
+            ),
+
+            QuizQuestion.extractText(
+                question: "【段落・抜き出し】つぎの文章の、第2段落のはじめの一文をそのまま抜き出しましょう。\n『わたしの町には小さな川があります。夏には魚が元気に泳ぎます。\n\nこの川をきれいに保つため、町の人たちは毎月そうじをしています。わたしも家族と参加しています。』",
+                answer: "この川をきれいに保つため、町の人たちは毎月そうじをしています。",
+                explanation: "第2段落のはじめの一文は『この川をきれいに保つため、町の人たちは毎月そうじをしています。』です。"
+            ),
+
+            QuizQuestion.extractText(
+                question: "【物語文・抜き出し】つぎの文を読み、ゆうきの気持ちが変わったことが分かる会話の内容を抜き出しましょう。\n『ゆうきは虫が苦手で、虫を見に行く会に参加したくありませんでした。けれど、友だちが見つけた美しい羽のトンボを見ると、「もう少し近くで見てみたい。」と言いました。』",
+                answer: "もう少し近くで見てみたい。",
+                explanation: "『もう少し近くで見てみたい。』という会話文から、ゆうきの気持ちが変わったことが分かります。"
+            ),
+
+            QuizQuestion.reorder(
+                question: "【接続語・並べ替え】理由と結果が自然につながる文になるように並べましょう。",
+                choices: [
+                    "そのため、",
+                    "道が ぬれていました。",
+                    "ゆっくり 歩きました。",
+                    "雨が ふったので、"
+                ],
+                orderedChoices: [
+                    "雨が ふったので、",
+                    "道が ぬれていました。",
+                    "そのため、",
+                    "ゆっくり 歩きました。"
+                ],
+                explanation: "『雨が ふったので、道が ぬれていました。そのため、ゆっくり 歩きました。』が正しい順番です。"
+            ),
+
+            QuizQuestion.reorder(
+                question: "【段落・並べ替え】一つの段落として、考えが自然に伝わる順番に並べましょう。",
+                choices: [
+                    "また、物語の世界を 楽しめます。",
+                    "だから、これからも 朝の読書を 続けたいです。",
+                    "わたしは 朝の読書が 好きです。",
+                    "本を読むと、知らない言葉に 出会えます。"
+                ],
+                orderedChoices: [
+                    "わたしは 朝の読書が 好きです。",
+                    "本を読むと、知らない言葉に 出会えます。",
+                    "また、物語の世界を 楽しめます。",
+                    "だから、これからも 朝の読書を 続けたいです。"
+                ],
+                explanation: "『わたしは 朝の読書が 好きです。本を読むと、知らない言葉に 出会えます。また、物語の世界を 楽しめます。だから、これからも 朝の読書を 続けたいです。』が正しい順番です。"
+            ),
+
+            QuizQuestion.reorder(
+                question: "【ことわざ・並べ替え】分からないことは質問するのが大切だと教えることわざになるように並べましょう。",
+                choices: [
+                    "聞かぬは",
+                    "一生の恥。",
+                    "聞くは",
+                    "一時の恥、"
+                ],
+                orderedChoices: [
+                    "聞くは",
+                    "一時の恥、",
+                    "聞かぬは",
+                    "一生の恥。"
+                ],
+                explanation: "『聞くは 一時の恥、聞かぬは 一生の恥。』が正しい順番です。分からないことを聞くのは一時だけですが、聞かずに知らないままでいるのは長く困るという意味です。"
+            ),
+
+            QuizQuestion.reorder(
+                question: "【修飾語・並べ替え】『昨日読んだ』が『物語』をくわしくする文になるように並べましょう。",
+                choices: [
+                    "感想を",
+                    "昨日読んだ",
+                    "書きました。",
+                    "物語の"
+                ],
+                orderedChoices: [
+                    "昨日読んだ",
+                    "物語の",
+                    "感想を",
+                    "書きました。"
+                ],
+                explanation: "『昨日読んだ 物語の 感想を 書きました。』が正しい順番です。『昨日読んだ』が『物語』をくわしくしています。"
+            ),
+
+            QuizQuestion.matching(
+                question: "【漢字・組み合わせ】漢字と読みが合うように組み合わせましょう。",
+                pairs: [
+                    QuizMatchingPair(prompt: "歯", match: "は"),
+                    QuizMatchingPair(prompt: "庭", match: "にわ"),
+                    QuizMatchingPair(prompt: "笛", match: "ふえ"),
+                    QuizMatchingPair(prompt: "羊", match: "ひつじ")
+                ],
+                choices: [
+                    "ふえ",
+                    "ひつじ",
+                    "は",
+                    "にわ"
+                ],
+                explanation: "『歯=は』『庭=にわ』『笛=ふえ』『羊=ひつじ』が正しい組み合わせです。"
+            ),
+
+            QuizQuestion.matching(
+                question: "【指示語・組み合わせ】指示語と、その言葉を使う場面を組み合わせましょう。",
+                pairs: [
+                    QuizMatchingPair(prompt: "これ", match: "話し手の近くにある物"),
+                    QuizMatchingPair(prompt: "それ", match: "聞き手の近くにある物"),
+                    QuizMatchingPair(prompt: "あれ", match: "話し手と聞き手の両方から遠い物"),
+                    QuizMatchingPair(prompt: "どれ", match: "いくつかの物からたずねるとき")
+                ],
+                choices: [
+                    "いくつかの物からたずねるとき",
+                    "聞き手の近くにある物",
+                    "話し手と聞き手の両方から遠い物",
+                    "話し手の近くにある物"
+                ],
+                explanation: "『これ=話し手の近くにある物』『それ=聞き手の近くにある物』『あれ=話し手と聞き手の両方から遠い物』『どれ=いくつかの物からたずねるとき』が正しい組み合わせです。"
+            ),
+
+            QuizQuestion.matching(
+                question: "【接続語・組み合わせ】接続語とはたらきが合うように組み合わせましょう。",
+                pairs: [
+                    QuizMatchingPair(prompt: "なぜなら", match: "理由を示す"),
+                    QuizMatchingPair(prompt: "また", match: "内容を付け加える"),
+                    QuizMatchingPair(prompt: "すると", match: "続いて起きたことを示す"),
+                    QuizMatchingPair(prompt: "つまり", match: "前の内容をまとめて言いかえる")
+                ],
+                choices: [
+                    "前の内容をまとめて言いかえる",
+                    "続いて起きたことを示す",
+                    "理由を示す",
+                    "内容を付け加える"
+                ],
+                explanation: "『なぜなら=理由を示す』『また=内容を付け加える』『すると=続いて起きたことを示す』『つまり=前の内容をまとめて言いかえる』が正しい組み合わせです。"
+            ),
+            QuizQuestion(
+                question: "【漢字】つぎの文の『ちゅうおう』を漢字で書いたものはどれですか。\n『野球場は町の ちゅうおう にあります。』",
+                choices: [
+                    "中央",
+                    "中間",
+                    "中心",
+                    "仲間"
+                ],
+                correctAnswerIndex: 0,
+                explanation: "『ちゅうおう』は『中央』と書きます。『野球場は町の中央にあります。』が正しい文です。"
+            ),
+
+            QuizQuestion(
+                question: "【修飾語】つぎの文で、『空気』をくわしくしている言葉はどれですか。\n『わたしは 朝の 空気を 胸いっぱいに 吸いました。』",
+                choices: [
+                    "わたしは",
+                    "胸いっぱいに",
+                    "朝の",
+                    "吸いました"
+                ],
+                correctAnswerIndex: 2,
+                explanation: "『朝の』が、いつの空気なのかをくわしくしています。"
+            ),
+
+            QuizQuestion(
+                question: "【指示語】つぎの文の『そこ』が指している場所はどれですか。\n『町の図書館のとなりに、小さな広場があります。そこで毎週日曜日に朝市が開かれます。』",
+                choices: [
+                    "町",
+                    "図書館",
+                    "図書館のとなり",
+                    "小さな広場"
+                ],
+                correctAnswerIndex: 3,
+                explanation: "朝市が開かれる場所は小さな広場なので、『そこ』は『小さな広場』を指しています。"
+            ),
+
+            QuizQuestion(
+                question: "【接続語】前のことが原因となった結果を表す接続語を、＿＿ に入れましょう。\n『何度も音読の練習をしました。＿＿、発表では落ち着いて読むことができました。』",
+                choices: [
+                    "その結果",
+                    "ところが",
+                    "たとえば",
+                    "それとも"
+                ],
+                correctAnswerIndex: 0,
+                explanation: "練習したことによる結果を表しているので、『その結果』が入ります。"
+            ),
+
+            QuizQuestion(
+                question: "【段落】つぎの文章の第2段落の中心となる内容はどれですか。\n『春になると、学校の花だんには色とりどりの花がさきます。\n\n花だんの世話は園芸委員がしています。朝の水やりや、週に一度の草取りを分担しています。』",
+                choices: [
+                    "花の色のちがい",
+                    "園芸委員の花だんの世話",
+                    "春の気温",
+                    "学校の広さ"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "正解は『園芸委員の花だんの世話』です。第2段落には、水やりや草取りなど、園芸委員が行う花だんの世話について書かれています。"
+            ),
+
+            QuizQuestion(
+                question: "【ことわざ】『早起きは三文の徳』の意味として正しいものはどれですか。",
+                choices: [
+                    "早起きすると必ずお金がもらえること",
+                    "夜おそくまで起きていると得をすること",
+                    "早起きをすると何かよいことがあること",
+                    "朝は何もしないほうがよいこと"
+                ],
+                correctAnswerIndex: 2,
+                explanation: "正解は『早起きをすると何かよいことがあること』です。『早起きは三文の徳』は、早起きをすると健康や時間などの面でよいことがあるという意味です。"
+            ),
+
+            QuizQuestion(
+                question: "【物語文】つぎの文を読んで、最後のゆうたの気持ちとしてもっとも合うものはどれですか。\n『ゆうたは、大切に育てた朝顔の種を袋に入れ、転校する友達の机にそっと置きました。帰り道は少しさびしかったけれど、来年、二人の家で同じ花がさくところを思いうかべると、笑顔になりました。』",
+                choices: [
+                    "友達に種を返してほしいと怒っている",
+                    "朝顔を育てたことを後悔している",
+                    "友達のことを忘れて安心している",
+                    "別れはさびしいが、同じ花がさくことを楽しみにしている"
+                ],
+                correctAnswerIndex: 3,
+                explanation: "正解は『別れはさびしいが、同じ花がさくことを楽しみにしている』です。帰り道ではさびしさを感じていますが、同じ花がさくところを思いうかべて笑顔になっています。"
+            ),
+
+            QuizQuestion(
+                question: "【漢字】つぎの文の『両手』の読みとして正しいものはどれですか。\n『箱を両手で持ちました。』",
+                choices: [
+                    "りょうて",
+                    "りょて",
+                    "りょうで",
+                    "ふたて"
+                ],
+                correctAnswerIndex: 0,
+                explanation: "『両手』の読みは『りょうて』です。"
+            ),
+
+            QuizQuestion(
+                question: "【修飾語】つぎの文で、小鳥が飛び立ったようすを表している言葉はどれですか。\n『小鳥が 枝から 軽やかに 飛び立ちました。』",
+                choices: [
+                    "小鳥が",
+                    "枝から",
+                    "軽やかに",
+                    "飛び立ちました"
+                ],
+                correctAnswerIndex: 2,
+                explanation: "『軽やかに』が、小鳥がどのように飛び立ったのかをくわしくしています。"
+            ),
+
+            QuizQuestion(
+                question: "【指示語】聞き手の手元にあるノートを指して話すとき、＿＿ に入る言葉はどれですか。\n『＿＿ ノートを見せてください。』",
+                choices: [
+                    "あの",
+                    "どの",
+                    "この",
+                    "その"
+                ],
+                correctAnswerIndex: 3,
+                explanation: "聞き手の近くにあるノートを指すので、『そのノート』と言います。"
+            ),
+
+            QuizQuestion.fillInBlank(
+                question: "【接続語】二つのうち、どちらかをたずねるときに使う、『それ』で始まる接続語を答えましょう。\n『昼食はパンにしますか。＿＿、おにぎりにしますか。』",
+                answer: "それとも",
+                explanation: "二つのうち、どちらかをたずねるときは『それとも』を使います。"
+            ),
+
+            QuizQuestion.fillInBlank(
+                question: "【段落】つぎの文の ＿＿ に入る言葉を答えましょう。\n『段落を変えるときに、行を変えて書くことを ＿＿ といいます。』",
+                answer: "改行",
+                acceptableAnswers: ["かいぎょう"],
+                explanation: "段落を変えるときなどに、行を変えて書くことを『改行』といいます。"
+            ),
+
+            QuizQuestion.fillInBlank(
+                question: "【ことわざ】つぎのことわざの ＿＿ に入る言葉を答えましょう。\n『二度あることは ＿＿ ある』",
+                answer: "三度",
+                acceptableAnswers: ["さんど", "3度"],
+                explanation: "ことわざは『二度あることは三度ある』です。同じようなことは、くり返し起こることがあるという意味です。"
+            ),
+
+            QuizQuestion.fillInBlank(
+                question: "【漢字】つぎの文の『ひろ』に当てはまる漢字一字を答えましょう。\n『校庭で木の実を ひろいました。』",
+                answer: "拾",
+                explanation: "『ひろいました』は『拾いました』と書くので、当てはまる漢字は『拾』です。"
+            ),
+
+            QuizQuestion.fillInBlank(
+                question: "【物語文】つぎの文の ＿＿ に入る言葉を答えましょう。\n『物語の中で、出来事が起こる場所や時のまとまりを ＿＿ といいます。』",
+                answer: "場面",
+                acceptableAnswers: ["ばめん"],
+                explanation: "物語の場所や時などによって分けられるまとまりを『場面』といいます。"
+            ),
+
+            QuizQuestion.extractText(
+                question: "【修飾語・抜き出し】つぎの文を読み、船がどのように汽笛を鳴らしたのかが分かる言葉を、そのまま抜き出しましょう。\n『港に着いた船が、長い汽笛を高らかに鳴らしました。』",
+                answer: "高らかに",
+                explanation: "『高らかに』が、船がどのように汽笛を鳴らしたのかをくわしくしています。"
+            ),
+
+            QuizQuestion.extractText(
+                question: "【指示語・抜き出し】つぎの文を読み、『その音』が指している言葉をそのまま抜き出しましょう。\n『教室の後ろで紙が落ちる音がしました。みんながその音の方を見ました。』",
+                answer: "紙が落ちる音",
+                explanation: "『その音』は、前に出てきた『紙が落ちる音』を指しています。"
+            ),
+
+            QuizQuestion.extractText(
+                question: "【段落・抜き出し】つぎの文章を読み、第2段落の中心となる一文をそのまま抜き出しましょう。\n『わたしは家で金魚を飼っています。赤い金魚と白い金魚が一匹ずついます。\n\n金魚の世話でいちばん大切なのは、水をきれいに保つことです。そのため、よごれを見つけたら水を少しずつ取りかえています。』",
+                answer: "金魚の世話でいちばん大切なのは、水をきれいに保つことです。",
+                explanation: "第2段落では金魚の水をきれいに保つことを説明しているので、中心となる一文は『金魚の世話でいちばん大切なのは、水をきれいに保つことです。』です。"
+            ),
+
+            QuizQuestion.extractText(
+                question: "【物語文・抜き出し】つぎの文を読み、みおが話し始めるきっかけになった出来事を、そのまま抜き出しましょう。\n『発表の前、みおは手がふるえていました。顔を上げると、友達が笑顔でうなずくのが見えました。みおは背すじを伸ばし、はっきりした声で話し始めました。』",
+                answer: "友達が笑顔でうなずくのが見えました。",
+                explanation: "友達が笑顔でうなずくのを見たあとに、みおは背すじを伸ばして話し始めています。きっかけは『友達が笑顔でうなずくのが見えました。』です。"
+            ),
+
+            QuizQuestion.reorder(
+                question: "【接続語・並べ替え】花の種をまく手順が自然につながるように並べましょう。",
+                choices: [
+                    "そして、土をうすくかぶせます。",
+                    "最後に、じょうろで水をやります。",
+                    "まず、土に小さな穴をあけます。",
+                    "次に、穴へ種を入れます。"
+                ],
+                orderedChoices: [
+                    "まず、土に小さな穴をあけます。",
+                    "次に、穴へ種を入れます。",
+                    "そして、土をうすくかぶせます。",
+                    "最後に、じょうろで水をやります。"
+                ],
+                explanation: "『まず、土に小さな穴をあけます。次に、穴へ種を入れます。そして、土をうすくかぶせます。最後に、じょうろで水をやります。』が正しい順番です。"
+            ),
+
+            QuizQuestion.reorder(
+                question: "【段落・並べ替え】図書室のよさを説明する一つの段落になるように並べましょう。",
+                choices: [
+                    "また、静かな場所で集中して読めます。",
+                    "このように、図書室にはよいところがたくさんあります。",
+                    "わたしは学校の図書室が好きです。",
+                    "まず、読みたい本を自由に選べます。"
+                ],
+                orderedChoices: [
+                    "わたしは学校の図書室が好きです。",
+                    "まず、読みたい本を自由に選べます。",
+                    "また、静かな場所で集中して読めます。",
+                    "このように、図書室にはよいところがたくさんあります。"
+                ],
+                explanation: "はじめに考えを示し、『まず』『また』で理由を続け、最後に『このように』でまとめる順番が自然です。"
+            ),
+
+            QuizQuestion.reorder(
+                question: "【ことわざ・並べ替え】明るく笑いのある家には幸せがやって来るということわざになるように並べましょう。",
+                choices: [
+                    "門には",
+                    "来る。",
+                    "笑う",
+                    "福"
+                ],
+                orderedChoices: [
+                    "笑う",
+                    "門には",
+                    "福",
+                    "来る。"
+                ],
+                explanation: "『笑う門には福来る。』が正しい順番です。いつも明るく笑っている家には、自然と幸せがやって来るという意味です。"
+            ),
+
+            QuizQuestion.reorder(
+                question: "【修飾語・並べ替え】『妹は』で始め、『絵にかきました。』で終わり、『庭に咲いた』が『赤い花』をくわしくする文になるように並べましょう。",
+                choices: [
+                    "赤い花を",
+                    "絵にかきました。",
+                    "庭に咲いた",
+                    "妹は"
+                ],
+                orderedChoices: [
+                    "妹は",
+                    "庭に咲いた",
+                    "赤い花を",
+                    "絵にかきました。"
+                ],
+                explanation: "『妹は 庭に咲いた 赤い花を 絵にかきました。』が正しい順番です。『庭に咲いた』が『赤い花』をくわしくしています。"
+            ),
+
+            QuizQuestion.matching(
+                question: "【漢字・組み合わせ】漢字の言葉と読みが合うように組み合わせましょう。",
+                pairs: [
+                    QuizMatchingPair(prompt: "反対", match: "はんたい"),
+                    QuizMatchingPair(prompt: "坂道", match: "さかみち"),
+                    QuizMatchingPair(prompt: "整列", match: "せいれつ"),
+                    QuizMatchingPair(prompt: "役目", match: "やくめ")
+                ],
+                choices: [
+                    "やくめ",
+                    "せいれつ",
+                    "はんたい",
+                    "さかみち"
+                ],
+                explanation: "『反対=はんたい』『坂道=さかみち』『整列=せいれつ』『役目=やくめ』が正しい組み合わせです。"
+            ),
+
+            QuizQuestion.matching(
+                question: "【指示語・組み合わせ】場所を表す指示語と、その使い方を組み合わせましょう。",
+                pairs: [
+                    QuizMatchingPair(prompt: "ここ", match: "話し手の近くの場所"),
+                    QuizMatchingPair(prompt: "そこ", match: "聞き手の近くの場所"),
+                    QuizMatchingPair(prompt: "あそこ", match: "話し手と聞き手の両方から遠い場所"),
+                    QuizMatchingPair(prompt: "どこ", match: "場所をたずねる言葉")
+                ],
+                choices: [
+                    "場所をたずねる言葉",
+                    "話し手と聞き手の両方から遠い場所",
+                    "話し手の近くの場所",
+                    "聞き手の近くの場所"
+                ],
+                explanation: "『ここ=話し手の近くの場所』『そこ=聞き手の近くの場所』『あそこ=話し手と聞き手の両方から遠い場所』『どこ=場所をたずねる言葉』が正しい組み合わせです。"
+            ),
+
+            QuizQuestion.matching(
+                question: "【接続語・組み合わせ】接続語とはたらきが合うように組み合わせましょう。",
+                pairs: [
+                    QuizMatchingPair(prompt: "ところが", match: "予想とちがう結果を続ける"),
+                    QuizMatchingPair(prompt: "そのうえ", match: "内容をさらに付け加える"),
+                    QuizMatchingPair(prompt: "そこで", match: "前の事柄を受けた行動を続ける"),
+                    QuizMatchingPair(prompt: "または", match: "どちらか一方を示す")
+                ],
+                choices: [
+                    "どちらか一方を示す",
+                    "前の事柄を受けた行動を続ける",
+                    "内容をさらに付け加える",
+                    "予想とちがう結果を続ける"
+                ],
+                explanation: "『ところが=予想とちがう結果を続ける』『そのうえ=内容をさらに付け加える』『そこで=前の事柄を受けた行動を続ける』『または=どちらか一方を示す』が正しい組み合わせです。"
+            ),
+            QuizQuestion(
+                question: "【漢字】つぎの文の『岸』の読みとして正しいものはどれですか。\n『川の岸に黄色い花がさいています。』",
+                choices: [
+                    "きし",
+                    "がん",
+                    "きじ",
+                    "かわ"
+                ],
+                correctAnswerIndex: 0,
+                explanation: "正解は『きし』です。『岸』は『きし』と読みます。"
+            ),
+
+            QuizQuestion(
+                question: "【修飾語】つぎの文で、子ねこがどのように眠っているかを表す言葉はどれですか。\n『子ねこが 毛布の上で しずかに 眠っています。』",
+                choices: [
+                    "子ねこが",
+                    "毛布の上で",
+                    "しずかに",
+                    "眠っています"
+                ],
+                correctAnswerIndex: 2,
+                explanation: "正解は『しずかに』です。子ねこがどのように眠っているのかをくわしくしています。"
+            ),
+
+            QuizQuestion(
+                question: "【指示語】つぎの文の『そこ』が指している場所はどれですか。\n『わたしたちは駅前の広場に集まりました。そこからバスに乗りました。』",
+                choices: [
+                    "駅の中",
+                    "バスの中",
+                    "駅のホーム",
+                    "駅前の広場"
+                ],
+                correctAnswerIndex: 3,
+                explanation: "正解は『駅前の広場』です。『そこ』は、バスに乗る前に集まった場所を指しています。"
+            ),
+
+            QuizQuestion(
+                question: "【接続語】つぎの文の ＿＿ に入る接続語はどれですか。\n『目覚まし時計が鳴りませんでした。＿＿、朝ねぼうをしてしまいました。』",
+                choices: [
+                    "それで",
+                    "ところが",
+                    "または",
+                    "たとえば"
+                ],
+                correctAnswerIndex: 0,
+                explanation: "正解は『それで』です。目覚まし時計が鳴らなかったことが原因で、朝ねぼうをしたことをつないでいます。"
+            ),
+
+            QuizQuestion(
+                question: "【段落】つぎの段落の中心となる内容はどれですか。\n『学校の屋上には百葉箱があります。中には温度計があり、毎日、係の人が決まった時刻に気温を調べています。』",
+                choices: [
+                    "学校の屋上から見える景色",
+                    "百葉箱を使った気温の観察",
+                    "温度計の作り方",
+                    "係の人の服そう"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "正解は『百葉箱を使った気温の観察』です。この段落には、百葉箱の温度計を使って毎日気温を調べることが書かれています。"
+            ),
+
+            QuizQuestion(
+                question: "【ことわざ】『ちりも積もれば山となる』の意味として正しいものはどれですか。",
+                choices: [
+                    "山ではごみを拾わなければならないこと",
+                    "小さなことは気にしなくてよいこと",
+                    "小さなものでも積み重なると大きなものになること",
+                    "高い山にはたくさんの土があること"
+                ],
+                correctAnswerIndex: 2,
+                explanation: "正解は『小さなものでも積み重なると大きなものになること』です。わずかな努力や物でも、積み重ねると大きな結果につながるという意味です。"
+            ),
+
+            QuizQuestion(
+                question: "【物語文】つぎの文を読んで、最後のりんの気持ちとしてもっとも合うものはどれですか。\n『りんは、図工で作ったかざりを家へ持ち帰る途中、風で一部をこわしてしまいました。家で時間をかけて直し、次の日に先生から「前よりじょうぶになったね。」と言われると、りんは作品を胸の前にかかえてうなずきました。』",
+                choices: [
+                    "作品を作ったことを後悔している",
+                    "先生に見つからず安心している",
+                    "作品をすてたいと思っている",
+                    "自分で直せたことをほこらしく思っている"
+                ],
+                correctAnswerIndex: 3,
+                explanation: "正解は『自分で直せたことをほこらしく思っている』です。時間をかけて直した作品を先生にほめられ、胸の前にかかえてうなずいていることから分かります。"
+            ),
+
+            QuizQuestion(
+                question: "【漢字】つぎの文の『筆』の読みとして正しいものはどれですか。\n『大きな紙に筆で文字を書きました。』",
+                choices: [
+                    "ふで",
+                    "ふて",
+                    "ひつ",
+                    "ふみ"
+                ],
+                correctAnswerIndex: 0,
+                explanation: "正解は『ふで』です。『筆』は『ふで』と読みます。"
+            ),
+
+            QuizQuestion(
+                question: "【修飾語】つぎの文で、『山』をくわしくしている言葉はどれですか。\n『わたしたちは 遠い 山を 校庭から 見上げました。』",
+                choices: [
+                    "わたしたちは",
+                    "校庭から",
+                    "遠い",
+                    "見上げました"
+                ],
+                correctAnswerIndex: 2,
+                explanation: "正解は『遠い』です。どのような山なのかをくわしくしています。"
+            ),
+
+            QuizQuestion(
+                question: "【指示語】つぎの文の『これ』が指しているものはどれですか。\n『昨日、青いかさを買いました。これは、開くと星のもようが見えます。』",
+                choices: [
+                    "昨日という日",
+                    "星のもよう",
+                    "かさを開くこと",
+                    "青いかさ"
+                ],
+                correctAnswerIndex: 3,
+                explanation: "正解は『青いかさ』です。開くと星のもようが見えるものは、前の文にある『青いかさ』なので、『これ』はそれを指しています。"
+            ),
+
+            QuizQuestion.fillInBlank(
+                question: "【接続語】つぎの文の ＿＿ に入る、『一』で始まる接続語を答えましょう。\n『兄は家で本を読むのが好きです。＿＿、弟は外で遊ぶのが好きです。』",
+                answer: "一方",
+                acceptableAnswers: ["いっぽう"],
+                explanation: "兄と弟のちがう好みをくらべているので、『一方』が入ります。"
+            ),
+
+            QuizQuestion.fillInBlank(
+                question: "【段落】つぎの文の ＿＿ に入る言葉を答えましょう。\n『段落の中で、いちばん伝えたいことが書かれた文を ＿＿ といいます。』",
+                answer: "中心文",
+                acceptableAnswers: ["ちゅうしんぶん"],
+                explanation: "段落の中で、いちばん伝えたいことが書かれた文を『中心文』といいます。"
+            ),
+
+            QuizQuestion.fillInBlank(
+                question: "【ことわざ】つぎのことわざの ＿＿ に入る漢字一字を答えましょう。\n『雨降って ＿＿ 固まる』",
+                answer: "地",
+                acceptableAnswers: ["ち"],
+                explanation: "ことわざは『雨降って地固まる』です。もめごとなどがあったあと、かえって前よりよい関係になることを表します。"
+            ),
+
+            QuizQuestion.fillInBlank(
+                question: "【漢字】つぎの文の『むかし』に当てはまる漢字を答えましょう。\n『むかし、この近くには大きな森がありました。』",
+                answer: "昔",
+                explanation: "『むかし』は『昔』と書きます。"
+            ),
+
+            QuizQuestion.fillInBlank(
+                question: "【物語文】つぎの文の ＿＿ に入る言葉を答えましょう。\n『物語に出てきて、行動したり話したりする人や動物を ＿＿ といいます。』",
+                answer: "登場人物",
+                acceptableAnswers: ["とうじょうじんぶつ"],
+                explanation: "物語に出てきて、行動したり話したりする人や動物を『登場人物』といいます。"
+            ),
+
+            QuizQuestion.extractText(
+                question: "【修飾語・抜き出し】つぎの文を読み、『虹』をくわしくしている言葉をそのまま抜き出しましょう。\n『雨上がりの空に、七色の虹が大きくかかりました。』",
+                answer: "七色の",
+                explanation: "『七色の』が、どのような虹なのかをくわしくしています。"
+            ),
+
+            QuizQuestion.extractText(
+                question: "【指示語・抜き出し】つぎの文を読み、『それ』が指している言葉をそのまま抜き出しましょう。\n『祖母から運動会の写真が届きました。それには、わたしが走っているところも写っていました。』",
+                answer: "運動会の写真",
+                explanation: "『それ』は、前の文に出てきた『運動会の写真』を指しています。"
+            ),
+
+            QuizQuestion.extractText(
+                question: "【段落・抜き出し】つぎの段落を読み、段落全体の話題を示している、はじめの一文をそのまま抜き出しましょう。\n『わたしの家では、毎週土曜日に家族全員でそうじをします。父はおふろ、母は台所、わたしと弟は自分たちの部屋を受け持ちます。みんなで分担すると、短い時間で家中がきれいになります。』",
+                answer: "わたしの家では、毎週土曜日に家族全員でそうじをします。",
+                explanation: "あとの二文は、家族全員でそうじをすることの具体的な分担やよさを説明しています。段落全体の話題を示す、はじめの一文は『わたしの家では、毎週土曜日に家族全員でそうじをします。』です。"
+            ),
+
+            QuizQuestion.extractText(
+                question: "【物語文・抜き出し】つぎの文を読み、跳び箱を跳べたあとのけんの自信が分かる会話の内容を抜き出しましょう。\n『けんは跳び箱が苦手でした。放課後に何度も練習し、とうとう四段を跳べると、先生に向かって「次はもっと高い段にも挑戦したい。」と言いました。』",
+                answer: "次はもっと高い段にも挑戦したい。",
+                explanation: "四段を跳べたあとに『次はもっと高い段にも挑戦したい。』と言っていることから、けんが自信を持ったことが分かります。"
+            ),
+
+            QuizQuestion.reorder(
+                question: "【接続語・並べ替え】出来事が自然につながるように並べましょう。",
+                choices: [
+                    "そこで、先生は窓を閉めました。",
+                    "強い風が教室に入ってきました。",
+                    "すると、机の上の紙が床に散らばりました。",
+                    "休み時間に窓を開けました。"
+                ],
+                orderedChoices: [
+                    "休み時間に窓を開けました。",
+                    "強い風が教室に入ってきました。",
+                    "すると、机の上の紙が床に散らばりました。",
+                    "そこで、先生は窓を閉めました。"
+                ],
+                explanation: "『休み時間に窓を開けました。強い風が教室に入ってきました。すると、机の上の紙が床に散らばりました。そこで、先生は窓を閉めました。』が自然な順番です。"
+            ),
+
+            QuizQuestion.reorder(
+                question: "【段落・並べ替え】給食当番について説明する一つの段落になるように並べましょう。",
+                choices: [
+                    "また、食器を数えて配ります。",
+                    "このように、給食当番には大切な仕事があります。",
+                    "給食当番は、みんなの昼食を用意します。",
+                    "まず、手を洗って白衣を着ます。"
+                ],
+                orderedChoices: [
+                    "給食当番は、みんなの昼食を用意します。",
+                    "まず、手を洗って白衣を着ます。",
+                    "また、食器を数えて配ります。",
+                    "このように、給食当番には大切な仕事があります。"
+                ],
+                explanation: "『給食当番は、みんなの昼食を用意します。まず、手を洗って白衣を着ます。また、食器を数えて配ります。このように、給食当番には大切な仕事があります。』が正しい順番です。"
+            ),
+
+            QuizQuestion.reorder(
+                question: "【ことわざ・並べ替え】好きなことには熱心に取り組むので、上達しやすいということわざになるように並べましょう。",
+                choices: [
+                    "上手",
+                    "好きこそ",
+                    "なれ。",
+                    "物の"
+                ],
+                orderedChoices: [
+                    "好きこそ",
+                    "物の",
+                    "上手",
+                    "なれ。"
+                ],
+                explanation: "『好きこそ物の上手なれ。』が正しい順番です。好きなことには熱心に取り組むため、上達しやすいという意味です。"
+            ),
+
+            QuizQuestion.reorder(
+                question: "【修飾語・並べ替え】『図書館で借りた』が『動物の本』をくわしくする文になるように並べましょう。",
+                choices: [
+                    "弟に",
+                    "わたしは図書館で借りた",
+                    "読んであげました。",
+                    "動物の本を"
+                ],
+                orderedChoices: [
+                    "わたしは図書館で借りた",
+                    "動物の本を",
+                    "弟に",
+                    "読んであげました。"
+                ],
+                explanation: "『わたしは図書館で借りた 動物の本を 弟に 読んであげました。』が正しい順番です。『図書館で借りた』が『動物の本』をくわしくしています。"
+            ),
+
+            QuizQuestion.matching(
+                question: "【漢字・組み合わせ】それぞれの漢字に、正しい読みをつなぎましょう。",
+                pairs: [
+                    QuizMatchingPair(prompt: "君", match: "きみ"),
+                    QuizMatchingPair(prompt: "炭", match: "すみ"),
+                    QuizMatchingPair(prompt: "柱", match: "はしら"),
+                    QuizMatchingPair(prompt: "秒", match: "びょう")
+                ],
+                choices: [
+                    "はしら",
+                    "びょう",
+                    "きみ",
+                    "すみ"
+                ],
+                explanation: "『君=きみ』『炭=すみ』『柱=はしら』『秒=びょう』が正しい組み合わせです。"
+            ),
+
+            QuizQuestion.matching(
+                question: "【指示語・組み合わせ】方向や場所を表す言葉を、正しい説明につなぎましょう。",
+                pairs: [
+                    QuizMatchingPair(prompt: "こちら", match: "話し手に近い方向や場所を指す"),
+                    QuizMatchingPair(prompt: "そちら", match: "聞き手に近い方向や場所を指す"),
+                    QuizMatchingPair(prompt: "あちら", match: "話し手と聞き手の両方から遠い方向や場所を指す"),
+                    QuizMatchingPair(prompt: "どちら", match: "方向や場所をたずねる")
+                ],
+                choices: [
+                    "方向や場所をたずねる",
+                    "聞き手に近い方向や場所を指す",
+                    "話し手と聞き手の両方から遠い方向や場所を指す",
+                    "話し手に近い方向や場所を指す"
+                ],
+                explanation: "『こちら=話し手に近い方向や場所を指す』『そちら=聞き手に近い方向や場所を指す』『あちら=話し手と聞き手の両方から遠い方向や場所を指す』『どちら=方向や場所をたずねる』が正しい組み合わせです。"
+            ),
+
+            QuizQuestion.matching(
+                question: "【接続語・組み合わせ】文と文をつなぐ言葉を、それぞれのはたらきにつなぎましょう。",
+                pairs: [
+                    QuizMatchingPair(prompt: "けれども", match: "前と反対の内容を続ける"),
+                    QuizMatchingPair(prompt: "さらに", match: "内容をもう一つ付け加える"),
+                    QuizMatchingPair(prompt: "それでは", match: "次の話や行動へ移る"),
+                    QuizMatchingPair(prompt: "このように", match: "前の内容をまとめる")
+                ],
+                choices: [
+                    "前の内容をまとめる",
+                    "次の話や行動へ移る",
+                    "前と反対の内容を続ける",
+                    "内容をもう一つ付け加える"
+                ],
+                explanation: "『けれども=前と反対の内容を続ける』『さらに=内容をもう一つ付け加える』『それでは=次の話や行動へ移る』『このように=前の内容をまとめる』が正しい組み合わせです。"
+            ),
     ]
-        
+
     @State private var shuffledQuizList: [QuizQuestion]
     private var authManager = AuthManager()
     private var audioManager = AudioManager.shared
@@ -2135,9 +1483,18 @@ struct Kokugo3ListView: View {
         _isPresenting = isPresenting
         _shuffledQuizList = State(initialValue: quizBeginnerList.shuffled())
     }
+
     @StateObject var sharedInterstitial = Interstitial()
+
     var body: some View {
-        QuizView(quizzes: shuffledQuizList, quizLevel: .kokugo3, authManager: authManager, audioManager: audioManager, isPresenting: $isPresenting, interstitial: sharedInterstitial)
+        QuizView(
+            quizzes: shuffledQuizList,
+            quizLevel: .kokugo3,
+            authManager: authManager,
+            audioManager: audioManager,
+            isPresenting: $isPresenting,
+            interstitial: sharedInterstitial
+        )
     }
 }
 
