@@ -597,13 +597,26 @@ class AuthManager: ObservableObject {
         let newAvatarKey = userRef.child("avatars").childByAutoId().key ?? UUID().uuidString
 
         userRef.observeSingleEvent(of: .value, with: { snapshot in
-            guard snapshot.exists() else {
+            guard snapshot.exists(),
+                  let fetchedUserData = snapshot.value as? [String: Any] else {
                 DispatchQueue.main.async { completion(false) }
                 return
             }
 
+            var hasUsedFetchedUserData = false
             userRef.runTransactionBlock { currentData in
-                guard var userData = currentData.value as? [String: Any] else {
+                var userData: [String: Any]
+                if let currentUserData = currentData.value as? [String: Any] {
+                    userData = currentUserData
+                } else if !hasUsedFetchedUserData {
+                    // Firebase can invoke the first transaction attempt before the
+                    // user node has reached its local cache. Aborting that attempt
+                    // makes a valid draw look like an insufficient-coin failure.
+                    // Seed it with the server snapshot fetched immediately above;
+                    // Firebase will retry with authoritative data if it changed.
+                    userData = fetchedUserData
+                    hasUsedFetchedUserData = true
+                } else {
                     return TransactionResult.abort()
                 }
 
