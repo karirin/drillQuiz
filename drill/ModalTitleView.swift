@@ -16,7 +16,7 @@ struct ModalTittleView: View {
     var body: some View {
         ZStack {
             // 半透明の背景
-            Color.black.opacity(0.4)
+            ModalDesignTokens.backgroundOverlay
                 .edgesIgnoringSafeArea(.all)
                 .onTapGesture {
                     showLevelUpModal = false

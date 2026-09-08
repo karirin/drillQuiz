@@ -38,7 +38,7 @@ struct TutorialModalView: View {
             title: "ようこそ！",
             description: "アプリの使い方を\nかんたんにご案内します",
             buttonImage: nil,
-            accentColors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+            accentColors: [QuizColors.primaryGradientStart, QuizColors.primaryGradientEnd],
             tips: []
         ),
         TutorialGuideStep(
@@ -70,14 +70,14 @@ struct TutorialModalView: View {
             title: "準備完了！",
             description: "まずは「学習モード」から\n始めてみましょう！",
             buttonImage: nil,
-            accentColors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+            accentColors: [QuizColors.primaryGradientStart, QuizColors.primaryGradientEnd],
             tips: ["毎日ログインでボーナスコイン獲得", "レベルを上げてどんどん強くなろう"]
         ),
     ]
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.6)
+            ModalDesignTokens.backgroundOverlay
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
@@ -240,7 +240,7 @@ struct TutorialModalView: View {
                         Spacer()
 
                         Toggle("", isOn: $toggle)
-                            .toggleStyle(SwitchToggleStyle(tint: Color(hex: "667eea")))
+                            .toggleStyle(SwitchToggleStyle(tint: QuizColors.primaryGradientStart))
                             .labelsHidden()
                     }
 
@@ -301,7 +301,7 @@ struct TutorialModalView: View {
                     }
                 }
                 .padding(24)
-                .background(Color("Color2"))
+                .background(ModalDesignTokens.cardBackground)
             }
             .frame(width: isSmallDevice() ? 320 : 350)
             .clipShape(RoundedRectangle(cornerRadius: 24))

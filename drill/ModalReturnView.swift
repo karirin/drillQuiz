@@ -19,7 +19,7 @@ struct ModalReturnView: View {
     var body: some View {
         ZStack {
             // 背景オーバーレイ
-            Color.black.opacity(0.4)
+            ModalDesignTokens.backgroundOverlay
                 .ignoresSafeArea()
                 .onTapGesture {
                     // 背景タップで閉じる

@@ -22,7 +22,7 @@ struct CoinModalView: View {
     var body: some View {
         ZStack {
             // 背景オーバーレイ
-            Color.black.opacity(0.6)
+            ModalDesignTokens.backgroundOverlay
                 .ignoresSafeArea()
                 .onTapGesture {
                     dismissWithAnimation()
@@ -53,7 +53,7 @@ struct CoinModalView: View {
                     .padding(.horizontal, 20)
                     .padding(.vertical, 16)
                 }
-                .background(Color("Color2"))
+                .background(ModalDesignTokens.cardBackground)
             }
             .frame(width: isSmallDevice() ? 340 : 360)
             .clipShape(RoundedRectangle(cornerRadius: 24))

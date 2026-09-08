@@ -15,7 +15,7 @@ struct StorySutaminaModalView: View {
     
     var body: some View {
         ZStack{
-            Color.black.opacity(0.6)
+            ModalDesignTokens.backgroundOverlay
                 .edgesIgnoringSafeArea(.all)
                 .onTapGesture {
                     isPresented = false

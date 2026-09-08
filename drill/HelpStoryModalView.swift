@@ -18,7 +18,7 @@ struct HelpStoryModalView: View {
     
     var body: some View {
         ZStack {
-            Color.black.opacity(0.4)
+            ModalDesignTokens.backgroundOverlay
                 .edgesIgnoringSafeArea(.all)
                 .onTapGesture {
                     isPresented = false
@@ -94,7 +94,7 @@ struct HelpStoryModalView: View {
             .frame(width: isSmallDevice() ? 290: 320)
             .foregroundColor(Color("fontGray"))
             .padding()
-        .background(Color("Color2"))
+        .background(ModalDesignTokens.cardBackground)
 //        .overlay(
 //            RoundedRectangle(cornerRadius: 20)
 //                .stroke(Color.gray, lineWidth: 15)

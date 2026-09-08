@@ -17,7 +17,7 @@ struct TutorialStoryModalView: View {
     
     var body: some View {
         ZStack {
-            Color.black.opacity(0.4)
+            ModalDesignTokens.backgroundOverlay
                 .edgesIgnoringSafeArea(.all)
                 .onTapGesture {
 //                    isFlag = true
@@ -39,7 +39,7 @@ struct TutorialStoryModalView: View {
             .frame(width: isSmallDevice() ? 330: 350,height: isSmallDevice() ? 280: 280)
             .foregroundColor(Color("fontGray"))
 //            .padding()
-        .background(Color("Color2"))
+        .background(ModalDesignTokens.cardBackground)
         .cornerRadius(20)
         .shadow(radius: 10)
         .overlay(

@@ -26,7 +26,7 @@ struct HelpModalView: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.6)
+            ModalDesignTokens.backgroundOverlay
                 .ignoresSafeArea()
                 .onTapGesture {
                     if !isFocused {
@@ -73,7 +73,7 @@ struct HelpModalView: View {
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 14)
                                         .stroke(
-                                            isFocused ? Color(hex: "667eea") : Color.gray.opacity(0.2),
+                                            isFocused ? QuizColors.primaryGradientStart : Color.gray.opacity(0.2),
                                             lineWidth: isFocused ? 2 : 1
                                         )
                                 )
@@ -104,7 +104,7 @@ struct HelpModalView: View {
                                     Color.gray.opacity(0.4)
                                 } else {
                                     LinearGradient(
-                                        colors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+                                        colors: [QuizColors.primaryGradientStart, QuizColors.primaryGradientEnd],
                                         startPoint: .leading,
                                         endPoint: .trailing
                                     )
@@ -113,7 +113,7 @@ struct HelpModalView: View {
                         )
                         .clipShape(RoundedRectangle(cornerRadius: 14))
                         .shadow(
-                            color: text.isEmpty ? .clear : Color(hex: "667eea").opacity(0.3),
+                            color: text.isEmpty ? .clear : QuizColors.primaryGradientStart.opacity(0.3),
                             radius: 8,
                             y: 4
                         )
@@ -129,13 +129,13 @@ struct HelpModalView: View {
                         Spacer()
 
                         Toggle("", isOn: $toggle)
-                            .toggleStyle(SwitchToggleStyle(tint: Color(hex: "667eea")))
+                            .toggleStyle(SwitchToggleStyle(tint: QuizColors.primaryGradientStart))
                             .labelsHidden()
                     }
                     .padding(.vertical, 4)
                 }
                 .padding(24)
-                .background(Color("Color2"))
+                .background(ModalDesignTokens.cardBackground)
             }
             .frame(width: isSmallDevice() ? 320 : 350)
             .clipShape(RoundedRectangle(cornerRadius: 24))
@@ -166,7 +166,7 @@ struct HelpModalView: View {
     private var headerView: some View {
         ZStack {
             LinearGradient(
-                colors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+                colors: [QuizColors.primaryGradientStart, QuizColors.primaryGradientEnd],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
