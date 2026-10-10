@@ -1,135 +1,366 @@
 import SwiftUI
-import UIKit
 
-// パーティクルエフェクトの追加（オプション）
-struct ParticleEmitterView: UIViewRepresentable {
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView(frame: .zero)
-        let emitter = CAEmitterLayer()
-        emitter.emitterPosition = CGPoint(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
-        emitter.emitterShape = .circle
-        emitter.emitterSize = CGSize(width: 100, height: 100)
-
-        let cell = CAEmitterCell()
-        cell.birthRate = 20
-        cell.lifetime = 5.0
-        cell.velocity = 100
-        cell.velocityRange = 50
-        cell.emissionRange = .pi * 2
-        cell.scale = 0.05
-        cell.contents = UIImage(systemName: "sparkle")?.cgImage
-        cell.color = UIColor.white.cgColor // パーティクルの色を白に設定
-
-        emitter.emitterCells = [cell]
-        view.layer.addSublayer(emitter)
-        return view
+/// 起動スプラッシュ。ITクエストと同じ演出で、マスコットのえんぴ君が落ちてきて弾み、ロゴが1文字ずつポップする。
+struct SplashScreenView: View {
+    var body: some View {
+        EnpiBounceSplashView()
     }
-
-    func updateUIView(_ uiView: UIView, context: Context) {}
 }
 
-struct SplashScreenView: View {
-    @State private var isActive = false
-    @State private var scale: CGFloat = 0.5
-    @State private var opacity = 0.0
-    @State private var opacity2 = 0.0
-    @State private var bgGradientStart = Color.white
-    @State private var bgGradientEnd = Color.white
-    @State private var showText = false
-    @State private var colorCycle: Double = 0
-    @State private var textBlur: CGFloat = 10.0 // テキストのブラー半径
-    @State private var textScale: CGFloat = 0.8 // テキストのスケール
-    @State private var textScale2: CGFloat = 0.8 // テキストのスケール
+/// デプロイメントターゲットが iOS 16 のため keyframeAnimator は使わず、
+/// 時刻付きのキューを Task.sleep で待ちながら順に withAnimation で再生する。
+struct EnpiBounceSplashView: View {
+    private enum Palette {
+        static let background = EnpiLoadingTheme.background
+        static let ink = EnpiLoadingTheme.ink
+        static let ripple = Color(hex: "5BBF9A")
+        static let sparkleGreen = EnpiLoadingTheme.accent
+        static let sparkleGold = EnpiLoadingTheme.flag
+    }
+
+    private enum LetterPhase {
+        case hidden, overshoot, settled
+    }
+
+    private enum SparklePhase {
+        case hidden, shown, gone
+    }
+
+    private struct SparkleSpec {
+        /// えんぴ君の中心からの位置（画像の一辺に対する比率）。
+        let offset: CGPoint
+        let size: CGFloat
+        let color: Color
+    }
+
+    private struct Cue {
+        let time: Double
+        let animation: Animation?
+        let change: () -> Void
+    }
+
+    private struct Layout {
+        let size: CGSize
+
+        /// iPhone SE など縦の短い端末。
+        var isCompact: Bool { size.height < 700 }
+        /// えんぴ君の画像（正方形）の一辺。縦長のキャラなので画像の高さいっぱいが体になる。
+        var enpiSide: CGFloat { min(isCompact ? 170 : 210, size.width * 0.55) }
+        /// 一辺210ptを基準にした縮尺。影・波紋・キラキラの大きさに掛ける。
+        var unit: CGFloat { enpiSide / 210 }
+        var enpiCenter: CGPoint { CGPoint(x: size.width / 2, y: size.height * 0.4) }
+        /// 画像内の足元（拡大縮小の基準点と同じ高さ）。
+        var feetY: CGFloat { enpiCenter.y + enpiSide * (EnpiLoadingTheme.footAnchor.y - 0.5) }
+        var logoFontSize: CGFloat { min(isCompact ? 44 : 52, (size.width - 48) / 6.2) }
+    }
+
+    private static let logoText = "小学クエスト"
+    private static let logoLetters = Array(logoText).map(String.init)
+    private static let sparkles: [SparkleSpec] = [
+        SparkleSpec(offset: CGPoint(x: -0.38, y: -0.30), size: 22, color: Palette.sparkleGreen),
+        SparkleSpec(offset: CGPoint(x: 0.40, y: -0.40), size: 26, color: Palette.sparkleGold),
+        SparkleSpec(offset: CGPoint(x: -0.42, y: 0.12), size: 18, color: Palette.sparkleGold),
+        SparkleSpec(offset: CGPoint(x: 0.38, y: 0.04), size: 20, color: Palette.sparkleGreen)
+    ]
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    @State private var enpiOffsetY: CGFloat = -560
+    @State private var enpiScale = CGSize(width: 0.92, height: 1.12)
+    @State private var shadowScale: CGFloat = 0.3
+    @State private var shadowOpacity: Double = 0
+    @State private var rippleScale: CGFloat = 0.5
+    @State private var rippleOpacity: Double = 0
+    @State private var sparklePhases = Array(repeating: SparklePhase.hidden, count: sparkles.count)
+    @State private var letterPhases = Array(repeating: LetterPhase.hidden, count: logoLetters.count)
+    @State private var subtitleVisible = false
+    @State private var isBreathing = false
+    @State private var dotsBouncing = false
 
     var body: some View {
-//        if isActive {
-//            TopView()
-//        } else {
+        GeometryReader { geometry in
+            let layout = Layout(size: geometry.size)
+
             ZStack {
-                // 背景グラデーション（より水色系）
-//                LinearGradient(gradient: Gradient(colors: [bgGradientStart, bgGradientEnd]),
-//                               startPoint: .topLeading,
-//                               endPoint: .bottomTrailing)
-//                    .animation(.easeInOut(duration: 3).repeatForever(autoreverses: true), value: bgGradientStart)
-//                    .edgesIgnoringSafeArea(.all)
-//                    .onAppear {
-//                        // グラデーションの色を水色系に変更してアニメーションさせる
-//                        bgGradientStart = Color.cyan.opacity(0.6)
-//                        bgGradientEnd = Color.blue.opacity(0.6)
-//                    }
-                
-                VStack(spacing: 20) {
-                    
-                    // ロゴ画像
-                    Image("ロゴ") // ロゴ画像を指定
-                        .resizable()
-                        .cornerRadius(20)
-                        .scaledToFit()
-                        .frame(width: 100, height: 100) // サイズを少し大きく
-                        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5) // シャドウの色と位置を調整
-                        .scaleEffect(scale)
-                        .opacity(opacity)
-                        .foregroundColor(Color(hue: colorCycle, saturation: 1, brightness: 1))
-                        .onAppear {
-                            // バウンスアニメーション
-                            withAnimation(.interpolatingSpring(stiffness: 50, damping: 5).delay(0.2)) {
-                                self.scale = 1.0
-                                self.opacity = 1.0
-                            }
-                            
-                            // カラーサイクルアニメーション
-                            withAnimation(.linear(duration: 3).repeatForever(autoreverses: false)) {
-                                self.colorCycle = 1.0
-                            }
-                            
-                            // テキストのフェードインとブラーのアニメーション
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                                withAnimation(.easeIn(duration: 1.0)) {
-                                    self.showText = true
-                                    self.textBlur = 0.0 // ブラーを減少
-                                    self.textScale = 1.0 // スケールを戻す
-                                }
-                            }
-                            
-                            // アニメーション後にメインコンテンツに遷移
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
-                                withAnimation {
-                                    self.isActive = true
-                                }
-                            }
-                        }
-                    
-                    // テキストビュー
-                    if showText {
-                        Image("ドリルクエスト文字")
-                            .resizable()
-                            .frame(width: 140, height: 30) // サイズを調整
-                            .opacity(opacity2)
-                            .blur(radius: textBlur) // ブラーエフェクト
-                            .scaleEffect(textScale2) // スケールエフェクト
-                            .transition(.opacity)
-                            .onAppear {
-                                withAnimation(.easeOut(duration: 1.0)) {
-                                    self.textScale2 = 1.0
-                                    self.opacity2 = 1.0
-                                }
-                            }
-                    }
+                Palette.background
+
+                landingRipple(layout)
+                groundShadow(layout)
+
+                ForEach(Self.sparkles.indices, id: \.self) { index in
+                    sparkle(Self.sparkles[index], phase: sparklePhases[index], layout: layout)
                 }
-                .frame(maxWidth:.infinity,maxHeight:.infinity)
-                .background(Color("Color2"))
-                
-                // パーティクルエフェクトを追加（オプション）
-                ParticleEmitterView()
-                    .blendMode(.screen)
-                    .edgesIgnoringSafeArea(.all)
+
+                enpi(layout)
+
+                VStack(spacing: layout.isCompact ? 8 : 12) {
+                    logo(layout)
+                    subtitle
+                }
+                .padding(.top, layout.feetY + (layout.isCompact ? 14 : 20))
+                .frame(width: layout.size.width, height: layout.size.height, alignment: .top)
+
+                loadingDots
+                    .position(x: layout.size.width / 2, y: layout.size.height - 96)
+            }
+            .frame(width: layout.size.width, height: layout.size.height)
+            .clipped()
+        }
+        .ignoresSafeArea()
+        .background(Palette.background.ignoresSafeArea())
+        .onAppear {
+            if reduceMotion {
+                showFinalState()
             }
         }
-//    }
+        .task {
+            await playIntro()
+        }
+    }
+
+    // MARK: - Parts
+
+    private func enpi(_ layout: Layout) -> some View {
+        Image(EnpiLoadingTheme.enpiImageName)
+            .resizable()
+            .scaledToFit()
+            .frame(width: layout.enpiSide, height: layout.enpiSide)
+            .scaleEffect(x: enpiScale.width, y: enpiScale.height, anchor: EnpiLoadingTheme.footAnchor)
+            .scaleEffect(x: isBreathing ? 1.04 : 1, y: isBreathing ? 0.96 : 1, anchor: EnpiLoadingTheme.footAnchor)
+            .offset(y: enpiOffsetY)
+            .position(layout.enpiCenter)
+            .accessibilityHidden(true)
+    }
+
+    private func groundShadow(_ layout: Layout) -> some View {
+        Ellipse()
+            .fill(Palette.ink.opacity(0.18))
+            .frame(width: 100 * layout.unit, height: 20 * layout.unit)
+            .scaleEffect(shadowScale)
+            .opacity(shadowOpacity)
+            .position(x: layout.enpiCenter.x, y: layout.feetY)
+            .accessibilityHidden(true)
+    }
+
+    private func landingRipple(_ layout: Layout) -> some View {
+        Ellipse()
+            .stroke(Palette.ripple, lineWidth: 3)
+            .frame(width: 160 * layout.unit, height: 48 * layout.unit)
+            .scaleEffect(rippleScale)
+            .opacity(rippleOpacity)
+            .position(x: layout.enpiCenter.x, y: layout.feetY)
+            .accessibilityHidden(true)
+    }
+
+    private func sparkle(_ spec: SparkleSpec, phase: SparklePhase, layout: Layout) -> some View {
+        let side = spec.size * layout.unit
+        let scale: CGFloat
+        switch phase {
+        case .hidden: scale = 0.2
+        case .shown: scale = 1.2
+        case .gone: scale = 0.9
+        }
+
+        return SparkleCross()
+            .stroke(spec.color, style: StrokeStyle(lineWidth: 2.4, lineCap: .round))
+            .frame(width: side, height: side)
+            .scaleEffect(scale)
+            .rotationEffect(.degrees(phase == .hidden ? 0 : 45))
+            .opacity(phase == .shown ? 1 : 0)
+            .position(
+                x: layout.enpiCenter.x + spec.offset.x * layout.enpiSide,
+                y: layout.enpiCenter.y + spec.offset.y * layout.enpiSide
+            )
+            .accessibilityHidden(true)
+    }
+
+    private func logo(_ layout: Layout) -> some View {
+        HStack(spacing: 1) {
+            ForEach(Self.logoLetters.indices, id: \.self) { index in
+                let phase = letterPhases[index]
+
+                Text(Self.logoLetters[index])
+                    .font(.custom("DelaGothicOne-Regular", fixedSize: layout.logoFontSize))
+                    .foregroundStyle(Palette.ink)
+                    .shadow(color: Palette.ink.opacity(0.18), radius: 0, x: 0, y: 4)
+                    .scaleEffect(phase == .hidden ? 0.5 : (phase == .overshoot ? 1.15 : 1))
+                    .offset(y: phase == .hidden ? 24 : (phase == .overshoot ? -10 : 0))
+                    .opacity(phase == .hidden ? 0 : 1)
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Self.logoText)
+        .accessibilityAddTraits(.isHeader)
+    }
+
+    private var subtitle: some View {
+        Text("べんきょうを、ぼうけんで。")
+            .font(.system(size: 16, weight: .bold, design: .rounded))
+            .tracking(2)
+            .foregroundStyle(Palette.ink)
+            .offset(y: subtitleVisible ? 0 : 8)
+            .opacity(subtitleVisible ? 1 : 0)
+    }
+
+    private var loadingDots: some View {
+        HStack(spacing: 10) {
+            ForEach(0..<3, id: \.self) { index in
+                Circle()
+                    .fill(Palette.ripple)
+                    .frame(width: 10, height: 10)
+                    .offset(y: dotsBouncing ? -10 : 0)
+                    .animation(
+                        dotsBouncing
+                            ? .easeInOut(duration: 0.5)
+                                .repeatForever(autoreverses: true)
+                                .delay(Double(index) * 0.15)
+                            : nil,
+                        value: dotsBouncing
+                    )
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("読み込み中")
+    }
+
+    // MARK: - Timeline
+
+    @MainActor
+    private func playIntro() async {
+        guard !reduceMotion else { return }
+
+        dotsBouncing = true
+        let start = ContinuousClock.now
+        for cue in introCues() {
+            try? await Task.sleep(until: start + .seconds(cue.time), clock: .continuous)
+            guard !Task.isCancelled else { return }
+            withAnimation(cue.animation) {
+                cue.change()
+            }
+        }
+    }
+
+    private func introCues() -> [Cue] {
+        var cues: [Cue] = [
+            // 0.0–0.8s 落下。縦長のまま加速して落ちる。
+            Cue(time: 0, animation: .easeIn(duration: 0.8)) {
+                enpiOffsetY = 0
+                shadowScale = 0.85
+                shadowOpacity = 0.6
+            },
+            // 0.8s 着地。つぶれて影が濃くなり、波紋が広がる。
+            Cue(time: 0.8, animation: .easeOut(duration: 0.1)) {
+                enpiScale = CGSize(width: 1.28, height: 0.68)
+                shadowScale = 1.15
+                shadowOpacity = 1
+            },
+            Cue(time: 0.8, animation: .linear(duration: 0.05)) {
+                rippleOpacity = 0.9
+            },
+            Cue(time: 0.85, animation: .easeOut(duration: 0.75)) {
+                rippleScale = 1.9
+                rippleOpacity = 0
+            },
+            // 0.92–1.2s 大きく跳ねる。
+            Cue(time: 0.92, animation: .easeOut(duration: 0.28)) {
+                enpiOffsetY = -70
+                enpiScale = CGSize(width: 0.9, height: 1.12)
+                shadowScale = 0.7
+                shadowOpacity = 0.55
+            },
+            Cue(time: 1.2, animation: .easeIn(duration: 0.2)) {
+                enpiOffsetY = 0
+                enpiScale = CGSize(width: 0.96, height: 1.05)
+                shadowScale = 1
+                shadowOpacity = 1
+            },
+            // 1.4s 2回目の着地。
+            Cue(time: 1.4, animation: .easeOut(duration: 0.08)) {
+                enpiScale = CGSize(width: 1.12, height: 0.88)
+                shadowScale = 1.08
+            },
+            // 1.48–1.62s 小さく跳ねる。
+            Cue(time: 1.48, animation: .easeOut(duration: 0.14)) {
+                enpiOffsetY = -18
+                enpiScale = CGSize(width: 0.97, height: 1.04)
+                shadowScale = 0.9
+                shadowOpacity = 0.85
+            },
+            Cue(time: 1.62, animation: .easeIn(duration: 0.12)) {
+                enpiOffsetY = 0
+                shadowScale = 1
+                shadowOpacity = 1
+            },
+            // 1.74s〜 元の形に落ち着く。
+            Cue(time: 1.74, animation: .spring(response: 0.3, dampingFraction: 0.6)) {
+                enpiScale = CGSize(width: 1, height: 1)
+            },
+            // 1.8–2.2s サブコピー。
+            Cue(time: 1.8, animation: .easeOut(duration: 0.4)) {
+                subtitleVisible = true
+            },
+            // 2.2s〜 待機ループ（息をする）。
+            Cue(time: 2.2, animation: .easeInOut(duration: 1.25).repeatForever(autoreverses: true)) {
+                isBreathing = true
+            }
+        ]
+
+        // 0.85s〜 キラキラを0.12秒ずつずらして出し、すぐ消す。
+        for index in Self.sparkles.indices {
+            let appear = 0.85 + Double(index) * 0.12
+            cues.append(Cue(time: appear, animation: .easeOut(duration: 0.3)) {
+                sparklePhases[index] = .shown
+            })
+            cues.append(Cue(time: appear + 0.3, animation: .easeIn(duration: 0.35)) {
+                sparklePhases[index] = .gone
+            })
+        }
+
+        // 1.0s〜 ロゴを1文字ずつ0.07秒ずらしてポップイン。
+        for index in Self.logoLetters.indices {
+            let pop = 1.0 + Double(index) * 0.07
+            cues.append(Cue(time: pop, animation: .easeOut(duration: 0.16)) {
+                letterPhases[index] = .overshoot
+            })
+            cues.append(Cue(time: pop + 0.16, animation: .spring(response: 0.35, dampingFraction: 0.55)) {
+                letterPhases[index] = .settled
+            })
+        }
+
+        return cues.sorted { $0.time < $1.time }
+    }
+
+    /// 視差効果を減らす設定のときに使う最終状態（待機ループなし）。
+    private func showFinalState() {
+        enpiOffsetY = 0
+        enpiScale = CGSize(width: 1, height: 1)
+        shadowScale = 1
+        shadowOpacity = 1
+        rippleOpacity = 0
+        sparklePhases = sparklePhases.map { _ in .gone }
+        letterPhases = letterPhases.map { _ in .settled }
+        subtitleVisible = true
+    }
 }
 
-struct SplashScreenView_Previews: PreviewProvider {
-    static var previews: some View {
-        SplashScreenView()
+/// キラキラ用の細い十字。
+private struct SparkleCross: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.midX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
+        path.move(to: CGPoint(x: rect.minX, y: rect.midY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.midY))
+        return path
     }
+}
+
+#Preview("iPhone SE") {
+    EnpiBounceSplashView()
+        .previewDevice("iPhone SE (3rd generation)")
+}
+
+#Preview("iPhone 15 Pro") {
+    EnpiBounceSplashView()
+        .previewDevice("iPhone 15 Pro")
 }

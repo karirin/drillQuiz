@@ -166,16 +166,8 @@ struct BarChartView: View {
     }
 
     private var loadingCard: some View {
-        VStack(spacing: 16) {
-            ActivityIndicator()
-            Text("読み込み中")
-                .font(.system(size: 15, weight: .bold))
-                .foregroundStyle(.secondary)
-        }
-        .padding(28)
-        .background(AnalysisTheme.card, in: RoundedRectangle(cornerRadius: 24))
-        .shadow(color: AnalysisTheme.primary.opacity(0.12), radius: 16, x: 0, y: 8)
-        .padding(.horizontal, 20)
+        EnpiCardLoadingView(message: "学習記録を読み込み中")
+            .padding(.horizontal, 20)
     }
 
     private var graphCard: some View {

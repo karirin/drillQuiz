@@ -201,7 +201,7 @@ struct AvatarListView: View {
                             )
                             .frame(width: 120, height: 120)
                         
-                        Image(selected.name)
+                        avatarArtworkImage(for: selected.name)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 100, height: 100)
@@ -396,7 +396,7 @@ struct AvatarListView: View {
                                 .frame(width: 70, height: 70)
                         }
                         
-                        Image(avatar.name)
+                        avatarArtworkImage(for: avatar.name)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 60, height: 60)

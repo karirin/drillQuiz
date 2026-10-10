@@ -31,7 +31,7 @@ struct IncorrectSansuListView: View {
                     QuizView(quizzes: shuffledQuizList, quizLevel: .incorrectSansuAnswer, authManager: authManager, audioManager: audioManager, isPresenting: $isPresenting, interstitial: sharedInterstitial)
                 }
             } else {
-                ActivityIndicator()
+                EnpiFullScreenLoadingView()
             }
         }
         .onAppear {

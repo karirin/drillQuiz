@@ -38,6 +38,9 @@ struct GuildBossBattleView: View {
     @State private var selectedAnswerIndex: Int?
     @State private var submittedAnswer: String?
     @State private var submittedAnswerWasCorrect: Bool?
+    @State private var keyboardVisible = false
+    @State private var showsFullQuestion = false
+    private var inputFocusMode: Bool { keyboardVisible && currentQuiz?.usesTextInput == true && !hasAnswered }
     @State private var hasAnswered = false
     @State private var quizResults: [QuizResult] = []
     @State private var navigateToQuizResultView = false
@@ -97,38 +100,25 @@ struct GuildBossBattleView: View {
                 .ignoresSafeArea()
 
                 VStack {
-                    header
-                    Spacer()
+                    if inputFocusMode, let quiz = currentQuiz {
+                        QuizInputFocusHeader(question: quiz, onSettings: { showSettingsModal = true }, onRead: { showsFullQuestion = true })
+                        QuizInputFocusStatus(enemyLabel: "ボス", enemyHP: bossHP, enemyMaxHP: bossMaxHP, playerHP: playerHP, playerMaxHP: playerMaxHP)
+                    } else {
+                        header
+                    }
+                    if !inputFocusMode { Spacer() }
 
                     if phase == .fighting, let quiz = currentQuiz {
                         battleContent(quiz: quiz)
+                            .frame(maxHeight: inputFocusMode ? .infinity : nil)
                     }
 
-                    Spacer()
+                    if !inputFocusMode { Spacer() }
 
                     if phase == .fighting, let quiz = currentQuiz {
-                        ScrollView {
-                            VStack {
-                                QuestionAnswerInputView(
-                                    questionKey: quiz.id ?? "\(currentQuizIndex)-\(quiz.question)",
-                                    question: quiz,
-                                    isAnswered: hasAnswered,
-                                    correctAnswerIndex: hasAnswered ? quiz.correctAnswerIndex : nil,
-                                    onChoiceSelected: answerSelectionAction,
-                                    onTextSubmitted: answerSubmissionAction,
-                                    onReorderSubmitted: reorderSubmissionAction,
-                                    onMatchingSubmitted: matchingSubmissionAction,
-                                    onMapSelectionSubmitted: mapSelectionSubmissionAction
-                                )
-                                .frame(maxWidth: .infinity)
-                                .shadow(radius: 1)
-
-                                Spacer()
-                                Spacer()
-                            }
-                        }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .padding(.bottom)
+                        QuizKeyboardAnswerScrollView { guildAnswerInput(quiz: quiz) }
+                            .frame(maxWidth: .infinity, maxHeight: inputFocusMode ? nil : .infinity)
+                            .padding(.bottom, inputFocusMode ? 4 : 16)
                     }
                 }
                 .background(showIncorrectBackground ? Color.red.opacity(0.1) : Color.white.opacity(0))
@@ -198,7 +188,29 @@ struct GuildBossBattleView: View {
                 navigateToQuizResultView = true
             }
         }
+        .quizKeyboardVisibility($keyboardVisible)
+        .environment(\.quizInputFocusMode, inputFocusMode)
+        .sheet(isPresented: $showsFullQuestion) {
+            if let quiz = currentQuiz { QuizFullQuestionView(question: quiz) }
+        }
     }
+
+    private func guildAnswerInput(quiz: QuizQuestion) -> some View {
+        QuestionAnswerInputView(
+            questionKey: quiz.id ?? "\(currentQuizIndex)-\(quiz.question)",
+            question: quiz,
+            isAnswered: hasAnswered,
+            correctAnswerIndex: hasAnswered ? quiz.correctAnswerIndex : nil,
+            onChoiceSelected: answerSelectionAction,
+            onTextSubmitted: answerSubmissionAction,
+            onReorderSubmitted: reorderSubmissionAction,
+            onMatchingSubmitted: matchingSubmissionAction,
+            onMapSelectionSubmitted: mapSelectionSubmissionAction
+        )
+        .frame(maxWidth: .infinity)
+        .shadow(radius: 1)
+    }
+
 
     // MARK: - ヘッダー
 
@@ -247,10 +259,12 @@ struct GuildBossBattleView: View {
                 question: quiz.question,
                 selectedAnswerIndex: selectedAnswerIndex,
                 correctAnswerIndex: quiz.correctAnswerIndex,
-                compactMode: quiz.usesCompactAnswerLayout
+                compactMode: quiz.usesCompactAnswerLayout,
+                focusQuestion: inputFocusMode ? quiz : nil
             )
             .padding(.horizontal, 16)
 
+            if !inputFocusMode {
             // ボス画像 + コンボバッジ
             ZStack {
                 if !bossImageName.isEmpty, UIImage(named: bossImageName) != nil {
@@ -325,7 +339,7 @@ struct GuildBossBattleView: View {
                             ProgressView()
                                 .frame(width: 30, height: 30)
                         } else if let avatarName {
-                            Image(avatarName)
+                            avatarArtworkImage(for: avatarName)
                                 .resizable()
                                 .frame(width: 30, height: 30)
                         } else {
@@ -353,7 +367,7 @@ struct GuildBossBattleView: View {
 
                     if let activeHelper {
                         HStack(spacing: 7) {
-                            Image(activeHelper.avatarName)
+                            avatarArtworkImage(for: activeHelper.avatarName)
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 26, height: 26)
@@ -380,6 +394,7 @@ struct GuildBossBattleView: View {
                         .padding(.bottom, -30)
                         .accessibilityHidden(true)
                 }
+            }
             }
         }
     }

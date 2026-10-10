@@ -362,7 +362,7 @@ class RankingViewModel: ObservableObject {
                         userId: userId,
                         userName: userName,
                         avatarCount: totalAvatarCount,
-                        avatarName: usedAvatarName ?? "defaultAvatar" // 使用中のアバター名がない場合はデフォルト名を使用
+                        avatarName: usedAvatarName ?? "defaultIcon" // 未設定の場合もえんぴ君を表示
                     )
                     userAvatarCounts.append(userAvatarCount)
                 }
@@ -548,7 +548,7 @@ struct RankingRowCard<Content: View>: View {
                 if let name = avatarData["name"] as? String,
                    let usedFlag = avatarData["usedFlag"] as? Int,
                    usedFlag == 1 {
-                    Image(name)
+                    avatarArtworkImage(for: name)
                         .resizable()
                         .frame(width: 40, height: 40)
                         .clipShape(Circle())
@@ -623,7 +623,7 @@ struct StoryRankingView: View {
     var body: some View {
         ZStack {
             if viewModel.storyUsers.isEmpty {
-                ActivityIndicator()
+                EnpiFullScreenLoadingView()
             } else {
                 VStack(spacing: 0) {
                     if isReturnFlag {
@@ -704,7 +704,7 @@ struct RankRankingView: View {
     var body: some View {
         if viewModel.rankedUsers.isEmpty {
             VStack {
-                ActivityIndicator()
+                EnpiFullScreenLoadingView()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
@@ -748,7 +748,7 @@ struct LevelRankingView: View {
     var body: some View {
         if viewModel.users.isEmpty {
             VStack {
-                ActivityIndicator()
+                EnpiFullScreenLoadingView()
             }
             .background(Color("Color2"))
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -800,7 +800,7 @@ struct MonthlyAnswersRankingView: View {
     var body: some View {
         if viewModel.userAnswerDataList.isEmpty {
             VStack {
-                ActivityIndicator()
+                EnpiFullScreenLoadingView()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
@@ -812,7 +812,7 @@ struct MonthlyAnswersRankingView: View {
                         HStack(spacing: 12) {
                             RankBadgeView(rank: index + 1)
 
-                            Image(userAnswerData.avatarName)
+                            avatarArtworkImage(for: userAnswerData.avatarName)
                                 .resizable()
                                 .frame(width: 40, height: 40)
                                 .clipShape(Circle())
@@ -871,7 +871,7 @@ struct StreakRankingView: View {
     var body: some View {
         if viewModel.streakUsers.isEmpty {
             VStack {
-                ActivityIndicator()
+                EnpiFullScreenLoadingView()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
@@ -921,7 +921,7 @@ struct AvatarRankingView: View {
     var body: some View {
         if viewModel.userAvatarCounts.isEmpty {
             VStack {
-                ActivityIndicator()
+                EnpiFullScreenLoadingView()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
@@ -932,7 +932,7 @@ struct AvatarRankingView: View {
                         HStack(spacing: 12) {
                             RankBadgeView(rank: index + 1)
 
-                            Image(userAvatarCount.avatarName)
+                            avatarArtworkImage(for: userAvatarCount.avatarName)
                                 .resizable()
                                 .frame(width: 40, height: 40)
                                 .clipShape(Circle())

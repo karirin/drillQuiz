@@ -10,7 +10,7 @@ import SwiftUI
 struct StoryShakaiListView: View {
     @Binding var isPresenting: Bool
 
-    let quizBeginnerList: [QuizQuestion] = [
+    static let quizBeginnerList: [QuizQuestion] = [
         QuizQuestion(
                    question: "次の中で、朝起きて最初にすることが多いのはどれですか？",
                    choices: [
@@ -6296,7 +6296,7 @@ struct StoryShakaiListView: View {
         self.monsterName = monsterName
         self.backgroundName = backgroundName
         self.viewModel = viewModel
-        _shuffledQuizList = State(initialValue: quizBeginnerList.shuffled())
+        _shuffledQuizList = State(initialValue: Self.quizBeginnerList.shuffled())
     }
     
     @StateObject var sharedInterstitial = Interstitial.story()

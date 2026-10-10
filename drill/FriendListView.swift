@@ -49,6 +49,7 @@ struct FriendListView: View {
     @State private var toastMessage: String?
     @State private var addErrorMessage: String?
     @State private var isPresentingHelperHelp = false
+    @State private var isPresentingPremium = false
     @FocusState private var isCodeInputFocused: Bool
 
     init(initialSection: FriendListInitialSection = .friends) {
@@ -139,6 +140,9 @@ struct FriendListView: View {
         .socialToast(message: $toastMessage)
         .sheet(isPresented: $isPresentingHelperHelp) {
             HelperBorrowHelpView()
+        }
+        .fullScreenCover(isPresented: $isPresentingPremium) {
+            PreView(audioManager: AudioManager.shared, source: .friendLimit)
         }
     }
 
@@ -486,7 +490,11 @@ struct FriendListView: View {
 
     private func accept(_ request: FriendRequestSummary) {
         guard friendManager.friends.count < friendLimit else {
-            alertMessage = "フレンドは\(friendLimit)人まで登録できます。誰かを解除してから承認してください。"
+            if appState.isSubscribed {
+                alertMessage = "フレンドは\(friendLimit)人まで登録できます。誰かを解除してから承認してください。"
+            } else {
+                isPresentingPremium = true
+            }
             return
         }
         handlingRequestId = request.id
@@ -735,6 +743,22 @@ struct FriendListView: View {
                     icon: "exclamationmark.triangle.fill",
                     tone: .warning
                 )
+
+                if !appState.isSubscribed {
+                    Button {
+                        generateHapticFeedback()
+                        isPresentingPremium = true
+                    } label: {
+                        Label("プレミアムで30人まで追加", systemImage: "crown.fill")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(theme.gradient)
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                }
             }
 
             if let addErrorMessage {

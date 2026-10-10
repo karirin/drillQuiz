@@ -18,6 +18,7 @@ struct MissionView: View {
     @State private var timerText = ""
     @State private var timer: Timer?
     @State private var selectedMissionForDetail: Mission?
+    @State private var claimErrorMessage: String?
 
     private var currentMissions: [Mission] {
         missionManager.missionsForCategory(selectedCategory)
@@ -51,7 +52,7 @@ struct MissionView: View {
 
             if isLoading {
                 VStack {
-                    CustomSpinner5()
+                    EnpiFullScreenLoadingView()
                 }
             } else {
                 VStack(spacing: 0) {
@@ -153,6 +154,17 @@ struct MissionView: View {
         .onChange(of: selectedCategory) { newValue in
             missionManager.selectedCategory = newValue
             updateTimerText()
+        }
+        .alert(
+            "報酬を受け取れませんでした",
+            isPresented: Binding(
+                get: { claimErrorMessage != nil },
+                set: { if !$0 { claimErrorMessage = nil } }
+            )
+        ) {
+            Button("閉じる", role: .cancel) { claimErrorMessage = nil }
+        } message: {
+            Text(claimErrorMessage ?? "通信状態を確認して、もう一度お試しください。")
         }
     }
 
@@ -261,7 +273,7 @@ struct MissionView: View {
 
     private var completionBonusCard: some View {
         let allCleared = selectedCategory == .daily ? missionManager.isDailyAllCompleted : missionManager.isWeeklyAllCompleted
-        let bonusCoin = selectedCategory == .daily ? 100 : 500
+        let bonusCoin = selectedCategory.completionBonusCoin
         let bonusImageName = selectedCategory == .daily ? "デイリーコンプリート" : "ウィークリーコンプリート"
         let bonusLabel = selectedCategory == .daily ? "デイリーコンプリートボーナス" : "ウィークリーコンプリートボーナス"
 
@@ -424,6 +436,8 @@ struct MissionView: View {
                 rewardCoinAmount = coins
                 rewardItems = items
                 showRewardAnimation = true
+            } else {
+                claimErrorMessage = "通信状態を確認して、もう一度お試しください。"
             }
         }
     }
@@ -434,6 +448,8 @@ struct MissionView: View {
                 rewardCoinAmount = coins
                 rewardItems = items
                 showRewardAnimation = true
+            } else {
+                claimErrorMessage = "通信状態を確認して、もう一度お試しください。"
             }
         }
     }
@@ -645,6 +661,8 @@ struct MissionCardModernView: View {
                         }
                     }
                 }
+                .contentShape(Rectangle())
+                .onTapGesture(perform: detailAction)
 
                 Spacer()
 
@@ -736,9 +754,6 @@ struct MissionCardModernView: View {
                         )
                 )
         )
-        .onTapGesture {
-            detailAction()
-        }
     }
 }
 

@@ -618,7 +618,10 @@ struct AnswerSelectionView: View {
     let choices: [String]
     var action: (Int) -> Void
     var correctAnswerIndex: Int?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var tappedIndex: Int? = nil
+    @State private var resultPulse = false
+    @State private var resultSequence = 0
     @State private var appearAnimation: [Bool] = []
 
     init(choices: [String], correctAnswerIndex: Int?, action: @escaping (Int) -> Void) {
@@ -633,38 +636,50 @@ struct AnswerSelectionView: View {
             ForEach(0..<choices.count, id: \.self) { index in
                 AnswerButton(
                     text: choices[index],
-                    index: index,
                     isCorrect: index == correctAnswerIndex,
+                    isIncorrect: correctAnswerIndex != nil && tappedIndex == index && index != correctAnswerIndex,
                     isTapped: tappedIndex == index,
+                    resultPulse: resultPulse && !reduceMotion,
                     hasAnswered: correctAnswerIndex != nil,
                     isVisible: appearAnimation.indices.contains(index) ? appearAnimation[index] : false
                 ) {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                    guard correctAnswerIndex == nil, tappedIndex == nil else { return }
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    withAnimation(reduceMotion ? nil : .spring(response: 0.22, dampingFraction: 0.55)) {
                         tappedIndex = index
                     }
-                    
-                    if index == correctAnswerIndex {
-                        let generator = UINotificationFeedbackGenerator()
-                        generator.notificationOccurred(.success)
-                    }
-                    generateHapticFeedback()
                     self.action(index)
-                    
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        withAnimation(.spring()) {
-                            tappedIndex = nil
-                        }
-                    }
                 }
             }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
+        .onChange(of: correctAnswerIndex) { answerIndex in
+            resultSequence += 1
+            guard let answerIndex, let tappedIndex else {
+                resultPulse = false
+                self.tappedIndex = nil
+                return
+            }
+
+            let sequence = resultSequence
+            let isCorrect = tappedIndex == answerIndex
+            UINotificationFeedbackGenerator().notificationOccurred(isCorrect ? .success : .error)
+            withAnimation(reduceMotion ? nil : .spring(response: 0.34, dampingFraction: 0.55)) {
+                resultPulse = true
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.38) {
+                guard resultSequence == sequence else { return }
+                withAnimation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.7)) {
+                    resultPulse = false
+                }
+            }
+        }
         .onAppear {
             // スタガードアニメーション
             for index in 0..<choices.count {
                 DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.08) {
-                    withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                    withAnimation(reduceMotion ? nil : .spring(response: 0.5, dampingFraction: 0.7)) {
                         if appearAnimation.indices.contains(index) {
                             appearAnimation[index] = true
                         }
@@ -867,6 +882,8 @@ struct TextAnswerInputView: View {
     let isAnswered: Bool
     let onSubmit: (String) -> Void
 
+    @Environment(\.quizInputFocusMode) private var focusMode
+    @State private var focusRequestID = UUID()
     @State private var input: String = ""
     @FocusState private var isInputFocused: Bool
     private let focusRetryDelays: [Double] = [0.0, 0.12, 0.28]
@@ -886,42 +903,72 @@ struct TextAnswerInputView: View {
     var body: some View {
         VStack(spacing: isCompactLayout ? 8 : 10) {
             VStack(alignment: .leading, spacing: 8) {
-                Text(keyboardType == .default ? "文字で答える" : "数字で答える")
-                    .font(.system(size: isCompactLayout ? 13 : 15, weight: .semibold))
-                    .foregroundColor(Color.black.opacity(0.72))
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(
-                        Capsule()
-                            .fill(Color.white.opacity(0.92))
-                    )
-                    .overlay(
-                        Capsule()
-                            .stroke(Color.white.opacity(0.65), lineWidth: 1)
-                    )
-                    .shadow(color: Color.black.opacity(0.08), radius: 5, x: 0, y: 2)
+                if !focusMode {
+                    Text(keyboardType == .default ? "文字で答える" : "数字で答える")
+                        .font(.system(size: isCompactLayout ? 13 : 15, weight: .semibold))
+                        .foregroundColor(Color.black.opacity(0.72))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .fill(Color.white.opacity(0.92))
+                        )
+                        .overlay(
+                            Capsule()
+                                .stroke(Color.white.opacity(0.65), lineWidth: 1)
+                        )
+                        .shadow(color: Color.black.opacity(0.08), radius: 5, x: 0, y: 2)
 
-                TextField(placeholder, text: $input)
-                    .font(.system(size: isCompactLayout ? 16 : 18, weight: .medium))
-                    .foregroundColor(Color("fontGray"))
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .fill(Color.white)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .stroke(Color.gray.opacity(0.14), lineWidth: 1)
-                    )
-                    .shadow(color: Color.black.opacity(0.05), radius: 6, x: 0, y: 3)
-                    .focused($isInputFocused)
-                    .keyboardType(keyboardType)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .submitLabel(.done)
-                    .onSubmit(submitInput)
-                    .disabled(isAnswered)
+                }
+
+                HStack(spacing: 8) {
+                    TextField(placeholder, text: $input)
+                        .font(.system(size: isCompactLayout ? 16 : 18, weight: .medium))
+                        .foregroundColor(Color("fontGray"))
+                        .padding(.leading, 14)
+                        .padding(.trailing, focusMode ? 44 : 14)
+                        .padding(.vertical, 12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                .fill(Color.white)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                .stroke(Color.gray.opacity(0.14), lineWidth: 1)
+                        )
+                        .shadow(color: Color.black.opacity(0.05), radius: 6, x: 0, y: 3)
+                        .focused($isInputFocused)
+                        .keyboardType(keyboardType)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .submitLabel(.done)
+                        .onSubmit(submitInput)
+                        .disabled(isAnswered)
+                        .overlay(alignment: .trailing) {
+                            if focusMode {
+                                Button(action: clearInput) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(.gray)
+                                        .frame(width: 44, height: 44)
+                                }
+                                .accessibilityLabel("入力を消す")
+                                .disabled(isAnswered || input.isEmpty)
+                            }
+                        }
+                    if focusMode {
+                        Button(action: submitInput) {
+                            Text("答える")
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 16)
+                                .frame(minHeight: 48)
+                                .background(canSubmit ? Color.blue : Color.gray)
+                                .clipShape(RoundedRectangle(cornerRadius: 14))
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(!canSubmit)
+                    }
+                }
 
                 if !inputSymbols.isEmpty {
                     HStack(spacing: 8) {
@@ -954,42 +1001,47 @@ struct TextAnswerInputView: View {
                 }
             }
 
-            HStack(spacing: isCompactLayout ? 6 : 8) {
-                Button(action: clearInput) {
-                    Text("クリア")
-                        .font(.system(size: isCompactLayout ? 13 : 15, weight: .semibold))
-                        .foregroundColor(Color("fontGray"))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, isCompactLayout ? 8 : 10)
-                        .background(Color.white.opacity(0.95))
-                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .stroke(Color.gray.opacity(0.14), lineWidth: 1)
-                        )
-                }
-                .buttonStyle(.plain)
-                .disabled(isAnswered || input.isEmpty)
-
-                Button(action: submitInput) {
-                    Text("答える")
-                        .font(.system(size: isCompactLayout ? 14 : 16, weight: .bold))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, isCompactLayout ? 8 : 10)
-                        .background(
-                            LinearGradient(
-                                colors: canSubmit
-                                    ? [Color(red: 0.12, green: 0.72, blue: 0.38), Color(red: 0.08, green: 0.58, blue: 0.30)]
-                                    : [Color.gray.opacity(0.45), Color.gray.opacity(0.55)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
+            if !focusMode {
+                HStack(spacing: isCompactLayout ? 6 : 8) {
+                    Button(action: clearInput) {
+                        Text("クリア")
+                            .font(.system(size: isCompactLayout ? 13 : 15, weight: .semibold))
+                            .foregroundColor(Color("fontGray"))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, isCompactLayout ? 8 : 10)
+                            .background(Color.white.opacity(0.95))
+                            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                    .stroke(Color.gray.opacity(0.14), lineWidth: 1)
                             )
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(isAnswered || input.isEmpty)
+
+                    Button(action: submitInput) {
+                        Text("答える")
+                            .font(.system(size: isCompactLayout ? 14 : 16, weight: .bold))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, isCompactLayout ? 8 : 10)
+                            .background(
+                                LinearGradient(
+                                    colors: canSubmit
+                                        ? [
+                                            Color(red: 0.12, green: 0.72, blue: 0.38),
+                                            Color(red: 0.08, green: 0.58, blue: 0.30),
+                                        ]
+                                        : [Color.gray.opacity(0.45), Color.gray.opacity(0.55)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(!canSubmit)
                 }
-                .buttonStyle(.plain)
-                .disabled(!canSubmit)
             }
         }
         .padding(.horizontal, isCompactLayout ? 10 : 14)
@@ -1011,9 +1063,15 @@ struct TextAnswerInputView: View {
         }
         .onChange(of: isInputFocused) { newValue in
             if !newValue {
-                scheduleFocus()
+                // A deliberate dismissal must remain dismissed, including pending focus retries.
+                focusRequestID = UUID()
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            focusRequestID = UUID()
+            isInputFocused = false
+        }
+        .onDisappear { focusRequestID = UUID() }
     }
 
     private func appendInputSymbol(_ symbol: String) {
@@ -1038,12 +1096,14 @@ struct TextAnswerInputView: View {
     }
 
     private func scheduleFocus() {
+        let requestID = UUID()
+        focusRequestID = requestID
         guard !isAnswered else {
             return
         }
         for delay in focusRetryDelays {
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                guard !isAnswered else {
+                guard !isAnswered, focusRequestID == requestID else {
                     return
                 }
                 isInputFocused = true
@@ -1052,7 +1112,7 @@ struct TextAnswerInputView: View {
     }
 }
 
-private struct ReferenceMaterialCard: View {
+struct ReferenceMaterialCard: View {
     let title: String
     let rows: [QuizReferenceRow]
     var compact: Bool = false
@@ -1748,6 +1808,7 @@ private struct ChoiceChipButton: View {
 }
 
 struct QuestionAnswerInputView: View {
+    @Environment(\.quizInputFocusMode) private var focusMode
     let questionKey: String
     let question: QuizQuestion
     let isAnswered: Bool
@@ -1777,11 +1838,13 @@ struct QuestionAnswerInputView: View {
             case .textInput:
                 if question.format == .dataReading {
                     VStack(spacing: isSmallDevice() ? 8 : 10) {
+                        if !focusMode {
                         ReferenceMaterialCard(
                             title: question.referenceTitle,
                             rows: question.referenceRows,
                             compact: isSmallDevice()
                         )
+                        }
 
                         TextAnswerInputView(
                             questionKey: questionKey,
@@ -1839,13 +1902,14 @@ struct QuestionAnswerInputView: View {
 
 struct AnswerButton: View {
     let text: String
-    let index: Int
     let isCorrect: Bool
+    let isIncorrect: Bool
     let isTapped: Bool
+    let resultPulse: Bool
     let hasAnswered: Bool
     let isVisible: Bool
     let action: () -> Void
-    
+
     private var buttonBackground: some View {
         Group {
             if hasAnswered {
@@ -1856,6 +1920,13 @@ struct AnswerButton: View {
                             Color(red: 0.2, green: 0.8, blue: 0.4),
                             Color(red: 0.1, green: 0.7, blue: 0.3)
                         ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                } else if isIncorrect {
+                    // 選んだ不正解の選択肢 - レッドグラデーション
+                    LinearGradient(
+                        colors: [Color(red: 1.0, green: 0.38, blue: 0.40), Color(red: 0.88, green: 0.19, blue: 0.28)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -1883,25 +1954,25 @@ struct AnswerButton: View {
             }
         }
     }
-    
+
     private var borderColor: Color {
         if hasAnswered && isCorrect {
             return Color(red: 0.1, green: 0.7, blue: 0.3)
         }
+        if isIncorrect { return Color.red.opacity(0.8) }
         return Color.gray.opacity(0.15)
     }
-    
+
     private var textColor: Color {
-        if hasAnswered && isCorrect {
+        if hasAnswered && (isCorrect || isIncorrect) {
             return .white
         }
         return Color("fontGray")
     }
-    
+
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 12) {
-                
+            HStack(alignment: .top, spacing: 12) {
                 // 選択肢テキスト
                 Text(text)
                     .font(.system(size: fontSize(for: text, isIPad: isIPad()), weight: .medium))
@@ -1909,39 +1980,49 @@ struct AnswerButton: View {
                     .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
                     .lineLimit(nil)
-                
-                Spacer()
-                
-                // 正解アイコン
-                if hasAnswered && isCorrect {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundColor(.white)
-                        .transition(.scale.combined(with: .opacity))
-                }
+                    .lineSpacing(3)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .layoutPriority(1)
+
+                // 正解/不正解アイコン。幅は常に確保しておき、表示時に文字の折り返しが
+                // 変わって選択肢の高さが動かないようにする
+                Image(systemName: isIncorrect ? "xmark.circle.fill" : "checkmark.circle.fill")
+                    .font(.system(size: 24, weight: .bold))
+                    .frame(width: 24, height: 24)
+                    .foregroundColor(.white)
+                    .opacity(hasAnswered && (isCorrect || isIncorrect) ? 1 : 0)
+                    .scaleEffect(hasAnswered && (isCorrect || isIncorrect) ? 1 : 0.5)
+                    .accessibilityHidden(!(hasAnswered && (isCorrect || isIncorrect)))
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 14)
-            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 14)
+            .padding(.vertical, text.count >= 40 ? 12 : 14)
+            .frame(maxWidth: .infinity, minHeight: isIPad() ? 72 : 56)
             .background(buttonBackground)
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(borderColor, lineWidth: hasAnswered && isCorrect ? 2 : 1)
+                    .stroke(borderColor, lineWidth: hasAnswered && (isCorrect || isIncorrect) ? 2 : 1)
             )
+            .overlay {
+                if hasAnswered && isCorrect {
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(Color.white.opacity(resultPulse ? 0.9 : 0), lineWidth: 3)
+                        .scaleEffect(resultPulse ? 1.06 : 1.0)
+                        .allowsHitTesting(false)
+                }
+            }
             .shadow(
                 color: hasAnswered && isCorrect
-                    ? Color.green.opacity(0.3)
+                    ? Color.green.opacity(resultPulse ? 0.6 : 0.3)
                     : Color.black.opacity(0.06),
-                radius: hasAnswered && isCorrect ? 12 : 8,
+                radius: hasAnswered && isCorrect ? (resultPulse ? 20 : 12) : 8,
                 x: 0,
                 y: hasAnswered && isCorrect ? 6 : 4
             )
-            .scaleEffect(isTapped ? 0.96 : 1.0)
+            .scaleEffect(hasAnswered && isCorrect && resultPulse ? 1.045 : (isTapped && !hasAnswered ? 0.94 : 1.0))
         }
-        .buttonStyle(PlainButtonStyle())
+        .buttonStyle(.plain)
         .opacity(isVisible ? 1 : 0)
-        .offset(y: isVisible ? 0 : 20)
     }
 }
 
@@ -1955,12 +2036,16 @@ func fontSize(for text: String, isIPad: Bool) -> CGFloat {
     if englishAlphabet.isSuperset(of: textCharacterSet) {
         return baseFontSize
     } else {
-        if text.count >= 25 {
+        if text.count >= 70 {
+            return baseFontSize - 5
+        } else if text.count >= 45 {
             return baseFontSize - 4
-        } else if text.count >= 21 {
+        } else if text.count >= 30 {
             return baseFontSize - 3
-        } else if text.count >= 17 {
+        } else if text.count >= 21 {
             return baseFontSize - 2
+        } else if text.count >= 17 {
+            return baseFontSize - 1
         } else {
             return baseFontSize
         }
@@ -1981,6 +2066,194 @@ struct AnswerSelectionView_Previews: PreviewProvider {
                     print("選択肢 \(index + 1) がタップされました")
                 }
             }
+        }
+    }
+}
+
+// MARK: - Shared keyboard focus layout
+
+private struct QuizInputFocusModeKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
+extension EnvironmentValues {
+    var quizInputFocusMode: Bool {
+        get { self[QuizInputFocusModeKey.self] }
+        set { self[QuizInputFocusModeKey.self] = newValue }
+    }
+}
+
+private struct QuizKeyboardVisibilityModifier: ViewModifier {
+    @Binding var isVisible: Bool
+
+    func body(content: Content) -> some View {
+        content
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) {
+                notification in
+                guard let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else {
+                    return
+                }
+                let screen = UIScreen.main.bounds
+                isVisible = frame.intersects(screen) && frame.minY < screen.maxY && frame.height > 0
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+                isVisible = false
+            }
+            .onDisappear { isVisible = false }
+    }
+}
+
+extension View {
+    func quizKeyboardVisibility(_ isVisible: Binding<Bool>) -> some View {
+        modifier(QuizKeyboardVisibilityModifier(isVisible: isVisible))
+    }
+}
+
+struct QuizInputFocusHeader: View {
+    let question: QuizQuestion
+    var remainingSeconds: Int? = nil
+    let onSettings: () -> Void
+    let onRead: () -> Void
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Button {
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                onSettings()
+            } label: {
+                Image(systemName: "gearshape.fill")
+                    .frame(width: 44, height: 44)
+            }
+            .accessibilityLabel("設定")
+            Spacer(minLength: 0)
+            if let remainingSeconds {
+                Text("あと \(remainingSeconds) 秒")
+                    .font(.system(size: 13, weight: .semibold))
+                    .monospacedDigit()
+                    .accessibilityLabel("残り\(remainingSeconds)秒")
+            }
+            Button {
+                UIApplication.shared.sendAction(
+                    #selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            } label: {
+                Image(systemName: "keyboard.chevron.compact.down")
+                    .frame(width: 44, height: 44)
+            }
+            .accessibilityLabel("キーボードを閉じる")
+            Button("全文を読む") {
+                UIApplication.shared.sendAction(
+                    #selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                onRead()
+            }
+            .font(.system(size: 13, weight: .semibold))
+            .frame(minHeight: 44)
+        }
+        .foregroundColor(Color("fontGray"))
+        .padding(.horizontal, 10)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .padding(.horizontal, 14)
+    }
+}
+
+struct QuizFullQuestionView: View {
+    let question: QuizQuestion
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            ScrollView { QuizFocusQuestionContent(question: question) }
+                .navigationTitle("問題の全文")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("回答に戻る") { dismiss() }
+                    }
+                }
+        }
+    }
+}
+
+struct QuizFocusQuestionContent: View {
+    let question: QuizQuestion
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text(question.question)
+                .font(.system(size: isSmallDevice() ? 16 : 18, weight: .semibold))
+                .foregroundColor(Color("fontGray"))
+                .lineSpacing(5)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
+            if question.format == .dataReading {
+                ReferenceMaterialCard(title: question.referenceTitle, rows: question.referenceRows)
+            }
+        }
+        .padding(16)
+    }
+}
+
+struct QuizInputFocusStatus: View {
+    var enemyLabel = "敵"
+    let enemyHP: Int
+    let enemyMaxHP: Int
+    let playerHP: Int
+    let playerMaxHP: Int
+
+    var body: some View {
+        HStack(spacing: 10) {
+            hpItem(label: enemyLabel, value: enemyHP, maximum: enemyMaxHP, color: Color("hpMonsterColor"))
+            hpItem(label: "自分", value: playerHP, maximum: playerMaxHP, color: Color("hpUserColor"))
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 4)
+    }
+
+    private func hpItem(label: String, value: Int, maximum: Int, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text("\(label) \(value)/\(maximum)")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundColor(.white)
+                .monospacedDigit()
+            GeometryReader { geometry in
+                Capsule().fill(Color.white.opacity(0.25))
+                    .overlay(alignment: .leading) {
+                        Capsule().fill(color)
+                            .frame(
+                                width: geometry.size.width * min(1, max(0, CGFloat(value) / CGFloat(max(1, maximum)))))
+                    }
+            }
+            .frame(height: 5)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(label)、HP\(value)、最大\(maximum)")
+    }
+}
+
+private struct QuizAnswerContentHeightKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
+}
+
+/// Keep the answer subtree alive and restore its original scroll area after dismissal.
+struct QuizKeyboardAnswerScrollView<Content: View>: View {
+    @Environment(\.quizInputFocusMode) private var focusMode
+    @State private var contentHeight: CGFloat = 60
+    @ViewBuilder var content: Content
+
+    var body: some View {
+        ScrollView {
+            content
+                .background(GeometryReader { geometry in
+                    Color.clear.preference(key: QuizAnswerContentHeightKey.self, value: geometry.size.height)
+                })
+        }
+        .scrollDismissesKeyboard(.never)
+        .frame(height: focusMode ? contentHeight : nil)
+        .onPreferenceChange(QuizAnswerContentHeightKey.self) { height in
+            if height > 0 { contentHeight = height }
         }
     }
 }

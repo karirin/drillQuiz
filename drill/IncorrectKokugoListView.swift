@@ -31,7 +31,7 @@ struct IncorrectKokugoListView: View {
                     QuizView(quizzes: shuffledQuizList, quizLevel: .incorrectKokugoAnswer, authManager: authManager, audioManager: audioManager, isPresenting: $isPresenting, interstitial: sharedInterstitial)
                 }
             } else {
-                ActivityIndicator()
+                EnpiFullScreenLoadingView()
             }
         }
         .onAppear {

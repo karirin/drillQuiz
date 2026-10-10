@@ -25,6 +25,7 @@ struct StoryQuizResultView: View {
     @State private var isShow: Bool = true
     @State private var flag: Bool = false
     @State private var preFlag: Bool = false
+    @State private var paywallSource: PremiumPaywallSource = .storyResultAutomatic
     @State private var level3flag: Bool = false
     @State private var level5flag: Bool = false
     @State private var level10flag: Bool = false
@@ -33,16 +34,19 @@ struct StoryQuizResultView: View {
     @State private var answer100flag: Bool = false
     @State private var rankUpFlag: Bool = false
     @State private var rankDownFlag: Bool = false
-    @State private var userPreFlag: Int = 0
+    @ObservedObject private var appState = AppState.shared
     @Binding var isPresenting: Bool
     @Binding var navigateToQuizResultView: Bool
     @State private var isHidden = false
     @State private var selectedTab = 0 // 0: 結果, 1: 統計
     @ObservedObject var interstitial: Interstitial
+    @State private var isResultVisible = false
+    @State private var hasPreparedMonetization = false
     @State private var hasRequestedInterstitial = false
     @State private var hasPresentedInterstitial = false
-    @StateObject private var quizResultRewardAd = QuizResultRewardAd()
-    @State private var hasClaimedRewardedCoinBonus = false
+    @StateObject private var quizResultRewardAd = QuizResultRewardAd(placement: .storyResult)
+    @StateObject private var rewardedCoinClaim = RewardedCoinClaim(placement: .storyResult)
+    @State private var rewardedAdUserID: String?
     @State private var showRewardedCoinAlert = false
     @Environment(\.presentationMode) var presentationMode
     @Binding var victoryFlag: Bool
@@ -95,7 +99,7 @@ struct StoryQuizResultView: View {
                     // 結果サマリーカード
                     resultSummaryCard
                         .padding(.horizontal).padding(.top,5)
-                    if userPreFlag != 1 {
+                    if appState.shouldShowAds {
                         rewardedCoinBonusCard
                             .padding(.horizontal)
                             .padding(.top, 12)
@@ -118,8 +122,13 @@ struct StoryQuizResultView: View {
             // モーダル類
             modalOverlays
         }
-        .fullScreenCover(isPresented: $preFlag) {
-            PreView(audioManager: audioManager)
+        .fullScreenCover(isPresented: $preFlag, onDismiss: {
+            isResultVisible = true
+            if appState.shouldShowAds {
+                quizResultRewardAd.preloadIfNeeded()
+            }
+        }) {
+            PreView(audioManager: audioManager, source: paywallSource)
         }
         .onChange(of: authManager.didLevelUp) { newValue in
             if newValue {
@@ -145,7 +154,16 @@ struct StoryQuizResultView: View {
                 }
             }
         }
+        .onChange(of: appState.shouldShowAds) { _ in
+            prepareResultMonetizationIfNeeded()
+        }
+        .onChange(of: rewardedCoinClaim.state) { state in
+            if state == .granted || state == .failed {
+                showRewardedCoinAlert = true
+            }
+        }
         .onAppear {
+            isResultVisible = true
             setupOnAppear()
             // モーダルを少し遅れて表示
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -153,6 +171,7 @@ struct StoryQuizResultView: View {
             }
         }
         .onDisappear {
+            isResultVisible = false
             guard !hasAppliedStoryProgress else { return }
             hasAppliedStoryProgress = true
 
@@ -172,19 +191,22 @@ struct StoryQuizResultView: View {
     private var headerView: some View {
         VStack(spacing: 16) {
             // プレミアムボタン
-            HStack {
-                Spacer()
-                Button(action: {
-                    generateHapticFeedback()
-                    preFlag = true
-                    audioManager.playSound()
-                }) {
-                    Image("プレミアムプランボタン")
-                        .resizable()
-                        .frame(width: 240, height: 70)
+            if appState.shouldShowAds {
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        generateHapticFeedback()
+                        paywallSource = .storyResultButton
+                        preFlag = true
+                        audioManager.playSound()
+                    }) {
+                        Image("プレミアムプランボタン")
+                            .resizable()
+                            .frame(width: 240, height: 70)
+                    }
+                    .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 2)
+                    Spacer()
                 }
-                .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 2)
-                Spacer()
             }
         }
         .padding(.horizontal)
@@ -285,9 +307,19 @@ struct StoryQuizResultView: View {
         max(playerMoney * authManager.rewardFlag, 1)
     }
 
+    private var displayedRewardedCoinAmount: Int {
+        rewardedCoinClaim.amount ?? rewardedCoinBonusAmount
+    }
+
     private var rewardedCoinBonusButtonTitle: String {
-        if hasClaimedRewardedCoinBonus {
+        if rewardedCoinClaim.state == .granted {
             return "獲得済み"
+        }
+        if rewardedCoinClaim.state == .failed {
+            return "コインの受け取りを再試行"
+        }
+        if rewardedCoinClaim.state == .granting {
+            return "コインを受け取り中"
         }
         if quizResultRewardAd.loadFailed {
             return "広告を再読み込み"
@@ -315,7 +347,7 @@ struct StoryQuizResultView: View {
 
                 Spacer()
 
-                Text("+\(rewardedCoinBonusAmount)")
+                Text("+\(displayedRewardedCoinAmount)")
                     .font(.title3)
                     .fontWeight(.bold)
                     .foregroundColor(.orange)
@@ -323,11 +355,11 @@ struct StoryQuizResultView: View {
 
             Button(action: handleRewardedCoinBonus) {
                 HStack(spacing: 8) {
-                    if quizResultRewardAd.isLoading {
+                    if quizResultRewardAd.isLoading || rewardedCoinClaim.state == .granting {
                         ProgressView()
                             .tint(.white)
                     } else {
-                        Image(systemName: hasClaimedRewardedCoinBonus ? "checkmark.circle.fill" : "play.fill")
+                        Image(systemName: rewardedCoinClaim.state == .granted ? "checkmark.circle.fill" : "play.fill")
                     }
 
                     Text(rewardedCoinBonusButtonTitle)
@@ -338,13 +370,14 @@ struct StoryQuizResultView: View {
                 .padding(.vertical, 12)
                 .background(
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(hasClaimedRewardedCoinBonus ? Color.green : Color.orange)
+                        .fill(rewardedCoinClaim.state == .granted ? Color.green : Color.orange)
                 )
             }
             .disabled(
-                hasClaimedRewardedCoinBonus
+                rewardedCoinClaim.state == .granted
+                || rewardedCoinClaim.state == .granting
                 || quizResultRewardAd.isPresenting
-                || (!quizResultRewardAd.isLoaded && !quizResultRewardAd.loadFailed)
+                || (rewardedCoinClaim.state == .ready && !quizResultRewardAd.isLoaded && !quizResultRewardAd.loadFailed)
             )
         }
         .padding(16)
@@ -353,30 +386,51 @@ struct StoryQuizResultView: View {
                 .fill(Color(.systemBackground))
                 .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 3)
         )
-        .alert("コインを獲得しました", isPresented: $showRewardedCoinAlert) {
+        .alert(rewardedCoinClaim.state == .granted ? "コインを獲得しました" : "コインを追加できませんでした", isPresented: $showRewardedCoinAlert) {
             Button("OK", role: .cancel) {}
         } message: {
-            Text("+\(rewardedCoinBonusAmount)コインを追加しました")
+            Text(rewardedCoinClaim.state == .granted
+                 ? "+\(displayedRewardedCoinAmount)コインを追加しました"
+                 : "広告の視聴は完了しています。もう一度広告を見る必要はありません。受け取りを再試行してください。")
         }
     }
 
     private func handleRewardedCoinBonus() {
+        guard appState.shouldShowAds else { return }
         generateHapticFeedback()
+
+        if rewardedCoinClaim.state == .failed {
+            rewardedCoinClaim.retry(grant: grantRewardedCoins)
+            return
+        }
 
         if quizResultRewardAd.loadFailed {
             quizResultRewardAd.preloadIfNeeded()
             return
         }
 
+        guard let userID = authManager.currentUserId else { return }
+        let amount = rewardedCoinBonusAmount
+        rewardedAdUserID = userID
         quizResultRewardAd.present {
             DispatchQueue.main.async {
-                guard !hasClaimedRewardedCoinBonus else { return }
-
-                hasClaimedRewardedCoinBonus = true
-                authManager.addMoney(amount: rewardedCoinBonusAmount)
-                showRewardedCoinAlert = true
+                rewardedCoinClaim.earned(amount: amount, grant: grantRewardedCoins)
             }
         }
+    }
+
+    private func grantRewardedCoins(idempotencyKey: String, amount: Int, completion: @escaping (Bool, RewardGrantFailure?) -> Void) {
+        guard let rewardedAdUserID else {
+            completion(false, RewardGrantFailure(.missingRewardUser))
+            return
+        }
+        authManager.grantEarnedAdCoins(
+            idempotencyKey: idempotencyKey,
+            amount: amount,
+            userID: rewardedAdUserID,
+            placement: .storyResult,
+            completion: completion
+        )
     }
 
     // MARK: - Tab Selector
@@ -712,17 +766,7 @@ struct StoryQuizResultView: View {
     
     private func setupOnAppear() {
         authManager.fetchUserStory()
-        authManager.fetchPreFlag { preFlag in
-            userPreFlag = preFlag
-            guard preFlag != 1 else { return }
-
-            quizResultRewardAd.preloadIfNeeded()
-
-            let shouldShowPremiumPrompt = shouldShowPaywallOnQuizResult()
-            if !shouldShowPremiumPrompt {
-                presentInterstitialIfNeeded()
-            }
-        }
+        prepareResultMonetizationIfNeeded()
         
         // レベルとタイトル処理
         authManager.fetchUserExperienceAndLevel()
@@ -788,16 +832,24 @@ struct StoryQuizResultView: View {
         }
     }
     
+    private func prepareResultMonetizationIfNeeded() {
+        guard isResultVisible, appState.shouldShowAds, !hasPreparedMonetization else { return }
+        hasPreparedMonetization = true
+        if !shouldShowPaywallOnQuizResult() {
+            quizResultRewardAd.preloadIfNeeded()
+            presentInterstitialIfNeeded()
+        }
+    }
+
     private func presentInterstitialIfNeeded() {
         // interstitial はクイズ画面と共有しているため、表示済み判定はこの画面のローカル状態で持つ。
-        guard userPreFlag != 1, !hasRequestedInterstitial else { return }
+        guard isResultVisible, appState.shouldShowAds, !hasRequestedInterstitial else { return }
         hasRequestedInterstitial = true
 
         // クイズ中に先読み済みならここで即座に表示される。
         interstitial.preloadIfNeeded { isLoaded in
-            guard isLoaded, userPreFlag != 1, !hasPresentedInterstitial else { return }
-            hasPresentedInterstitial = true
-            interstitial.presentInterstitial()
+            guard isLoaded, isResultVisible, appState.shouldShowAds, !preFlag, !hasPresentedInterstitial else { return }
+            hasPresentedInterstitial = interstitial.presentInterstitial()
         }
     }
 
@@ -807,6 +859,7 @@ struct StoryQuizResultView: View {
         let count = UserDefaults.standard.integer(forKey: "quizResultPaywallCount") + 1
         UserDefaults.standard.set(count, forKey: "quizResultPaywallCount")
         if count % 3 == 0 {
+            paywallSource = .storyResultAutomatic
             preFlag = true
             return true
         }

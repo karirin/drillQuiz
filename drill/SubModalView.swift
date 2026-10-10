@@ -19,128 +19,77 @@ struct SubModalView: View {
     @Binding var userFlag: Int
 
     @StateObject private var viewModel = SubscriptionViewModel()
-    @ObservedObject private var appState = AppState.shared
-    @State private var showAlert = false
     @State private var selectedProduct: Product?
+    @State private var animateGlow = false
+
+    private let benefits: [(icon: String, title: String, color: Color)] = [
+        ("rectangle.badge.xmark.fill", "広告がすべて非表示", Color(hex: "FF5E62")),
+        ("arrow.counterclockwise.circle.fill", "まちがえた問題を復習", Color(hex: "A56BFF")),
+        ("chart.bar.fill", "成績をグラフで確認", Color(hex: "3D9BFF")),
+        ("person.2.fill", "フレンド上限が30人に", Color(hex: "2FC28A"))
+    ]
 
     var body: some View {
         ZStack {
             Color.black.opacity(0.72)
                 .ignoresSafeArea()
 
-            VStack(spacing: 18) {
-                HStack {
-                    Spacer()
-                    Text("プレミアムプラン")
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundColor(.white)
-                    Spacer()
-                }
+            VStack(spacing: 16) {
+                header
 
-                Text("広告なしで学習を進めながら、\nグラフ確認や復習機能も使えるようになります。")
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(.white.opacity(0.84))
-                    .multilineTextAlignment(.center)
-
-                VStack(alignment: .leading, spacing: 12) {
-                    featureRow(icon: "rectangle.badge.xmark.fill", text: "広告非表示")
-                    featureRow(icon: "chart.bar.fill", text: "グラフ機能")
-                    featureRow(icon: "arrow.counterclockwise.circle.fill", text: "復習機能")
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-                if viewModel.isLoadingProducts && viewModel.products.isEmpty {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        .padding(.vertical, 20)
-                } else if !viewModel.products.isEmpty {
-                    VStack(spacing: 10) {
-                        ForEach(viewModel.products, id: \.id) { product in
-                            compactPlanButton(for: product)
-                        }
+                VStack(spacing: 8) {
+                    ForEach(benefits, id: \.title) { benefit in
+                        benefitRow(icon: benefit.icon, text: benefit.title, color: benefit.color)
                     }
-                } else {
-                    VStack(spacing: 12) {
-                        Text(viewModel.productLoadErrorMessage ?? "商品情報を取得できませんでした。")
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundColor(.white.opacity(0.78))
-                            .multilineTextAlignment(.center)
-
-                        Button("再読み込み") {
-                            loadProducts()
-                        }
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundColor(Color(hex: "2D1F14"))
-                        .padding(.horizontal, 18)
-                        .padding(.vertical, 10)
-                        .background(Color.white)
-                        .clipShape(Capsule())
-                    }
-                    .padding(.vertical, 10)
                 }
 
-                Text("※プレミアムプランはいつでも解約できます")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(.white.opacity(0.68))
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                planArea
+
+                trustRow
 
                 HStack(spacing: 10) {
                     Button("購入を復元") {
-                        Task {
-                            do {
-                                try await AppStore.sync()
-                                await appState.refreshSubscriptionState()
-                            } catch {
-                                print("購入復元中にエラーが発生しました: \(error)")
-                            }
-                        }
+                        restorePurchases()
                     }
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(.white)
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.white.opacity(0.75))
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
-                    .background(Color.white.opacity(0.16))
-                    .clipShape(Capsule())
+                    .background(Capsule().fill(Color.white.opacity(0.12)))
 
                     Spacer()
 
                     Button("閉じる") {
                         dismiss()
                     }
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(Color(hex: "2D1F14"))
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.white.opacity(0.6))
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
-                    .background(
-                        LinearGradient(
-                            colors: [Color(hex: "FFE082"), Color(hex: "FFB300")],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .clipShape(Capsule())
+                    .background(Capsule().fill(Color.white.opacity(0.08)))
                 }
             }
-            .padding(22)
+            .padding(20)
             .background(
-                RoundedRectangle(cornerRadius: 24)
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
                     .fill(
                         LinearGradient(
-                            colors: [Color(hex: "1A1A2E"), Color(hex: "16213E")],
+                            colors: [PremiumPalette.backdropTop, PremiumPalette.backdropMid, PremiumPalette.backdropBottom],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
                     )
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 24)
-                    .stroke(Color.white.opacity(0.12), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .stroke(PremiumPalette.gold.opacity(0.35), lineWidth: 1.2)
             )
-            .padding(.horizontal, 24)
-            .alert(isPresented: $showAlert) {
+            .shadow(color: Color(hex: "FFC83D").opacity(0.18), radius: 20, x: 0, y: 8)
+            .padding(.horizontal, 20)
+            .alert(item: $viewModel.notice) { notice in
                 Alert(
-                    title: Text("プレミアムプラン登録ありがとうございます！"),
-                    message: Text("広告非表示の反映に少しお時間がかかる場合がございます。"),
+                    title: Text(notice.title),
+                    message: Text(notice.message),
                     dismissButton: .default(Text("OK"))
                 )
             }
@@ -154,24 +103,141 @@ struct SubModalView: View {
                 isSoundOn = false
             }
 
+            withAnimation(.easeInOut(duration: 1.6).repeatForever(autoreverses: true)) {
+                animateGlow = true
+            }
+
             loadProducts()
         }
     }
 
-    private func featureRow(icon: String, text: String) -> some View {
-        HStack(spacing: 10) {
-            Image(systemName: icon)
-                .font(.system(size: 18, weight: .bold))
-                .foregroundColor(.yellow)
+    // MARK: - Sections
 
-            Text(text)
-                .font(.system(size: 16, weight: .bold))
+    private var header: some View {
+        VStack(spacing: 8) {
+            HStack(spacing: 5) {
+                Image(systemName: "crown.fill")
+                    .font(.system(size: 11))
+                Text("プレミアムプラン")
+                    .font(.system(size: 12, weight: .black))
+            }
+            .foregroundColor(PremiumPalette.ink)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 5)
+            .background(Capsule().fill(PremiumPalette.goldGradient))
+
+            Text("広告なしで、学習に集中しよう")
+                .font(.system(size: 20, weight: .black))
                 .foregroundColor(.white)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text("復習・グラフなど、学習を支える機能もまとめて使えます。")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundColor(.white.opacity(0.72))
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 
+    @ViewBuilder
+    private var planArea: some View {
+        if viewModel.isLoadingProducts && viewModel.products.isEmpty {
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                .padding(.vertical, 20)
+        } else if !viewModel.products.isEmpty {
+            VStack(spacing: 9) {
+                ForEach(viewModel.products, id: \.id) { product in
+                    compactPlanButton(for: product)
+                }
+
+                Text("タップするとApp Storeの購入画面が開きます・いつでも解約OK")
+                    .font(.system(size: 10))
+                    .foregroundColor(.white.opacity(0.5))
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, 2)
+            }
+        } else {
+            VStack(spacing: 12) {
+                Text(viewModel.productLoadErrorMessage ?? "商品情報を取得できませんでした。")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(.white.opacity(0.78))
+                    .multilineTextAlignment(.center)
+
+                Button("再読み込み") {
+                    loadProducts()
+                }
+                .font(.system(size: 13, weight: .bold))
+                .foregroundColor(PremiumPalette.ink)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 10)
+                .background(Capsule().fill(Color.white))
+            }
+            .padding(.vertical, 10)
+        }
+    }
+
+    private var trustRow: some View {
+        HStack(spacing: 6) {
+            trustChip(icon: "checkmark.shield.fill", text: "いつでも解約OK")
+            trustChip(icon: "applelogo", text: "App Store決済")
+        }
+    }
+
+    private func trustChip(icon: String, text: String) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 9, weight: .bold))
+            Text(text)
+                .font(.system(size: 10, weight: .bold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+        }
+        .foregroundColor(.white.opacity(0.75))
+        .padding(.horizontal, 9)
+        .padding(.vertical, 6)
+        .background(Capsule().fill(Color.white.opacity(0.09)))
+    }
+
+    private func benefitRow(icon: String, text: String, color: Color) -> some View {
+        HStack(spacing: 10) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [color.opacity(0.95), color.opacity(0.55)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 30, height: 30)
+
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.white)
+            }
+
+            Text(text)
+                .font(.system(size: 14, weight: .bold))
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 15))
+                .foregroundColor(PremiumPalette.gold)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color.white.opacity(0.07))
+        )
+    }
+
     private func compactPlanButton(for product: Product) -> some View {
-        let isSelected = selectedProduct?.id == product.id
+        let isRecommended = premiumPeriodUnit(for: product) == .month
         let metadata = planMetadata(for: product)
 
         return Button(action: {
@@ -179,71 +245,145 @@ struct SubModalView: View {
             selectedProduct = product
             purchaseSelectedProduct(product)
         }) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(metadata.title)
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(.white)
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 3) {
+                    HStack(spacing: 5) {
+                        Text(metadata.title)
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundColor(.white)
+
+                        if let badge = metadata.badge {
+                            Text(badge)
+                                .font(.system(size: 9, weight: .black))
+                                .foregroundColor(PremiumPalette.ink)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Capsule().fill(PremiumPalette.goldGradient))
+                        }
+                    }
 
                     Text(metadata.caption)
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(.white.opacity(0.72))
+                        .font(.system(size: 11))
+                        .foregroundColor(.white.opacity(0.65))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
                 }
-
-                Spacer()
+                .frame(maxWidth: .infinity, alignment: .leading)
 
                 Text(metadata.price)
-                    .font(.system(size: 22, weight: .bold))
-                    .foregroundColor(.white)
+                    .font(.system(size: 19, weight: .black))
+                    .foregroundColor(isRecommended ? PremiumPalette.ink : .white)
+                    .fixedSize()
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 14)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 13)
             .background(
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .fill(
-                        LinearGradient(
-                            colors: isSelected
-                                ? [Color(hex: "4B3524"), Color(hex: "23170F")]
-                                : [Color.white.opacity(0.1), Color.white.opacity(0.05)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
+                        isRecommended
+                            ? AnyShapeStyle(PremiumPalette.goldGradient)
+                            : AnyShapeStyle(Color.white.opacity(0.08))
                     )
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .stroke(
-                        isSelected ? Color.yellow.opacity(0.9) : Color.white.opacity(0.12),
-                        lineWidth: isSelected ? 2 : 1
+                        isRecommended ? Color.white.opacity(0.5) : Color.white.opacity(0.14),
+                        lineWidth: 1
                     )
+            )
+            .shadow(
+                color: isRecommended ? Color(hex: "FFB020").opacity(animateGlow ? 0.5 : 0.25) : .clear,
+                radius: isRecommended ? (animateGlow ? 14 : 8) : 0,
+                x: 0,
+                y: 4
             )
         }
         .buttonStyle(.plain)
+        .disabled(viewModel.isProcessing)
+        .opacity(viewModel.isProcessing ? 0.6 : 1)
     }
 
-    private func planMetadata(for product: Product) -> (title: String, caption: String, price: String) {
-        switch product.subscription?.subscriptionPeriod.unit {
+    // MARK: - Helpers
+
+    private func planMetadata(for product: Product) -> (title: String, caption: String, price: String, badge: String?) {
+        let weekly = viewModel.products.first { premiumPeriodUnit(for: $0) == .week }
+        let monthly = viewModel.products.first { premiumPeriodUnit(for: $0) == .month }
+
+        switch premiumPeriodUnit(for: product) {
         case .week:
-            return ("週額プラン", "まずは1週間から", "¥480")
+            return ("週間プラン", "まずは1週間おためし", product.displayPrice, nil)
         case .month:
-            return ("月額プラン", "定番のおすすめプラン", "¥980")
+            if let trial = viewModel.freeTrialText(for: product) {
+                return (
+                    "月額プラン",
+                    "\(trial)・その後\(product.displayPrice)/月",
+                    product.displayPrice,
+                    "無料体験"
+                )
+            }
+            if let percent = discountPercent(for: product, comparedTo: weekly) {
+                return ("月額プラン", "週間プランより約\(percent)%お得", product.displayPrice, "人気")
+            }
+            return ("月額プラン", "毎月自動更新でずっと快適", product.displayPrice, "人気")
         case .year:
-            return ("年額プラン", "長く使うならいちばんお得", "¥9,800")
+            if let trial = viewModel.freeTrialText(for: product) {
+                return (
+                    "年額プラン",
+                    "\(trial)・その後\(product.displayPrice)/年",
+                    product.displayPrice,
+                    "無料体験"
+                )
+            }
+            let caption: String
+            if let monthlyEq = monthlyEquivalent(for: product) {
+                caption = "月あたり約\(Decimal(monthlyEq).formatted(product.priceFormatStyle))"
+            } else {
+                caption = "1年分をまとめてお得に"
+            }
+            if let percent = discountPercent(for: product, comparedTo: monthly) {
+                return ("年額プラン", caption, product.displayPrice, "\(percent)%お得")
+            }
+            return ("年額プラン", caption, product.displayPrice, "最もお得")
         default:
-            return (product.displayName, "プレミアムプラン", product.displayPrice)
+            return (product.displayName, "プレミアムプラン", product.displayPrice, nil)
         }
     }
 
+    private func monthlyEquivalent(for product: Product) -> Double? {
+        guard let unit = premiumPeriodUnit(for: product) else { return nil }
+        let price = NSDecimalNumber(decimal: product.price).doubleValue
+        let count = Double(premiumPeriodValue(for: product))
+
+        switch unit {
+        case .day: return price * 30.0 / count
+        case .week: return price * 52.0 / 12.0 / count
+        case .month: return price / count
+        case .year: return price / (12.0 * count)
+        default: return nil
+        }
+    }
+
+    private func discountPercent(for product: Product, comparedTo base: Product?) -> Int? {
+        guard let base,
+              let target = monthlyEquivalent(for: product),
+              let baseline = monthlyEquivalent(for: base),
+              baseline > 0,
+              target < baseline else { return nil }
+
+        let percent = Int(((baseline - target) / baseline * 100).rounded())
+        return percent > 0 ? percent : nil
+    }
+
     private func purchaseSelectedProduct(_ product: Product) {
+        Task { @MainActor in
+            await viewModel.purchaseProduct(product, source: "quiz_pause_modal")
+        }
+    }
+
+    private func restorePurchases() {
         Task {
-            do {
-                try await AppStore.sync()
-                try await viewModel.purchaseProduct(product, showAlert: $showAlert)
-            } catch SubscribeError.userCancelled {
-                print("ユーザーによって購入がキャンセルされました")
-            } catch {
-                print("購入処理中にエラーが発生しました: \(error)")
-            }
+            await viewModel.restorePurchases(source: "quiz_pause_modal")
         }
     }
 
@@ -268,8 +408,13 @@ struct SubModalView: View {
         }
 
         selectedProduct = viewModel.products.first(where: {
-            $0.subscription?.subscriptionPeriod.unit == .week
+            premiumPeriodUnit(for: $0) == .month
         }) ?? viewModel.products.first
+    }
+
+    private var selectedFreeTrialText: String? {
+        guard let selectedProduct else { return nil }
+        return viewModel.freeTrialText(for: selectedProduct)
     }
 
     private func dismiss() {

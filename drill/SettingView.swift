@@ -92,7 +92,7 @@ struct SettingView: View {
                             .buttonStyle(PlainButtonStyle())
                             Divider().padding(.leading, 56)
                             
-                            NavigationLink(destination: PreView(audioManager: audioManager).navigationBarBackButtonHidden(true)) {
+                            NavigationLink(destination: PreView(audioManager: audioManager, source: .settings).navigationBarBackButtonHidden(true)) {
                                 settingRow(icon: "eye.slash", iconColor: .purple, title: "広告を非表示にする")
                             }
                             .buttonStyle(PlainButtonStyle())

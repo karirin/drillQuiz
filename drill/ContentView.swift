@@ -639,7 +639,7 @@ private struct CompactHomeProfileCard: View {
             Color.clear
                 .frame(width: 72, height: 82)
                 .overlay(
-                    Image(avatarName.isEmpty ? "defaultIcon" : avatarName)
+                    Image(avatarName.isEmpty ? "defaultIcon" : avatarArtworkName(for: avatarName))
                         .resizable()
                         .scaledToFit()
                         .frame(width: 108, height: 123)
@@ -743,7 +743,7 @@ private struct CompactHomeProfileCard: View {
                 Spacer(minLength: 0)
 
                 HStack(spacing: 3) {
-                    Image(avatarName.isEmpty ? "defaultIcon" : avatarName)
+                    Image(avatarName.isEmpty ? "defaultIcon" : avatarArtworkName(for: avatarName))
                         .renderingMode(.original)
                         .resizable()
                         .scaledToFit()
@@ -789,6 +789,7 @@ struct ContentView: View {
     @State private var isPresentingQuizBeginnerList: Bool = false
     @State private var isPresentingSettingList: Bool = false
     @State private var isPresentingQuizList: Bool = false
+    @State private var isPresentingWeaknessReview = false
     @State private var isIntermediateQuizActive: Bool = false
     @State private var isPresentingStoryView: Bool = false
     @State private var isPresentingGachaView: Bool = false
@@ -820,7 +821,7 @@ struct ContentView: View {
     @State private var rewardFlag: Int = 0
     @State private var customerFlag: Bool = false
     @Environment(\.requestReview) var requestReview
-    @State private var userPreFlag: Int = 0
+    @ObservedObject private var appState = AppState.shared
     @State private var preFlag: Bool = false
     @State private var startFlag: Bool = false
     @State private var isFlag: Bool = false
@@ -838,23 +839,27 @@ struct ContentView: View {
     @State private var hasBootstrapped = false
     @State private var hasLoadedDeferredHomeData = false
     private static let homeLoadingTimeout: TimeInterval = 8
-    private let initialLaunchKey = "hasLaunchedBeforeOnappear"
     private let introOptOutKey = "hasOptedOutOfIntroTutorial"
     
     private var maxExperience: Int {
         return 100 // または authManager から取得
     }
 
+    // 一覧で更新された選択状態を優先し、未取得時はホームの初期データを使う。
+    private var activeAvatar: Avatar? {
+        authManager.avatars.first(where: { $0.usedFlag == 1 })
+    }
+
     private var avatarName: String {
-        avatar.first?["name"] as? String ?? ""
+        activeAvatar?.name ?? (avatar.first?["name"] as? String ?? "")
     }
 
     private var avatarBonusHp: Int {
-        avatar.first?["health"] as? Int ?? 0
+        activeAvatar?.health ?? (avatar.first?["health"] as? Int ?? 0)
     }
 
     private var avatarBonusAttack: Int {
-        avatar.first?["attack"] as? Int ?? 0
+        activeAvatar?.attack ?? (avatar.first?["attack"] as? Int ?? 0)
     }
 
     private var friendNotificationCount: Int {
@@ -879,16 +884,13 @@ struct ContentView: View {
             ZStack{
                 if isLoading {
                     VStack{
-                        ActivityIndicator()
+                        EnpiFullScreenLoadingView()
                     }
                         .frame(maxWidth:.infinity,maxHeight:.infinity)
                 } else {
                     VStack {
-                        if userPreFlag != 1 {
-                            // 下のZStackの背景画像が .ignoresSafeArea() で上方向にはみ出し、
-                            // バナーを覆って見えなくなるため、描画順を明示的に前面へ上げる。
+                        if appState.shouldShowAds {
                             BannerAdView()
-                                .zIndex(1)
                         }
                         ZStack{
                             // LazyVStack内に置くと画面外では未描画のままになり遷移が発火しないため、
@@ -1005,6 +1007,18 @@ struct ContentView: View {
                                         }
                                     }
 
+                                    CompactHomeFeatureCard(
+                                        title: "苦手分野克服",
+                                        subtitle: "復習・教科別の集中特訓",
+                                        icon: .symbol("arrow.clockwise"),
+                                        accent: Color(hex: "2f7edb")
+                                    ) {
+                                        generateHapticFeedback()
+                                        isPresentingWeaknessReview = true
+                                        audioManager.playSound()
+                                    }
+                                    .accessibilityIdentifier("home.weaknessReview")
+
                                     CompactHomeSectionHeader(title: "みんなで")
 
                                     LazyVGrid(
@@ -1110,7 +1124,9 @@ struct ContentView: View {
                                 .scaledToFill()
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 .clipped()
-                                .ignoresSafeArea()
+                                // 上方向にまではみ出させると、上に並ぶバナーの領域まで覆ってしまう。
+                                // 背景がスクロール領域からはみ出す必要があるのは下側だけなのでそちらに限定する。
+                                .ignoresSafeArea(.container, edges: .bottom)
                                 .allowsHitTesting(false)
                         }
                     }
@@ -1297,7 +1313,10 @@ struct ContentView: View {
             bootstrapIfNeeded()
         }
         .fullScreenCover(isPresented: $preFlag) {
-            PreView(audioManager: audioManager)
+            PreView(audioManager: audioManager, source: .homeAutomatic)
+        }
+        .fullScreenCover(isPresented: $isPresentingWeaknessReview) {
+            SpacedReviewHomeView(isPresenting: $isPresentingWeaknessReview)
         }
         .onChange(of: isPresentingQuizList) { isPresenting in
             fetchUserInfoIfNeeded(isPresenting: isPresenting)
@@ -1308,6 +1327,9 @@ struct ContentView: View {
             fetchUserInfoIfNeeded(isPresenting: isPresenting)
             authManager.fetchUserExperienceAndLevel()
             authManager.fetchUserRewardFlag()
+        }
+        .onChange(of: authManager.money) { money in
+            userMoney = money
         }
         .background(Color("purple2").opacity(0.6))
         .onChange(of: tutorialNum) { num in
@@ -1373,33 +1395,23 @@ struct ContentView: View {
             hasBootstrapped = false
             return
         }
-        
-        let userDefaults = UserDefaults.standard
-        if !userDefaults.bool(forKey: initialLaunchKey) {
-            userDefaults.set(true, forKey: initialLaunchKey)
-            userDefaults.synchronize()
-            showCreateButton = true
-            let shouldShowIntro = !userDefaults.bool(forKey: introOptOutKey)
-            authManager.saveUserToDatabase(userName: userName) { success in
-                if success {
-                    refreshUserInfo {
-                        self.startFlag = shouldShowIntro
-                        loadDeferredHomeData(userId: userId)
-                    }
-                } else {
-                    refreshUserInfo {
-                        self.startFlag = shouldShowIntro
-                    }
-                }
-            }
-            return
-        }
-        
-        authManager.checkIfUserIdExists(userId: userId) { exists in
-            self.isUserExists = exists
-            guard self.isUserExists != nil else { return }
 
+        let shouldShowIntro = !UserDefaults.standard.bool(forKey: introOptOutKey)
+        authManager.initializeUserIfNeeded(userName: userName) { result in
+            guard result != .failed else {
+                self.hasBootstrapped = false
+                self.isLoading = false
+                return
+            }
+
+            self.isUserExists = true
+            if result == .created {
+                self.showCreateButton = true
+            }
             refreshUserInfo {
+                if result == .created {
+                    self.startFlag = shouldShowIntro
+                }
                 loadDeferredHomeData(userId: userId)
             }
         }
@@ -1435,9 +1447,11 @@ struct ContentView: View {
         }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            authManager.fetchPreFlag { preFlag in
-                self.userPreFlag = preFlag
-                if preFlag != 1 {
+            Task { @MainActor in
+                if !appState.hasResolvedSubscription {
+                    await appState.refreshSubscriptionState()
+                }
+                if appState.shouldShowAds {
                     showPaywallEveryTenHomeAppearances()
                 }
             }

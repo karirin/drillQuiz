@@ -12,6 +12,41 @@
 import Foundation
 import FirebaseDatabase
 
+enum ReviewSubject: String, CaseIterable, Identifiable {
+    case sansu, kokugo, shakai, rika
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .sansu: return "算数"
+        case .kokugo: return "国語"
+        case .shakai: return "社会"
+        case .rika: return "理科"
+        }
+    }
+
+    static func resolve(sourceQuizLevel: String?) -> ReviewSubject? {
+        guard let sourceQuizLevel else { return nil }
+        return allCases.first { subject in
+            sourceQuizLevel == subject.title || sourceQuizLevel == subject.rawValue
+                || (1...6).contains { sourceQuizLevel == "\(subject.rawValue)\($0)" }
+        }
+    }
+}
+
+struct ScheduledReviewQuestion {
+    let question: QuizQuestion
+    let subject: ReviewSubject?
+    let nextReviewAt: Date
+    let reviewStage: Int
+
+    init(question: QuizQuestion, subject: ReviewSubject?, nextReviewAt: Date = .distantPast, reviewStage: Int = 0) {
+        self.question = question; self.subject = subject
+        self.nextReviewAt = nextReviewAt; self.reviewStage = reviewStage
+    }
+}
+
 struct ReviewScheduleSummary {
     let dueCount: Int
     let totalCount: Int
@@ -72,6 +107,21 @@ enum ReviewScheduleService {
         now: Date = Date(),
         completion: ((Bool) -> Void)? = nil
     ) {
+        saveIncorrectAnswer(
+            userId: userId,
+            quiz: QuizQuestion(question: quizQuestion, choices: choices,
+                               correctAnswerIndex: correctAnswerIndex, explanation: explanation),
+            sourceQuizLevel: sourceQuizLevel, now: now, completion: completion
+        )
+    }
+
+    static func saveIncorrectAnswer(
+        userId: String,
+        quiz: QuizQuestion,
+        sourceQuizLevel: String? = nil,
+        now: Date = Date(),
+        completion: ((Bool) -> Void)? = nil
+    ) {
         let answersRef = Database.database().reference()
             .child(incorrectAnswersPath)
             .child(userId)
@@ -79,20 +129,15 @@ enum ReviewScheduleService {
         answersRef.observeSingleEvent(of: .value) { snapshot in
             let existing = snapshot.children.compactMap { $0 as? DataSnapshot }.first { child in
                 guard let value = child.value as? [String: Any] else { return false }
-                return value["quizQuestion"] as? String == quizQuestion
+                return value["quizQuestion"] as? String == quiz.question
             }
             let answerRef = existing?.ref ?? answersRef.childByAutoId()
             let nowMilliseconds = milliseconds(from: now)
 
-            var values: [String: Any] = [
-                "quizQuestion": quizQuestion,
-                "choices": choices,
-                "correctAnswerIndex": correctAnswerIndex,
-                "explanation": explanation,
-                "reviewStage": 0,
-                "nextReviewAt": nowMilliseconds + Int64(firstReviewInterval * 1_000),
-                "lastAnsweredAt": nowMilliseconds
-            ]
+            var values = IncorrectAnswer(userId: userId, quiz: quiz).databasePayload
+            values["reviewStage"] = 0
+            values["nextReviewAt"] = nowMilliseconds + Int64(firstReviewInterval * 1_000)
+            values["lastAnsweredAt"] = nowMilliseconds
             if let sourceQuizLevel {
                 values["sourceQuizLevel"] = sourceQuizLevel
             }
@@ -114,11 +159,23 @@ enum ReviewScheduleService {
         questionIdPrefix: String? = nil,
         completion: @escaping (Result<[QuizQuestion], Error>) -> Void
     ) {
+        fetchDueReviews(userId: userId, now: now, questionIdPrefix: questionIdPrefix) { result in
+            completion(result.map { $0.map(\.question) })
+        }
+    }
+
+    static func fetchDueReviews(
+        userId: String,
+        now: Date = Date(),
+        questionIdPrefix: String? = nil,
+        dueOnly: Bool = true,
+        completion: @escaping (Result<[ScheduledReviewQuestion], Error>) -> Void
+    ) {
         answersReference(userId: userId).observeSingleEvent(of: .value) { snapshot in
             let nowMilliseconds = milliseconds(from: now)
             let questions = snapshot.children
                 .compactMap { $0 as? DataSnapshot }
-                .compactMap { snapshot -> (QuizQuestion, Int64)? in
+                .compactMap { snapshot -> (ScheduledReviewQuestion, Int64)? in
                     if let questionIdPrefix,
                        !snapshot.key.hasPrefix(questionIdPrefix) {
                         return nil
@@ -128,14 +185,19 @@ enum ReviewScheduleService {
                         return nil
                     }
                     guard let value = snapshot.value as? [String: Any],
-                          let question = quizQuestion(from: value, id: snapshot.key) else {
+                          let question = decodedQuestion(from: value, id: snapshot.key) else {
                         return nil
                     }
                     // reviewStage/nextReviewAt がない旧データは、すぐ復習できる状態として扱う。
                     let nextReviewAt = int64(value["nextReviewAt"]) ?? 0
-                    return (question, nextReviewAt)
+                    return (ScheduledReviewQuestion(
+                        question: question,
+                        subject: ReviewSubject.resolve(sourceQuizLevel: value["sourceQuizLevel"] as? String),
+                        nextReviewAt: Date(timeIntervalSince1970: TimeInterval(nextReviewAt) / 1_000),
+                        reviewStage: int(value["reviewStage"]) ?? 0
+                    ), nextReviewAt)
                 }
-                .filter { $0.1 <= nowMilliseconds }
+                .filter { !dueOnly || $0.1 <= nowMilliseconds }
                 .sorted { $0.1 < $1.1 }
                 .map(\.0)
             completion(.success(questions))
@@ -154,7 +216,8 @@ enum ReviewScheduleService {
             let nowMilliseconds = milliseconds(from: now)
             let scheduledItems = snapshot.children.compactMap { child -> (date: Int64, stage: Int)? in
                 guard let snapshot = child as? DataSnapshot,
-                      let value = snapshot.value as? [String: Any] else { return nil }
+                      let value = snapshot.value as? [String: Any],
+                      decodedQuestion(from: value, id: snapshot.key) != nil else { return nil }
                 if let questionIdPrefix,
                    !snapshot.key.hasPrefix(questionIdPrefix) {
                     return nil
@@ -223,6 +286,8 @@ enum ReviewScheduleService {
                         return
                     }
                     if !questionId.hasPrefix(testQuestionIdPrefix) {
+                        ReviewDailyActivityLog.record(ReviewDailyActivity(kind: .review, topicID: nil,
+                            answeredCount: 1, correctCount: 1, masteredCount: 1, completedAt: now), userID: userId)
                         MissionManager.shared.updateMissionProgress(type: .review, increment: 1) { _ in }
                         GuildManager.shared.recordReviewCompleted()
                         markReviewDayIfCompleted(userId: userId, now: now)
@@ -236,6 +301,8 @@ enum ReviewScheduleService {
                 value["nextReviewAt"] = nowMilliseconds + Int64(nextIntervals[currentStage] * 1_000)
                 answerRef.setValue(value) { error, _ in
                     if error == nil, !questionId.hasPrefix(testQuestionIdPrefix) {
+                        ReviewDailyActivityLog.record(ReviewDailyActivity(kind: .review, topicID: nil,
+                            answeredCount: 1, correctCount: 1, masteredCount: 0, completedAt: now), userID: userId)
                         markReviewDayIfCompleted(userId: userId, now: now)
                     }
                     completion?(error == nil)
@@ -259,6 +326,8 @@ enum ReviewScheduleService {
             "lastAnsweredAt": nowMilliseconds
         ]) { error, _ in
             if error == nil, !questionId.hasPrefix(testQuestionIdPrefix) {
+                ReviewDailyActivityLog.record(ReviewDailyActivity(kind: .review, topicID: nil,
+                    answeredCount: 1, correctCount: 0, masteredCount: 0, completedAt: now), userID: userId)
                 markReviewDayIfCompleted(userId: userId, now: now)
             }
             completion?(error == nil)
@@ -543,20 +612,8 @@ enum ReviewScheduleService {
         Database.database().reference().child(reviewActivityPath).child(userId)
     }
 
-    private static func quizQuestion(from value: [String: Any], id: String) -> QuizQuestion? {
-        guard let question = value["quizQuestion"] as? String,
-              let choices = value["choices"] as? [String],
-              let correctAnswerIndex = int(value["correctAnswerIndex"]),
-              let explanation = value["explanation"] as? String else {
-            return nil
-        }
-        return QuizQuestion(
-            id: id,
-            question: question,
-            choices: choices,
-            correctAnswerIndex: correctAnswerIndex,
-            explanation: explanation
-        )
+    private static func decodedQuestion(from value: [String: Any], id: String) -> QuizQuestion? {
+        quizQuestion(fromIncorrectAnswerDict: value, quizId: id)
     }
 
     private static func milliseconds(from date: Date) -> Int64 {

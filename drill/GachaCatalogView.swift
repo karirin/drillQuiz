@@ -163,8 +163,7 @@ struct GachaCatalogDetailCard: View {
                                 ))
                                 .frame(width: 120, height: 120)
                         }
-                            Image(isOwned ? item.artworkName : item.silhouetteArtworkName)
-                                .resizable()
+                            GachaCatalogArtworkView(item: item, isOwned: isOwned)
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 100, height: 100)
                             .clipShape(RoundedRectangle(cornerRadius: 14))
@@ -284,8 +283,7 @@ struct GachaCatalogGridItemView: View {
                             .fill(item.rarity.catalogColor.opacity(0.2))
                             .frame(width: 80, height: 80)
                     }
-                    Image(isOwned ? item.artworkName : item.silhouetteArtworkName)
-                        .resizable()
+                    GachaCatalogArtworkView(item: item, isOwned: isOwned)
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 70, height: 70)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
@@ -312,6 +310,25 @@ struct GachaCatalogGridItemView: View {
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
         }
         .buttonStyle(PlainButtonStyle())
+    }
+}
+
+private struct GachaCatalogArtworkView: View {
+    let item: GachaManager.Item
+    let isOwned: Bool
+
+    var body: some View {
+        Group {
+            if isOwned || item.hasDedicatedSilhouette {
+                companionArtworkImage(named: isOwned ? item.artworkName : item.silhouetteArtworkName)
+                    .resizable()
+            } else {
+                companionArtworkImage(named: item.artworkName)
+                    .resizable()
+                    .renderingMode(.template)
+                    .foregroundColor(Color.black.opacity(0.82))
+            }
+        }
     }
 }
 

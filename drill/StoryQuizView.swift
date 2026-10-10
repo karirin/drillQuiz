@@ -58,7 +58,8 @@ struct Monster: Codable {
     let monsterAttack: Int
 }
 
-let storyMonstersById: [Int: Monster] = [
+let storyMonstersById: [Int: Monster] = {
+    var catalog: [Int: Monster] = [
     1: Monster(name: "モンスター1", playerExperience: 30, playerMoney: 30, monsterHP: 160, monsterUnderHP: 160, monsterAttack: 30),
     2: Monster(name: "モンスター2", playerExperience: 20, playerMoney: 20, monsterHP: 100, monsterUnderHP: 100, monsterAttack: 10),
     3: Monster(name: "モンスター3", playerExperience: 15, playerMoney: 15, monsterHP: 120, monsterUnderHP: 120, monsterAttack: 15),
@@ -91,8 +92,42 @@ let storyMonstersById: [Int: Monster] = [
     30: Monster(name: "モンスター30", playerExperience: 145, playerMoney: 145, monsterHP: 370, monsterUnderHP: 370, monsterAttack: 80),
     31: Monster(name: "モンスター31", playerExperience: 150, playerMoney: 150, monsterHP: 380, monsterUnderHP: 380, monsterAttack: 82),
     32: Monster(name: "モンスター32", playerExperience: 155, playerMoney: 155, monsterHP: 390, monsterUnderHP: 390, monsterAttack: 85),
-    150: Monster(name: "ボス150", playerExperience: 1500, playerMoney: 3000, monsterHP: 6000, monsterUnderHP: 6000, monsterAttack: 750)
-]
+        150: Monster(name: "ボス150", playerExperience: 1500, playerMoney: 3000, monsterHP: 6000, monsterUnderHP: 6000, monsterAttack: 750)
+    ]
+
+    // 101〜299階の通常モンスター。既存の成長曲線をそのまま延長する。
+    for id in 33...98 {
+        let step = id - 33
+        let hp = 400 + (step * 10)
+        catalog[id] = Monster(
+            name: "モンスター\(id)",
+            playerExperience: 160 + (step * 5),
+            playerMoney: 160 + (step * 5),
+            monsterHP: hp,
+            monsterUnderHP: hp,
+            monsterAttack: 88 + Int(Double(step) * 2.5)
+        )
+    }
+
+    catalog[200] = Monster(
+        name: "ボス200",
+        playerExperience: 2500,
+        playerMoney: 5000,
+        monsterHP: 9000,
+        monsterUnderHP: 9000,
+        monsterAttack: 900
+    )
+    catalog[300] = Monster(
+        name: "ボス300",
+        playerExperience: 4000,
+        playerMoney: 8000,
+        monsterHP: 14000,
+        monsterUnderHP: 14000,
+        monsterAttack: 1200
+    )
+
+    return catalog
+}()
 
 let monsters: [String: Monster] = Dictionary(
     uniqueKeysWithValues: storyMonstersById.map { ($0.value.name, $0.value) }
@@ -135,7 +170,6 @@ struct StoryQuizView: View {
     @State private var userHp: Int = 100
     @State private var userMaxHp: Int = 100
     @State private var userFlag: Int = 0
-    @State private var userPreFlag: Int = 0
     @State private var avatarHp: Int = 100
     @State private var userAttack: Int = 30
     @State private var tutorialNum: Int = 0
@@ -147,6 +181,10 @@ struct StoryQuizView: View {
     @State var showExplanationModal: Bool = false
     @State private var showMonsterDownImage: Bool = false
     @State private var showIncorrectBackground: Bool = false
+    @State private var showsFullQuestion = false
+    @State private var keyboardVisible = false
+    private var inputFocusMode: Bool { keyboardVisible && currentQuiz.usesTextInput && !hasAnswered }
+
     @State private var hasAnswered: Bool = false
     @Binding var isPresenting: Bool
     @State var showHomeModal: Bool = false
@@ -229,7 +267,7 @@ struct StoryQuizView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.bottom, 2)
             } else {
-                ScrollView{
+                QuizKeyboardAnswerScrollView {
                     VStack(spacing: 0){
                         answerInputContent
 
@@ -238,8 +276,8 @@ struct StoryQuizView: View {
                         }
                     }
                 }
-                .frame(maxWidth: .infinity,maxHeight:.infinity)
-                .padding(.bottom, 12)
+                .frame(maxWidth: .infinity, maxHeight: inputFocusMode ? nil : .infinity)
+                .padding(.bottom, inputFocusMode ? 2 : 12)
             }
         }
     }
@@ -574,6 +612,17 @@ struct StoryQuizView: View {
                         saveIncorrectAnswer(incorrectAnswer)
                         break
                     }
+                    if let userId = authManager.currentUserId {
+                        if currentQuiz.format == .multipleChoice {
+                            WeaknessCourseStore.shared.recordMistake(question: currentQuiz,
+                                selectedIndex: selectionIndex, userID: userId)
+                        }
+                        ReviewScheduleService.saveIncorrectAnswer(
+                            userId: userId,
+                            quiz: currentQuiz,
+                            sourceQuizLevel: ReviewSubject.resolve(sourceQuizLevel: quizLevel.description)?.rawValue
+                        )
+                    }
                 }
                 answerCount += 1
                 audioManager.playUnCorrectSound()
@@ -775,10 +824,13 @@ struct StoryQuizView: View {
             .padding()
         } else {
             quizContent
+                .quizKeyboardVisibility($keyboardVisible)
+                .environment(\.quizInputFocusMode, inputFocusMode)
+                .sheet(isPresented: $showsFullQuestion) { QuizFullQuestionView(question: currentQuiz) }
                 .onAppear {
                     // 結果画面のインタースティシャルを先読みしておく。
                     // 表示直前にロードすると読み込み待ちで表示機会を落とすため、必ずクイズ開始時に呼ぶ。
-                    if !appState.isSubscribed {
+                    if appState.shouldShowAds {
                         interstitial.preloadIfNeeded()
                     }
                 }
@@ -792,6 +844,14 @@ struct StoryQuizView: View {
                  .resizable()
                  .edgesIgnoringSafeArea(.all)
             VStack {
+                    if inputFocusMode {
+                        QuizInputFocusHeader(question: currentQuiz, remainingSeconds: remainingSeconds, onSettings: {
+                            generateHapticFeedback()
+                            showHomeModal.toggle()
+                            audioManager.playSound()
+                        }, onRead: { showsFullQuestion = true })
+                        QuizInputFocusStatus(enemyHP: monsterHP, enemyMaxHP: monsterUnderHP, playerHP: playerHP, playerMaxHP: userMaxHp)
+                    } else {
                 HStack{
                     Button(action: {
                                 generateHapticFeedback()
@@ -840,6 +900,7 @@ struct StoryQuizView: View {
                         }
 	                }
 	                .padding(.trailing)
+                    }
 	//                    .padding(.top,40)
 	                topContentSpacer
                     // 正解の場合の赤い円
@@ -850,13 +911,15 @@ struct StoryQuizView: View {
                         question: currentQuiz.question,
                         selectedAnswerIndex: selectedAnswerIndex,
                         correctAnswerIndex: currentQuiz.correctAnswerIndex,
-                        compactMode: isCompactAnswerQuiz
+                        compactMode: isCompactAnswerQuiz,
+                        focusQuestion: inputFocusMode ? currentQuiz : nil
                     )
                     .background(GeometryReader { geometry in
                         Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
                     })
                     .padding(.horizontal, 16)
 
+                    if !inputFocusMode {
                     ZStack{
                                     Image("\(monsterName)")
                             .resizable()
@@ -915,7 +978,7 @@ struct StoryQuizView: View {
                             .padding(.horizontal)
                                 // 味方キャラのHP
                                 HStack{
-                                    Image(avator.isEmpty ? "defaultIcon" : (avator.first?["name"] as? String) ?? "")
+                                    avatarArtworkImage(for: avator.isEmpty ? "defaultIcon" : (avator.first?["name"] as? String) ?? "")
                                         .resizable()
                                         .frame(width: 30,height:30)
                                     ProgressBar3(value: Double(playerHP), maxValue: Double(self.userMaxHp), color: Color("hpUserColor"))
@@ -957,7 +1020,9 @@ struct StoryQuizView: View {
                         }
                         .padding()
                     }
+                    }
                 }
+                .frame(maxHeight: inputFocusMode ? .infinity : nil)
                 answerContentSpacer
                 answerInputSection
                     
@@ -1249,11 +1314,9 @@ struct StoryQuizView: View {
             if quizLevel == .incorrectAnswer {
                 userAttack = 0
             }
-            authManager.fetchPreFlag()
             authManager.fetchUserFlag()
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 userFlag = authManager.userFlag
-                userPreFlag = authManager.userPreFlag
             }
         }
         .onDisappear {

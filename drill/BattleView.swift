@@ -586,6 +586,9 @@ struct BattlePlayView: View {
     @ObservedObject private var audioManager = AudioManager.shared
     @ObservedObject private var authManager = AuthManager.shared
 
+    @State private var keyboardVisible = false
+    @State private var showsFullQuestion = false
+    private var inputFocusMode: Bool { keyboardVisible && currentQuestion?.usesTextInput == true && selectedIndex == nil }
     @State private var currentIndex = 0
     @State private var answers: [BattleAnswerRecord] = []
     @State private var selectedIndex: Int?
@@ -620,8 +623,14 @@ struct BattlePlayView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
-                header
+                if inputFocusMode, let question = currentQuestion {
+                    QuizInputFocusHeader(question: question, remainingSeconds: Int(ceil(remainingSeconds)), onSettings: { showSettings = true; timer?.invalidate() }, onRead: { showsFullQuestion = true })
+                    QuizInputFocusStatus(enemyLabel: "相手", enemyHP: opponentHP, enemyMaxHP: session.opponent.maxHP, playerHP: playerHP, playerMaxHP: session.player.maxHP)
+                } else {
+                    header
+                }
 
+                GeometryReader { geometry in
                 ScrollView(showsIndicators: false) {
                     if let question = currentQuestion {
                         VStack(spacing: 12) {
@@ -629,7 +638,8 @@ struct BattlePlayView: View {
                                 question: question.question,
                                 selectedAnswerIndex: selectedIndex,
                                 correctAnswerIndex: question.correctAnswerIndex,
-                                compactMode: question.usesCompactAnswerLayout
+                                compactMode: question.usesCompactAnswerLayout,
+                                focusQuestion: inputFocusMode ? question : nil
                             )
                                 .id(currentIndex)
                                 .opacity(questionAppeared ? 1 : 0)
@@ -641,7 +651,7 @@ struct BattlePlayView: View {
                                 .padding(.top, 8)
                                 .padding(.horizontal, 16)
 
-                            battleArena
+                            if !inputFocusMode { battleArena }
 
                             QuestionAnswerInputView(
                                 questionKey: question.id ?? "\(currentIndex)-\(question.question)",
@@ -665,14 +675,17 @@ struct BattlePlayView: View {
                                 }
                             )
                             .id("answers-\(currentIndex)")
+                            .fixedSize(horizontal: false, vertical: inputFocusMode)
                             .allowsHitTesting(selectedIndex == nil)
                         }
                         .padding(.horizontal, 16)
-                        .padding(.bottom, 24)
+                        .padding(.bottom, inputFocusMode ? 4 : 24)
+                        .frame(height: inputFocusMode ? geometry.size.height : nil)
                     }
                 }
 
-                footer
+                }
+                if !inputFocusMode { footer }
             }
 
             if showExplanation, let question = currentQuestion {
@@ -686,6 +699,11 @@ struct BattlePlayView: View {
                     .transition(.opacity.combined(with: .scale(scale: 0.97)))
                     .zIndex(3)
             }
+        }
+        .quizKeyboardVisibility($keyboardVisible)
+        .environment(\.quizInputFocusMode, inputFocusMode)
+        .sheet(isPresented: $showsFullQuestion) {
+            if let question = currentQuestion { QuizFullQuestionView(question: question) }
         }
         .dynamicTypeSize(...DynamicTypeSize.accessibility1)
         .onAppear {

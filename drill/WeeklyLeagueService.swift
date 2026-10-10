@@ -581,15 +581,25 @@ final class WeeklyLeagueService {
         // トランザクションのブロックはローカルキャッシュ未取得だとデータ無しで呼ばれる。
         // 空データから組み立て直す実装にするため、ユーザーの実在を先に確かめておく。
         userRef.observeSingleEvent(of: .value) { snapshot in
-            guard snapshot.exists() else {
+            guard snapshot.exists(),
+                  let fetchedUserData = snapshot.value as? [String: Any] else {
                 completion(.failure(WeeklyLeagueServiceError.invalidProfile))
                 return
             }
 
             var alreadyClaimed = false
+            var hasUsedFetchedUserData = false
 
             userRef.runTransactionBlock { mutableData in
-                var userData = mutableData.value as? [String: Any] ?? [:]
+                var userData: [String: Any]
+                if let currentUserData = mutableData.value as? [String: Any] {
+                    userData = currentUserData
+                } else if !hasUsedFetchedUserData {
+                    userData = fetchedUserData
+                    hasUsedFetchedUserData = true
+                } else {
+                    return TransactionResult.abort()
+                }
                 var claims = userData["leagueRewardClaims"] as? [String: Any] ?? [:]
 
                 if Self.boolValue(claims[result.seasonId]) == true {

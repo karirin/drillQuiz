@@ -31,7 +31,7 @@ struct IncorrectShakaiListView: View {
                     QuizView(quizzes: shuffledQuizList, quizLevel: .incorrectShakaiAnswer, authManager: authManager, audioManager: audioManager, isPresenting: $isPresenting, interstitial: sharedInterstitial)
                 }
             } else {
-                ActivityIndicator()
+                EnpiFullScreenLoadingView()
             }
         }
         .onAppear {

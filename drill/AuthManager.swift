@@ -15,6 +15,7 @@ enum InventoryItemType: String, Codable, CaseIterable {
     case mekaGachaTicket
     case godGachaTicket
     case constellationGachaTicket
+    case ruinsGachaTicket
     case staminaPotion
     case boostTicket
 
@@ -30,6 +31,8 @@ enum InventoryItemType: String, Codable, CaseIterable {
             return "神ガチャチケット"
         case .constellationGachaTicket:
             return "星座ガチャチケット"
+        case .ruinsGachaTicket:
+            return "知恵の遺跡ガチャチケット"
         case .staminaPotion:
             return "スタミナ回復薬"
         case .boostTicket:
@@ -49,6 +52,8 @@ enum InventoryItemType: String, Codable, CaseIterable {
             return "神"
         case .constellationGachaTicket:
             return "星座"
+        case .ruinsGachaTicket:
+            return "遺跡"
         case .staminaPotion:
             return "回復薬"
         case .boostTicket:
@@ -68,6 +73,8 @@ enum InventoryItemType: String, Codable, CaseIterable {
             return "sparkles.rectangle.stack.fill"
         case .constellationGachaTicket:
             return "moon.stars.fill"
+        case .ruinsGachaTicket:
+            return "building.columns.fill"
         case .staminaPotion:
             return "cross.case.fill"
         case .boostTicket:
@@ -98,6 +105,8 @@ enum InventoryItemType: String, Codable, CaseIterable {
             return Color(red: 1.0, green: 0.84, blue: 0.22)
         case .constellationGachaTicket:
             return Color(hex: "6A2CFF")
+        case .ruinsGachaTicket:
+            return Color(hex: "D08A32")
         case .staminaPotion:
             return Color(red: 0.24, green: 0.74, blue: 0.48)
         case .boostTicket:
@@ -379,11 +388,51 @@ enum QuizLevel: CaseIterable {
 }
 
 struct Avatar: Equatable {
+    static let starter = Avatar(name: "えんぴ君", attack: 20, health: 20, usedFlag: 1, count: 1)
+
     var name: String
     var attack: Int
     var health: Int
     var usedFlag: Int
     var count: Int
+}
+
+enum UserInitializationResult: Equatable {
+    case created
+    case existing
+    case failed
+}
+
+private let avatarArtworkAliases: [String: String] = [
+    "ランプモス": "RuinsCompanion01",
+    "インクぷるん": "RuinsCompanion02",
+    "コンパスビートル": "RuinsCompanion03",
+    "ブックバット": "RuinsCompanion04",
+    "クリスタートル": "RuinsCompanion05",
+    "そろばんゴーレム": "RuinsCompanion06",
+    "ルーンオウル": "RuinsCompanion07",
+    "ギアモール": "RuinsCompanion08",
+    "プリズムクラブ": "RuinsCompanion09",
+    "スクロールスネーク": "RuinsCompanion10",
+    "ミラージュフォックス": "RuinsCompanion11",
+    "グリフガーゴイル": "RuinsCompanion12",
+    "クリスタルフォックス": "RuinsCompanion13",
+    "クイズミミック": "RuinsCompanion14",
+    "アストロジェリー": "RuinsCompanion15",
+    "セージドラコ": "RuinsCompanion16"
+]
+
+func avatarArtworkName(for avatarName: String) -> String {
+    avatarArtworkAliases[avatarName] ?? avatarName
+}
+
+func companionArtworkImage(named artworkName: String) -> Image {
+    Image(artworkName)
+        .interpolation(artworkName.hasPrefix("RuinsCompanion") ? .none : .high)
+}
+
+func avatarArtworkImage(for avatarName: String) -> Image {
+    companionArtworkImage(named: avatarArtworkName(for: avatarName))
 }
 
 class User: Identifiable {
@@ -418,7 +467,37 @@ class User: Identifiable {
     }
 }
 
+struct RewardGrantFailure {
+    enum Reason: String {
+        case invalidInput = "invalid_input"
+        case receiptConflict = "receipt_conflict"
+        case accountChanged = "account_changed"
+        case userMissing = "user_missing"
+        case readCancelled = "read_cancelled"
+        case transactionError = "transaction_error"
+        case transactionNotCommitted = "transaction_not_committed"
+        case invalidResponse = "invalid_response"
+        case missingRewardUser = "missing_reward_user"
+    }
+
+    let reason: Reason
+    let error: Error?
+
+    init(_ reason: Reason, error: Error? = nil) {
+        self.reason = reason
+        self.error = error
+    }
+}
+
 class AuthManager: ObservableObject {
+    private struct PendingRewardedCoinGrant: Codable {
+        let idempotencyKey: String
+        let userID: String
+        let amount: Int
+        let placement: String?
+    }
+
+    private let pendingRewardedCoinGrantsKey = "pendingRewardedCoinGrants.v1"
     @Published var user: FirebaseAuth.User?
     @Published var experience: Int = 0
     @Published var rankMatchPoint: Int = 0
@@ -436,7 +515,6 @@ class AuthManager: ObservableObject {
     @Published var rewardFlag: Int = 1
     @Published var story: Int = 0
     @Published var userPreFlag: Int = 0
-    @State private var selectedAvatar: Avatar?
     @Published var loginCount: Int = 0
     @Published var loginBonus: Int = 0
     @Published var userStoryCsFlag: Int = 0
@@ -445,10 +523,14 @@ class AuthManager: ObservableObject {
     @Published var mekaGachaTicketCount: Int = 0
     @Published var godGachaTicketCount: Int = 0
     @Published var constellationGachaTicketCount: Int = 0
+    @Published var ruinsGachaTicketCount: Int = 0
     @Published var staminaPotionCount: Int = 0
     @Published var boostTicketCount: Int = 0
     @Published var usedAvatars: [Avatar] = []
     private var authStateListenerHandle: AuthStateDidChangeListenerHandle?
+    private var databaseConnectionRef: DatabaseReference?
+    private var databaseConnectionHandle: DatabaseHandle?
+    private var wasDatabaseConnected: Bool?
     private let rewardBoostDuration: TimeInterval = 3600
     private let rewardBoostDateKey = "rewardAcquiredDate"
     private let rewardBoostActivatedAtKey = "rewardBoostActivatedAt"
@@ -479,12 +561,30 @@ class AuthManager: ObservableObject {
     
     init() {
         user = Auth.auth().currentUser
+        DispatchQueue.main.async { [weak self] in
+            self?.resumePendingRewardedCoinGrants()
+        }
         authStateListenerHandle = Auth.auth().addStateDidChangeListener { [weak self] _, user in
             DispatchQueue.main.async {
                 let previousUserId = self?.user?.uid
                 self?.user = user
                 if previousUserId != user?.uid, user != nil {
                     self?.onLoginCompleted?()
+                    self?.resumePendingRewardedCoinGrants()
+                }
+            }
+        }
+        if !SubscriptionRuntime.isTesting {
+            let connectionRef = Database.database().reference(withPath: ".info/connected")
+            databaseConnectionRef = connectionRef
+            databaseConnectionHandle = connectionRef.observe(.value) { [weak self] snapshot in
+                DispatchQueue.main.async {
+                    guard let self else { return }
+                    let connected = snapshot.value as? Bool ?? false
+                    if connected && self.wasDatabaseConnected == false {
+                        self.resumePendingRewardedCoinGrants()
+                    }
+                    self.wasDatabaseConnected = connected
                 }
             }
         }
@@ -503,6 +603,9 @@ class AuthManager: ObservableObject {
     deinit {
         if let authStateListenerHandle {
             Auth.auth().removeStateDidChangeListener(authStateListenerHandle)
+        }
+        if let databaseConnectionHandle {
+            databaseConnectionRef?.removeObserver(withHandle: databaseConnectionHandle)
         }
     }
     
@@ -816,20 +919,22 @@ class AuthManager: ObservableObject {
         }
     }
     
-    func saveUserToDatabase(userName: String, completion: @escaping (Bool) -> Void) {
+    func initializeUserIfNeeded(userName: String, completion: @escaping (UserInitializationResult) -> Void) {
         guard let userId = user?.uid else {
-            print("saveUserToDatabase")
-            completion(false)
+            DispatchQueue.main.async { completion(.failed) }
             return
         }
 
-        // ユーザーのリファレンスを作成
         let userRef = Database.database().reference().child("users").child(userId)
-        
-        // 選択されたアバターの作成
-        let selectedAvatar = Avatar(name: self.selectedAvatar?.name ?? "えんぴ君", attack: 20, health: 20, usedFlag: 1, count: 1)
-        
-        // ユーザーデータを設定（アバターデータは後で設定）
+        let selectedAvatar = Avatar.starter
+        let avatarKey = userRef.child("avatars").childByAutoId().key ?? UUID().uuidString
+        let avatarData: [String: Any] = [
+            "name": selectedAvatar.name,
+            "attack": selectedAvatar.attack,
+            "health": selectedAvatar.health,
+            "usedFlag": selectedAvatar.usedFlag,
+            "count": selectedAvatar.count
+        ]
         let userData: [String: Any] = [
             "userName": userName,
             "userMoney": 300,
@@ -843,38 +948,38 @@ class AuthManager: ObservableObject {
             InventoryItemType.mekaGachaTicket.userFieldKey: 0,
             InventoryItemType.godGachaTicket.userFieldKey: 0,
             InventoryItemType.constellationGachaTicket.userFieldKey: 0,
+            InventoryItemType.ruinsGachaTicket.userFieldKey: 0,
             InventoryItemType.staminaPotion.userFieldKey: 0,
-            InventoryItemType.boostTicket.userFieldKey: 0
+            InventoryItemType.boostTicket.userFieldKey: 0,
+            "avatars": [avatarKey: avatarData]
         ]
 
-        // ユーザーデータを保存
-        userRef.setValue(userData) { (error, ref) in
-            if let error = error {
-                print("Failed to save user to database:", error.localizedDescription)
-                completion(false)
-                return
+        userRef.runTransactionBlock { currentData in
+            guard currentData.value == nil || currentData.value is NSNull else {
+                return TransactionResult.abort()
             }
-            print("Successfully saved user to database.")
-            
-            // アバターデータを保存
-            let avatarRef = userRef.child("avatars").childByAutoId()
-            let avatarData: [String: Any] = [
-                "name": selectedAvatar.name,
-                "attack": selectedAvatar.attack,
-                "health": selectedAvatar.health,
-                "usedFlag": selectedAvatar.usedFlag,
-                "count": selectedAvatar.count
-            ]
-            
-            avatarRef.setValue(avatarData) { (error, ref) in
-                if let error = error {
-                    print("Failed to save avatar to database:", error.localizedDescription)
-                    completion(false)
-                    return
+
+            currentData.value = userData
+            return TransactionResult.success(withValue: currentData)
+        } andCompletionBlock: { error, committed, snapshot in
+            DispatchQueue.main.async {
+                if let error {
+                    print("Failed to initialize user:", error.localizedDescription)
+                    completion(.failed)
+                } else if committed {
+                    completion(.created)
+                } else if snapshot?.exists() == true {
+                    completion(.existing)
+                } else {
+                    completion(.failed)
                 }
-                print("Successfully saved avatar to database.")
-                completion(true)
             }
+        }
+    }
+
+    func saveUserToDatabase(userName: String, completion: @escaping (Bool) -> Void) {
+        initializeUserIfNeeded(userName: userName) { result in
+            completion(result != .failed)
         }
     }
 
@@ -1507,6 +1612,8 @@ class AuthManager: ObservableObject {
             return godGachaTicketCount
         case .constellationGachaTicket:
             return constellationGachaTicketCount
+        case .ruinsGachaTicket:
+            return ruinsGachaTicketCount
         case .staminaPotion:
             return staminaPotionCount
         case .boostTicket:
@@ -1527,6 +1634,8 @@ class AuthManager: ObservableObject {
             godGachaTicketCount = safeCount
         case .constellationGachaTicket:
             constellationGachaTicketCount = safeCount
+        case .ruinsGachaTicket:
+            ruinsGachaTicketCount = safeCount
         case .staminaPotion:
             staminaPotionCount = safeCount
         case .boostTicket:
@@ -1597,6 +1706,7 @@ class AuthManager: ObservableObject {
                 self.mekaGachaTicketCount = self.intValue(from: data[InventoryItemType.mekaGachaTicket.userFieldKey])
                 self.godGachaTicketCount = self.intValue(from: data[InventoryItemType.godGachaTicket.userFieldKey])
                 self.constellationGachaTicketCount = self.intValue(from: data[InventoryItemType.constellationGachaTicket.userFieldKey])
+                self.ruinsGachaTicketCount = self.intValue(from: data[InventoryItemType.ruinsGachaTicket.userFieldKey])
                 self.staminaPotionCount = self.intValue(from: data[InventoryItemType.staminaPotion.userFieldKey])
                 self.boostTicketCount = self.intValue(from: data[InventoryItemType.boostTicket.userFieldKey])
                 self.hasFetchedInventory = true
@@ -1748,23 +1858,50 @@ class AuthManager: ObservableObject {
             .child(userId)
             .child(type.userFieldKey)
 
-        itemRef.runTransactionBlock { currentData in
-            let current = self.intValue(from: currentData.value)
-            guard current >= amount else {
-                return TransactionResult.abort()
-            }
-            currentData.value = current - amount
-            return TransactionResult.success(withValue: currentData)
-        } andCompletionBlock: { error, committed, snapshot in
-            DispatchQueue.main.async {
-                guard error == nil, committed else {
+        // Realtime Database の transaction は、対象の子ノードがまだローカル
+        // キャッシュに無い場合、最初の update block を nil で呼ぶことがある。
+        // nil を所持数0として中断すると、実際には所持しているアイテムまで
+        // 「使えない」状態になるため、先にサーバー値を取得して初回試行を補完する。
+        itemRef.observeSingleEvent(of: .value, with: { snapshot in
+            let fetchedCount = self.intValue(from: snapshot.value)
+            guard fetchedCount >= amount else {
+                DispatchQueue.main.async {
+                    self.setInventoryCount(fetchedCount, for: type)
                     completion(false)
-                    return
                 }
-                self.setInventoryCount(self.intValue(from: snapshot?.value), for: type)
-                completion(true)
+                return
             }
-        }
+
+            var hasUsedFetchedCount = false
+            itemRef.runTransactionBlock { currentData in
+                let current: Int
+                if let value = currentData.value, !(value is NSNull) {
+                    current = self.intValue(from: value)
+                } else if !hasUsedFetchedCount {
+                    current = fetchedCount
+                    hasUsedFetchedCount = true
+                } else {
+                    return TransactionResult.abort()
+                }
+
+                guard current >= amount else {
+                    return TransactionResult.abort()
+                }
+                currentData.value = current - amount
+                return TransactionResult.success(withValue: currentData)
+            } andCompletionBlock: { error, committed, transactionSnapshot in
+                DispatchQueue.main.async {
+                    guard error == nil, committed else {
+                        completion(false)
+                        return
+                    }
+                    self.setInventoryCount(self.intValue(from: transactionSnapshot?.value), for: type)
+                    completion(true)
+                }
+            }
+        }, withCancel: { _ in
+            DispatchQueue.main.async { completion(false) }
+        })
     }
 
     func useStaminaPotion(recoveryAmount: Int = 30, completion: @escaping (Bool) -> Void) {
@@ -2041,6 +2178,90 @@ class AuthManager: ObservableObject {
         }
     }
 
+    /// An earned ad is recorded locally before the Firebase transaction starts.
+    /// A retry or app relaunch uses the same receipt key, so it cannot add coins twice.
+    func grantEarnedAdCoins(
+        idempotencyKey: String,
+        amount: Int,
+        userID: String,
+        placement: AdPlacement,
+        completion: @escaping (Bool, RewardGrantFailure?) -> Void
+    ) {
+        guard amount > 0, !userID.isEmpty else {
+            completion(false, RewardGrantFailure(.invalidInput))
+            return
+        }
+
+        var pending = pendingRewardedCoinGrants()
+        if let existing = pending.first(where: { $0.idempotencyKey == idempotencyKey }) {
+            guard existing.userID == userID, existing.amount == amount else {
+                completion(false, RewardGrantFailure(.receiptConflict))
+                return
+            }
+        } else {
+            pending.append(PendingRewardedCoinGrant(
+                idempotencyKey: idempotencyKey,
+                userID: userID,
+                amount: amount,
+                placement: placement.rawValue
+            ))
+            savePendingRewardedCoinGrants(pending)
+        }
+
+        guard currentUserId == userID else {
+            completion(false, RewardGrantFailure(.accountChanged))
+            return
+        }
+
+        grantRewardBundleDetailed(
+            idempotencyKey: idempotencyKey,
+            coinAmount: amount,
+            itemRewards: []
+        ) { success, _, failure in
+            if success {
+                self.removePendingRewardedCoinGrant(idempotencyKey)
+            }
+            completion(success, failure)
+        }
+    }
+
+    private func resumePendingRewardedCoinGrants() {
+        guard !SubscriptionRuntime.isTesting,
+              let userID = currentUserId else { return }
+
+        for pending in pendingRewardedCoinGrants() where pending.userID == userID {
+            grantRewardBundleDetailed(
+                idempotencyKey: pending.idempotencyKey,
+                coinAmount: pending.amount,
+                itemRewards: []
+            ) { success, _, failure in
+                let placement = AdPlacement(rawValue: pending.placement ?? "") ?? .unknown
+                if success {
+                    self.removePendingRewardedCoinGrant(pending.idempotencyKey)
+                    AdTelemetry.record("reward_grant_recovered", placement: placement)
+                } else {
+                    AdTelemetry.record("reward_grant_retry_failed", placement: placement, failure: failure)
+                }
+            }
+        }
+    }
+
+    private func pendingRewardedCoinGrants() -> [PendingRewardedCoinGrant] {
+        guard let data = UserDefaults.standard.data(forKey: pendingRewardedCoinGrantsKey) else { return [] }
+        return (try? JSONDecoder().decode([PendingRewardedCoinGrant].self, from: data)) ?? []
+    }
+
+    private func savePendingRewardedCoinGrants(_ pending: [PendingRewardedCoinGrant]) {
+        guard let data = try? JSONEncoder().encode(pending) else { return }
+        UserDefaults.standard.set(data, forKey: pendingRewardedCoinGrantsKey)
+    }
+
+    private func removePendingRewardedCoinGrant(_ idempotencyKey: String) {
+        savePendingRewardedCoinGrants(
+            pendingRewardedCoinGrants().filter { $0.idempotencyKey != idempotencyKey }
+        )
+    }
+
     /// StoreKit の消耗型購入を、トランザクションID単位で一度だけ反映する。
     /// コイン残高と処理済みIDを同じ Firebase transaction で更新するため、
     /// アプリ中断や Transaction.updates からの再配信でも二重付与されない。
@@ -2110,8 +2331,40 @@ class AuthManager: ObservableObject {
         itemRewards: [InventoryReward],
         completion: @escaping (Bool) -> Void
     ) {
+        grantRewardBundleIfNeeded(
+            idempotencyKey: idempotencyKey,
+            coinAmount: coinAmount,
+            itemRewards: itemRewards
+        ) { success, _ in
+            completion(success)
+        }
+    }
+
+    /// 報酬を未付与の場合だけ反映し、今回新たに付与したかも返す。
+    /// 完了ボーナスのように複数の受取経路がある報酬でも、表示額と実際の加算を一致させる。
+    func grantRewardBundleIfNeeded(
+        idempotencyKey: String,
+        coinAmount: Int,
+        itemRewards: [InventoryReward],
+        completion: @escaping (_ success: Bool, _ newlyGranted: Bool) -> Void
+    ) {
+        grantRewardBundleDetailed(
+            idempotencyKey: idempotencyKey,
+            coinAmount: coinAmount,
+            itemRewards: itemRewards
+        ) { success, newlyGranted, _ in
+            completion(success, newlyGranted)
+        }
+    }
+
+    private func grantRewardBundleDetailed(
+        idempotencyKey: String,
+        coinAmount: Int,
+        itemRewards: [InventoryReward],
+        completion: @escaping (_ success: Bool, _ newlyGranted: Bool, _ failure: RewardGrantFailure?) -> Void
+    ) {
         guard coinAmount >= 0, let userId = currentUserId else {
-            completion(false)
+            completion(false, false, RewardGrantFailure(.invalidInput))
             return
         }
 
@@ -2120,21 +2373,37 @@ class AuthManager: ObservableObject {
         let receiptKey = firebaseSafeKey(idempotencyKey)
 
         userRef.observeSingleEvent(of: .value, with: { snapshot in
-            guard snapshot.exists() else {
-                DispatchQueue.main.async { completion(false) }
+            guard snapshot.exists(),
+                  let fetchedUserData = snapshot.value as? [String: Any] else {
+                DispatchQueue.main.async { completion(false, false, RewardGrantFailure(.userMissing)) }
                 return
             }
 
+            var hasUsedFetchedUserData = false
+            var newlyGranted = false
             userRef.runTransactionBlock { currentData in
-                guard var userData = currentData.value as? [String: Any] else {
+                newlyGranted = false
+                var userData: [String: Any]
+                if let currentUserData = currentData.value as? [String: Any] {
+                    userData = currentUserData
+                } else if !hasUsedFetchedUserData {
+                    // A Firebase transaction may start before the user node has
+                    // reached the local cache. Seed only that first attempt with
+                    // the server snapshot fetched above; Firebase will retry with
+                    // the authoritative value if another write raced with it.
+                    userData = fetchedUserData
+                    hasUsedFetchedUserData = true
+                } else {
                     return TransactionResult.abort()
                 }
 
                 var receipts = userData["rewardGrantReceipts"] as? [String: Any] ?? [:]
                 if receipts[receiptKey] != nil {
+                    currentData.value = userData
                     return TransactionResult.success(withValue: currentData)
                 }
 
+                newlyGranted = true
                 userData["userMoney"] = self.intValue(from: userData["userMoney"]) + coinAmount
                 for reward in rewards {
                     userData[reward.type.userFieldKey] = self.intValue(from: userData[reward.type.userFieldKey]) + reward.amount
@@ -2148,21 +2417,27 @@ class AuthManager: ObservableObject {
                 return TransactionResult.success(withValue: currentData)
             } andCompletionBlock: { error, committed, snapshot in
                 DispatchQueue.main.async {
-                    guard error == nil,
-                          committed,
-                          let userData = snapshot?.value as? [String: Any] else {
-                        completion(false)
+                    if let error {
+                        completion(false, false, RewardGrantFailure(.transactionError, error: error))
+                        return
+                    }
+                    guard committed else {
+                        completion(false, false, RewardGrantFailure(.transactionNotCommitted))
+                        return
+                    }
+                    guard let userData = snapshot?.value as? [String: Any] else {
+                        completion(false, false, RewardGrantFailure(.invalidResponse))
                         return
                     }
                     self.money = self.intValue(from: userData["userMoney"])
                     for reward in rewards {
                         self.setInventoryCount(self.intValue(from: userData[reward.type.userFieldKey]), for: reward.type)
                     }
-                    completion(true)
+                    completion(true, newlyGranted, nil)
                 }
             }
-        }, withCancel: { _ in
-            DispatchQueue.main.async { completion(false) }
+        }, withCancel: { error in
+            DispatchQueue.main.async { completion(false, false, RewardGrantFailure(.readCancelled, error: error)) }
         })
     }
 

@@ -169,6 +169,103 @@ struct ModernSubjectCard: View {
     }
 }
 
+// MARK: - Learning Mode Glass (itQuiz の学習モードと共通の見た目)
+struct LearningModeGlassBackground: View {
+    var body: some View {
+        ZStack {
+            Color(uiColor: .systemGroupedBackground)
+            LinearGradient(
+                colors: [Color(hex: "b9e9e1").opacity(0.4), Color(hex: "d4d9fa").opacity(0.3), Color(hex: "f5d8e7").opacity(0.35)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            GeometryReader { geometry in
+                Circle()
+                    .fill(Color(hex: "38c9ae").opacity(0.2))
+                    .frame(width: 300, height: 300)
+                    .blur(radius: 40)
+                    .offset(x: -100, y: -50)
+                Circle()
+                    .fill(Color(hex: "667eea").opacity(0.22))
+                    .frame(width: 250, height: 250)
+                    .blur(radius: 40)
+                    .offset(x: geometry.size.width - 100, y: geometry.size.height - 200)
+            }
+        }
+        .ignoresSafeArea()
+    }
+}
+
+private struct LearningModeGlassSurface: ViewModifier {
+    let gradient: LinearGradient
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.colorScheme) private var colorScheme
+
+    func body(content: Content) -> some View {
+        content
+            .background {
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .fill(reduceTransparency
+                          ? AnyShapeStyle(Color(uiColor: .secondarySystemGroupedBackground))
+                          : AnyShapeStyle(Material.ultraThin))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 22, style: .continuous)
+                            .fill(gradient.opacity(colorScheme == .dark ? 0.1 : 0.12))
+                    }
+            }
+            .overlay {
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .strokeBorder(
+                        LinearGradient(
+                            colors: [.white.opacity(colorScheme == .dark ? 0.4 : 0.9), .white.opacity(0.1)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1
+                    )
+            }
+            .contentShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .shadow(color: .black.opacity(0.07), radius: 12, x: 0, y: 6)
+    }
+}
+
+extension View {
+    func learningModeGlassSurface(gradient: LinearGradient) -> some View {
+        modifier(LearningModeGlassSurface(gradient: gradient))
+    }
+}
+
+/// 学習モードのカード右端に置く丸いシェブロン
+private struct GlassCardChevron: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        Image(systemName: "chevron.right")
+            .font(.system(size: 12, weight: .bold))
+            .foregroundStyle(.secondary)
+            .frame(width: 26, height: 26)
+            .background(.white.opacity(colorScheme == .dark ? 0.08 : 0.5), in: Circle())
+    }
+}
+
+/// プレミアム限定カードに重ねるロック表示
+private struct GlassCardLockOverlay: View {
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .fill(Color.black.opacity(0.4))
+
+            VStack(spacing: 6) {
+                Image(systemName: "lock.fill")
+                    .font(.system(size: 14))
+                Text("プレミアムプランで解放")
+                    .font(.system(size: 11, weight: .bold))
+            }
+            .foregroundColor(.white)
+        }
+    }
+}
+
 // MARK: - Review Card (復習問題用)
 struct ReviewCard: View {
     let subjectName: String
@@ -177,122 +274,92 @@ struct ReviewCard: View {
     let isLoading: Bool
     let isLocked: Bool
     let action: () -> Void
-    
+
+    private var isActive: Bool { hasIncorrectAnswers && !isLocked }
+
     var body: some View {
         Button(action: {
             generateHapticFeedback()
             action()
         }) {
-            HStack(spacing: 16) {
-                // Icon with Badge
+            HStack(spacing: 10) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 14)
-                        .fill(
-                            LinearGradient(
-                                colors: hasIncorrectAnswers && !isLocked ? theme.gradientColors : [Color.gray.opacity(0.3), Color.gray.opacity(0.4)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .frame(width: isIPad() ? 60 : 44, height: isIPad() ? 60 : 44)
-                    
+                    Circle()
+                        .fill(QuizColors.review.opacity(0.14))
+                        .frame(width: 34, height: 34)
+
                     if isLoading {
                         ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .scaleEffect(0.8)
                     } else {
                         Image(systemName: "arrow.counterclockwise")
-                            .font(.system(size: isIPad() ? 24 : 18, weight: .semibold))
-                            .foregroundColor(.white)
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundStyle(.primary)
                     }
                 }
-                
-                VStack(alignment: .leading, spacing: 4) {
+
+                VStack(alignment: .leading, spacing: 3) {
                     Text("復習問題")
-                        .font(.system(size: isIPad() ? 20 : 15, weight: .bold))
-                        .foregroundColor(hasIncorrectAnswers && !isLocked ? Color("fontGray") : .gray)
-                    
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundStyle(.primary)
+
                     Text(isLoading ? "読み込み中..." : (hasIncorrectAnswers ? "不正解の問題を復習" : "復習する問題はありません"))
-                        .font(.system(size: isIPad() ? 14 : 11))
-                        .foregroundColor(.gray)
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(.secondary)
                 }
-                
-                Spacer()
-                
-                if hasIncorrectAnswers && !isLocked && !isLoading {
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: isIPad() ? 16 : 12, weight: .semibold))
-                        .foregroundColor(theme.primaryColor.opacity(0.7))
+
+                Spacer(minLength: 0)
+
+                if isActive && !isLoading {
+                    GlassCardChevron()
                 }
             }
-            .padding(isIPad() ? 18 : 14)
-            .background(
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(Color.white.opacity(0.9))
-                    .shadow(color: Color.black.opacity(0.05), radius: 6, x: 0, y: 3)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 14)
-                    .stroke(
-                        hasIncorrectAnswers && !isLocked ? theme.primaryColor.opacity(0.2) : Color.gray.opacity(0.1),
-                        lineWidth: 1
-                    )
-            )
-            .overlay(
-                Group {
-                    if isLocked {
-                        RoundedRectangle(cornerRadius: 14)
-                            .fill(Color.black.opacity(0.45))
-                        
-                        VStack(spacing: 6) {
-                            Image(systemName: "lock.fill")
-                                .font(.system(size: isIPad() ? 20 : 14))
-                            Text("プレミアムプランで解放")
-                                .font(.system(size: isIPad() ? 14 : 10, weight: .medium))
-                        }
-                        .foregroundColor(.white)
-                    }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .learningModeGlassSurface(gradient: QuizColors.review)
+            .opacity(isActive || isLocked || isLoading ? 1 : 0.6)
+            .overlay {
+                if isLocked {
+                    GlassCardLockOverlay()
                 }
-            )
+            }
         }
         .buttonStyle(ScaleButtonStyle())
         .disabled(isLoading || (!hasIncorrectAnswers && !isLocked))
-        .padding(.horizontal)
-    }
-    
-    private func isIPad() -> Bool {
-        UIDevice.current.userInterfaceIdiom == .pad
+        .padding(.horizontal, 16)
     }
 }
 
 // MARK: - Section Header
 struct SectionHeader: View {
     let title: String
-    let theme: SubjectTheme
-    
+    let icon: String
+    let colors: [Color]
+
     var body: some View {
         HStack(spacing: 10) {
             RoundedRectangle(cornerRadius: 2)
                 .fill(
                     LinearGradient(
-                        colors: theme.gradientColors,
+                        colors: colors,
                         startPoint: .top,
                         endPoint: .bottom
                     )
                 )
-                .frame(width: 4, height: isIPad() ? 24 : 18)
-            
+                .frame(width: 4, height: 20)
+
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(colors.first ?? .secondary)
+
             Text(title)
-                .font(.system(size: isIPad() ? 18 : 14, weight: .semibold))
-                .foregroundColor(Color("fontGray"))
-            
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundColor(.secondary)
+
             Spacer()
         }
         .padding(.horizontal, 20)
-        .padding(.vertical, 8)
-    }
-    
-    private func isIPad() -> Bool {
-        UIDevice.current.userInterfaceIdiom == .pad
     }
 }
 
@@ -311,126 +378,73 @@ struct GradeCard: View {
     let title: String
     let theme: SubjectTheme
     let action: () -> Void
-    
-    private var gradeIcon: String {
-        switch grade {
-        case 1: return "1.circle.fill"
-        case 2: return "2.circle.fill"
-        case 3: return "3.circle.fill"
-        case 4: return "4.circle.fill"
-        case 5: return "5.circle.fill"
-        case 6: return "6.circle.fill"
-        default: return "\(grade).circle.fill"
-        }
+
+    private var gradient: LinearGradient {
+        LinearGradient(colors: theme.gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
     }
-    
+
     var body: some View {
         Button(action: {
             generateHapticFeedback()
             action()
         }) {
-            HStack(spacing: 14) {
-                // Grade Number
-                ZStack {
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                colors: theme.gradientColors.map { $0.opacity(0.15) },
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .frame(width: isIPad() ? 56 : 42, height: isIPad() ? 56 : 42)
-                    
-                    Text("\(grade)")
-                        .font(.system(size: isIPad() ? 26 : 20, weight: .bold, design: .rounded))
-                        .foregroundColor(theme.primaryColor)
-                }
-                
-                // Title
-                VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: 10) {
+                Text("\(grade)")
+                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                    .foregroundStyle(.primary)
+                    .frame(width: 34, height: 34)
+                    .background(gradient.opacity(0.14), in: Circle())
+
+                VStack(alignment: .leading, spacing: 3) {
                     Text("\(grade)年生")
-                        .font(.system(size: isIPad() ? 12 : 10, weight: .medium))
-                        .foregroundColor(theme.primaryColor.opacity(0.8))
-                    
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(.secondary)
+
                     Text(title)
-                        .font(.system(size: isIPad() ? 18 : 14, weight: .semibold))
-                        .foregroundColor(Color("fontGray"))
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundStyle(.primary)
                         .lineLimit(1)
                 }
-                
-                Spacer()
-                
-                // Progress indicator (placeholder)
-                Image(systemName: "chevron.right")
-                    .font(.system(size: isIPad() ? 16 : 12, weight: .medium))
-                    .foregroundColor(.gray.opacity(0.5))
+
+                Spacer(minLength: 0)
+
+                GlassCardChevron()
             }
-            .padding(.horizontal, isIPad() ? 18 : 14)
-            .padding(.vertical, isIPad() ? 16 : 12)
-            .background(
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(Color.white)
-                    .shadow(color: theme.primaryColor.opacity(0.08), radius: 8, x: 0, y: 4)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 14)
-                    .stroke(theme.primaryColor.opacity(0.08), lineWidth: 1)
-            )
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .learningModeGlassSurface(gradient: gradient)
         }
         .buttonStyle(ScaleButtonStyle())
-        .padding(.horizontal)
-    }
-    
-    private func isIPad() -> Bool {
-        UIDevice.current.userInterfaceIdiom == .pad
-    }
-}
-
-// MARK: - Background Gradient
-struct SubjectBackgroundView: View {
-    let theme: SubjectTheme
-    
-    var body: some View {
-        ZStack {
-            Color("Color2")
-                .ignoresSafeArea()
-            
-            // Subtle gradient overlay
-            LinearGradient(
-                colors: [
-                    theme.primaryColor.opacity(0.03),
-                    Color.clear
-                ],
-                startPoint: .top,
-                endPoint: .center
-            )
-            .ignoresSafeArea()
-        }
+        .padding(.horizontal, 16)
     }
 }
 
 #Preview {
     ScrollView {
-        VStack(spacing: 16) {
-            SectionHeader(title: "復習問題", theme: .sansu)
-            
-            ReviewCard(
-                subjectName: "算数",
-                theme: .sansu,
-                hasIncorrectAnswers: true,
-                isLoading: false,
-                isLocked: false,
-                action: {}
-            )
-            
-            SectionHeader(title: "学年を選択", theme: .sansu)
-            
-            GradeCard(grade: 1, title: "足し算・引き算", theme: .sansu, action: {})
-            GradeCard(grade: 2, title: "かけ算・時計", theme: .sansu, action: {})
-            GradeCard(grade: 3, title: "わり算・分数", theme: .sansu, action: {})
+        VStack(spacing: 24) {
+            VStack(spacing: 12) {
+                SectionHeader(title: "復習問題", icon: "arrow.counterclockwise", colors: [QuizColors.reviewStart, QuizColors.reviewEnd])
+
+                ReviewCard(
+                    subjectName: "算数",
+                    theme: .sansu,
+                    hasIncorrectAnswers: true,
+                    isLoading: false,
+                    isLocked: false,
+                    action: {}
+                )
+            }
+
+            VStack(spacing: 12) {
+                SectionHeader(title: "学年を選択", icon: "folder.fill", colors: SubjectTheme.sansu.gradientColors)
+
+                GradeCard(grade: 1, title: "足し算・引き算", theme: .sansu, action: {})
+                GradeCard(grade: 2, title: "かけ算・時計", theme: .sansu, action: {})
+                GradeCard(grade: 3, title: "わり算・分数", theme: .sansu, action: {})
+            }
         }
         .padding(.vertical)
     }
-    .background(SubjectBackgroundView(theme: .sansu))
+    .background(LearningModeGlassBackground())
 }

@@ -33,22 +33,28 @@ enum DungeonQuizSubject {
 
     static func subject(for floor: Int) -> DungeonQuizSubject {
         switch floor {
-        case 1...5, 10...15, 41...52, 53...64:
+        case 1...5, 10...15, 41...52:
             return .math
-        case 6...9, 16...20, 65...76:
+        case 6...9, 16...20:
             return .japanese
-        case 21...25, 30...35, 77...88:
+        case 21...25, 30...35:
             return .science
-        case 26...29, 36...40, 89...100:
+        case 26...29, 36...40:
             return .socialStudies
         default:
-            return .math
+            // 53階以降は12階ごとに4教科を切り替え、48階で一巡する。
+            switch ((DungeonTheme.clampedFloor(floor) - 53) % 48) / 12 {
+            case 0: return .math
+            case 1: return .japanese
+            case 2: return .science
+            default: return .socialStudies
+            }
         }
     }
 }
 
 struct DungeonTheme {
-    static let maxFloor = 100
+    static let maxFloor = 300
 
     static func clampedFloor(_ floor: Int) -> Int {
         min(max(floor, 1), maxFloor)
@@ -57,21 +63,112 @@ struct DungeonTheme {
     static func mapBackgroundName(for floor: Int) -> String {
         switch clampedFloor(floor) {
         case 1...52: return "背景1"
-        default: return "背景3"
+        case 53...100: return "背景3"
+        case 101...200: return "背景200新"
+        default: return "背景300"
         }
     }
 
     static func battleBackgroundName(for floor: Int) -> String {
-        clampedFloor(floor) <= 52 ? "ダンジョン背景1" : "ダンジョン背景2"
+        switch clampedFloor(floor) {
+        case 1...52: return "ダンジョン背景1"
+        case 53...100: return "ダンジョン背景2"
+        case 101...200: return "ダンジョン背景200"
+        default: return "ダンジョン背景3"
+        }
     }
 
     static func platformImageName(for floor: Int) -> String {
         switch clampedFloor(floor) {
-        case 1...52: return floor == 52 ? "ボス足場1" : "足場1"
+        case 1...51: return "足場1"
+        case 52: return "ボス足場1"
         case 53...99: return "足場3"
-        default: return "ボス足場3"
+        case 100: return "ボス足場3"
+        case 101...199: return "足場200"
+        case 200: return "ボス足場200"
+        case 201...299: return "足場4"
+        default: return "ボス足場4"
         }
     }
+
+    static func isBossFloor(_ floor: Int) -> Bool {
+        [52, 100, 200, 300].contains(clampedFloor(floor))
+    }
+}
+
+/// 53階以降の配置をデータから生成するための定義。
+/// モンスターは各3マスのまとまりに1体、宝箱は9階間隔、各エリア末尾はボス戦とする。
+struct DungeonFloorPlan {
+    struct Segment {
+        let startFloor: Int
+        let bossFloor: Int
+        let monsterIDs: ClosedRange<Int>
+        let treasureID: Int?
+        let bossID: Int
+        let fixedTreasures: [Int: Int]
+
+        init(
+            startFloor: Int,
+            bossFloor: Int,
+            monsterIDs: ClosedRange<Int>,
+            treasureID: Int? = nil,
+            bossID: Int,
+            fixedTreasures: [Int: Int] = [:]
+        ) {
+            self.startFloor = startFloor
+            self.bossFloor = bossFloor
+            self.monsterIDs = monsterIDs
+            self.treasureID = treasureID
+            self.bossID = bossID
+            self.fixedTreasures = fixedTreasures
+        }
+
+        var monsterPositions: [Int] {
+            Array(stride(from: startFloor + 2, through: bossFloor - 3, by: 3)) + [bossFloor - 1]
+        }
+
+        var monsterByPosition: [Int: Int] {
+            Dictionary(uniqueKeysWithValues: zip(monsterPositions, monsterIDs))
+        }
+
+        var treasureByPosition: [Int: Int] {
+            if !fixedTreasures.isEmpty {
+                return fixedTreasures
+            }
+            guard let treasureID else { return [:] }
+            return Dictionary(
+                uniqueKeysWithValues: stride(
+                    from: startFloor + 7,
+                    through: bossFloor - 2,
+                    by: 9
+                ).map { ($0, treasureID) }
+            )
+        }
+    }
+
+    static let segments: [Segment] = [
+        Segment(
+            startFloor: 53,
+            bossFloor: 100,
+            monsterIDs: 17...32,
+            bossID: 150,
+            fixedTreasures: [60: 13, 69: 14, 78: 15, 87: 16, 96: 17]
+        ),
+        Segment(
+            startFloor: 101,
+            bossFloor: 200,
+            monsterIDs: 33...65,
+            treasureID: 18,
+            bossID: 200
+        ),
+        Segment(
+            startFloor: 201,
+            bossFloor: 300,
+            monsterIDs: 66...98,
+            treasureID: 19,
+            bossID: 300
+        )
+    ]
 }
 
 // PositionViewModel の定義
@@ -625,6 +722,30 @@ struct ScrollOffsetKey: PreferenceKey {
 
 private enum StoryDungeonScrollTarget: Hashable {
     case currentPosition(Int)
+    /// LazyVStack の直下の子（＝行）。遅延生成される行でも ScrollViewProxy から解決できる。
+    case row(Int)
+}
+
+private extension View {
+    /// iOS 17 以降でのみ scrollPosition を適用する。
+    /// scrollTo と違いレイアウト時に効くため、LazyVStack の遅延生成された行にも確実に届く。
+    @ViewBuilder
+    func dungeonScrollPosition(_ target: Binding<StoryDungeonScrollTarget?>) -> some View {
+        if #available(iOS 17.0, *) {
+            self.scrollPosition(id: target, anchor: .center)
+        } else {
+            self
+        }
+    }
+
+    @ViewBuilder
+    func dungeonScrollTargetLayout() -> some View {
+        if #available(iOS 17.0, *) {
+            self.scrollTargetLayout()
+        } else {
+            self
+        }
+    }
 }
 
 // TestView の定義
@@ -643,7 +764,7 @@ struct StoryView: View {
     @State private var currentVisiblePosition: Int = 1
     @State private var isSoundOn: Bool = true
     @Environment(\.scenePhase) var scenePhase
-    @State private var userPreFlag: Int = 0
+    @ObservedObject private var appState = AppState.shared
     @State private var isStoryFlag: Bool = false
     @State private var isTutorialStart: Bool = false
     @State private var csFlag: Bool = false
@@ -652,19 +773,26 @@ struct StoryView: View {
     @Binding var isPresented: Bool
     @State private var isStoryRankingModal = false
     @State private var hasAppeared = false
+    /// 初期表示位置。scrollTo と違い LazyVStack でもレイアウト時に正確に適用される。
+    @State private var scrolledRowTarget: StoryDungeonScrollTarget?
 
     var body: some View {
         NavigationStack {
             ScrollViewReader { proxy in
                 ZStack {
+                    Color.white
+                        .ignoresSafeArea()
+
                     Image(backgroundImageName(for: currentVisiblePosition))
                         .resizable()
                         .edgesIgnoringSafeArea(.all)
+                        // 背景だけを薄くして、足場・モンスター・宝箱の視認性を保つ。
+                        .opacity(0.74)
                         .transition(.opacity)
                         .animation(.easeInOut(duration: 0.5), value: currentVisiblePosition)
 
                     VStack {
-                        if userPreFlag != 1 {
+                        if appState.shouldShowAds {
                             BannerStortyView()
                         }
                         VStack {
@@ -735,6 +863,17 @@ struct StoryView: View {
                         ProgressStoryView(progress: .constant(viewModel.staminaProgress))
                             .progressViewStyle(LinearProgressViewStyle(tint: .green))
                             .padding(.bottom, 10)
+
+                        if viewModel.userPosition >= PositionViewModel.Constants.maxDungeonPosition {
+                            Label("300階に到達しました！ ダンジョン踏破おめでとう！", systemImage: "flag.checkered")
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 8)
+                                .background(Color.black.opacity(0.58), in: Capsule())
+                                .padding(.bottom, 8)
+                                .accessibilityIdentifier("dungeon.completed")
+                        }
                         
                         // スクロールビュー
                         ScrollView {
@@ -743,6 +882,18 @@ struct StoryView: View {
                             }
                             NavigationLink("", destination: StoryRankingView(viewModel: rankingViewModel, isReturnFlag: .constant(true)).navigationBarBackButtonHidden(true), isActive: $isStoryRankingModal)
                         }
+                        .dungeonScrollPosition($scrolledRowTarget)
+                        .background(
+                            GeometryReader { geometry in
+                                Color.clear
+                                    .onChange(of: geometry.size.height) { _ in
+                                        // 初回スクロール後に広告バナーが読み込まれると、スクロール領域の上端だけが
+                                        // 押し下げられて現在地がタブバーの裏へずれるため、現在地へ合わせ直す。
+                                        guard initialScrollDone else { return }
+                                        scrollToCurrentPosition(proxy: proxy, animated: false)
+                                    }
+                            }
+                        )
                         .opacity(initialScrollDone ? 1 : 0)
                         .allowsHitTesting(initialScrollDone)
                         .onPreferenceChange(ViewOffsetKey.self) { offsets in
@@ -819,7 +970,7 @@ struct StoryView: View {
                     
                     if isLoading {
                         VStack {
-                            ActivityIndicator()
+                            EnpiFullScreenLoadingView()
                         }
                         .background(Color("Color2"))
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -848,10 +999,6 @@ struct StoryView: View {
                     index = viewModel.userPosition
                     if let userId = AuthManager.shared.currentUserId {
                          viewModel.fetchUserStamina(for: userId)
-                    }
-                    authManager.fetchPreFlag()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        userPreFlag = authManager.userPreFlag
                     }
                     if viewModel.isPositionFetched {
                         prepareInitialCurrentPositionScroll(proxy: proxy)
@@ -966,27 +1113,61 @@ struct StoryView: View {
         guard !initialScrollDone, !isPreparingInitialScroll else { return }
 
         isPreparingInitialScroll = true
-        let delays: [TimeInterval] = [0, 0.05, 0.16, 0.30]
 
-        for delay in delays {
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+        // scrollTo は LazyVStack の未生成行に対しては推定位置までしか動かず、
+        // ダンジョンのように行数が多いと目的の階層へ届かない。
+        // scrollPosition はレイアウト時に適用されるため、遅延生成でも確実に現在地から始まる。
+        let userPos = DungeonTheme.clampedFloor(viewModel.userPosition)
+
+        if #available(iOS 17.0, *) {
+            if let rowIndex = PlatformsContainer.rowIndex(containing: userPos) {
+                scrolledRowTarget = .row(rowIndex)
+            }
+
+            // scrollPosition で目的地の周辺まで来ると該当行が生成されるので、
+            // そこで一度 scrollTo を掛けて中央へ正確に合わせ直す。
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.20) {
                 scrollToCurrentPosition(proxy: proxy, animated: false)
             }
-        }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.34) {
-            withAnimation(.easeOut(duration: 0.16)) {
-                initialScrollDone = true
-                isLoading = false
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.34) {
+                finishInitialScroll()
             }
-            isPreparingInitialScroll = false
+        } else {
+            // iOS 16 では scrollPosition が使えないため、生成が進むたびに精度が上がる
+            // scrollTo を複数回試す。
+            let delays: [TimeInterval] = [0, 0.05, 0.16, 0.30, 0.45, 0.60]
+            for delay in delays {
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                    scrollToCurrentPosition(proxy: proxy, animated: false)
+                }
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
+                finishInitialScroll()
+            }
         }
+    }
+
+    private func finishInitialScroll() {
+        withAnimation(.easeOut(duration: 0.16)) {
+            initialScrollDone = true
+            isLoading = false
+        }
+        isPreparingInitialScroll = false
     }
 
     private func scrollToCurrentPosition(proxy: ScrollViewProxy, animated: Bool) {
         let userPos = DungeonTheme.clampedFloor(viewModel.userPosition)
         let action = {
-            proxy.scrollTo(StoryDungeonScrollTarget.currentPosition(userPos), anchor: .center)
+            // 現在地の id はアバター画像（行の内部）に付いており、LazyVStack が
+            // その行をまだ生成していない間は解決できず scrollTo が無視される。
+            // そのため LazyVStack の直下の子である行を優先的に対象にする。
+            if let rowIndex = PlatformsContainer.rowIndex(containing: userPos) {
+                proxy.scrollTo(StoryDungeonScrollTarget.row(rowIndex), anchor: .center)
+            } else {
+                proxy.scrollTo(StoryDungeonScrollTarget.currentPosition(userPos), anchor: .center)
+            }
         }
 
         if animated {
@@ -1048,23 +1229,45 @@ struct PlatformsContainer: View {
     init(viewModel: PositionViewModel, namespace: Namespace.ID) {
         self.viewModel = viewModel
         self.namespace = namespace
-        self.platformImageName = "足場1"
-        let lowerFloorDatas: [[PlatformData]] = [
+        self.platformImageName = Self.defaultPlatformImageName
+        self.platformDatas = Self.allRows
+    }
+
+    private static let defaultPlatformImageName = "足場1"
+
+    /// 全行（自動生成分＋手書きの低層分）。
+    /// 行インデックスからのスクロールにも使うため、インスタンスごとに作り直さず一度だけ構築する。
+    static let allRows: [[PlatformData]] = makeGeneratedFloorDatas() + makeLowerFloorDatas()
+
+    /// 指定した階層を含む行のインデックス。
+    ///
+    /// LazyVStack では行の内部に付けた id は、その行が生成されるまで ScrollViewProxy から
+    /// 解決できない。そのため現在地へのスクロールは LazyVStack の直下の子である
+    /// 「行」を対象にする必要があり、その対応表としてこれを使う。
+    static func rowIndex(containing floor: Int) -> Int? {
+        allRows.firstIndex { row in
+            row.contains { $0.position == floor }
+        }
+    }
+
+    private static func makeLowerFloorDatas() -> [[PlatformData]] {
+        let platformImageName = Self.defaultPlatformImageName
+        return [
 //            [
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 97,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 98,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 99,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
@@ -1072,19 +1275,19 @@ struct PlatformsContainer: View {
 //            ],
 //            [
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 96,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 95,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 94,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
 //                    padding1: nil
@@ -1092,19 +1295,19 @@ struct PlatformsContainer: View {
 //            ],
 //            [
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 91,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 92,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 93,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
@@ -1112,19 +1315,19 @@ struct PlatformsContainer: View {
 //            ],
 //            [
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 90,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 89,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 88,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
 //                    padding1: nil
@@ -1132,19 +1335,19 @@ struct PlatformsContainer: View {
 //            ],
 //            [
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 85,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 86,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 87,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
@@ -1152,19 +1355,19 @@ struct PlatformsContainer: View {
 //            ],
 //            [
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 84,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 83,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 82,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
 //                    padding1: nil
@@ -1172,19 +1375,19 @@ struct PlatformsContainer: View {
 //            ],
 //            [
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 79,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 80,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 81,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
@@ -1192,19 +1395,19 @@ struct PlatformsContainer: View {
 //            ],
 //            [
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 78,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 77,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 76,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
 //                    padding1: nil
@@ -1212,19 +1415,19 @@ struct PlatformsContainer: View {
 //            ],
 //            [
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 73,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 74,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 75,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
@@ -1232,19 +1435,19 @@ struct PlatformsContainer: View {
 //            ],
 //            [
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 72,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 71,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 70,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
 //                    padding1: nil
@@ -1252,19 +1455,19 @@ struct PlatformsContainer: View {
 //            ],
 //            [
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 67,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 68,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 69,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
@@ -1272,19 +1475,19 @@ struct PlatformsContainer: View {
 //            ],
 //            [
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 66,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 65,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 64,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
 //                    padding1: nil
@@ -1292,19 +1495,19 @@ struct PlatformsContainer: View {
 //            ],
 //            [
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 61,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 62,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 63,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
@@ -1312,19 +1515,19 @@ struct PlatformsContainer: View {
 //            ],
 //            [
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position:60,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 59,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 58,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
 //                    padding1: nil
@@ -1332,19 +1535,19 @@ struct PlatformsContainer: View {
 //            ],
 //            [
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 55,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 56,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 57,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
@@ -1352,19 +1555,19 @@ struct PlatformsContainer: View {
 //            ],
 //            [
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position:54,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 53,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 52,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
 //                    padding1: nil
@@ -1381,39 +1584,39 @@ struct PlatformsContainer: View {
             ],
             [
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 49,
                     padding: EdgeInsets(top: 0, leading: 40, bottom: -60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 30, bottom: 0, trailing: 0),
-                    paddingTreasure: EdgeInsets(top: 0, leading: 40, bottom: 0, trailing: 0),
+                    paddingTreasure: EdgeInsets(top: 4, leading: 40, bottom: -4, trailing: 0),
                     treasure: 12
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 50,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 51,
                     padding: EdgeInsets(top: 0, leading: -20, bottom: 60, trailing: 30),
                     padding1: EdgeInsets(top: 0, leading: -10, bottom: 120, trailing: 30)
                 )
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 49,
 //                    padding: EdgeInsets(top: 0, leading: 45, bottom: -60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 50,
 //                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
 //                ),
 //                PlatformData(
-//                    imageName: self.platformImageName,
+//                    imageName: platformImageName,
 //                    position: 51,
 //                    padding: EdgeInsets(top: 0, leading: -45, bottom: 60, trailing: 0),
 //                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
@@ -1422,37 +1625,37 @@ struct PlatformsContainer: View {
             ],
             [
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 48,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
-                    paddingMonster: EdgeInsets(top: -120, leading: 0, bottom: 0, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -68, leading: 0, bottom: 68, trailing: 0),
                     monster: 14
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 47,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 46,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
                     padding1: nil,
-                    paddingMonster: EdgeInsets(top: -60, leading: 0, bottom: 0, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -8, leading: 0, bottom: 8, trailing: 0),
                     monster: 13
                 )
             ],
             [
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 43,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 44,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
@@ -1460,7 +1663,7 @@ struct PlatformsContainer: View {
                     treasure: 11
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 45,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
@@ -1468,45 +1671,47 @@ struct PlatformsContainer: View {
             ],
             [
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 42,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
-                    paddingMonster: EdgeInsets(top: -120, leading: 0, bottom: 0, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -68, leading: 0, bottom: 68, trailing: 0),
                     monster: 12
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 41,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 40,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
                     padding1: nil,
+                    paddingTreasure: EdgeInsets(top: -6, leading: 0, bottom: 6, trailing: 0),
                     treasure: 10
                 )
             ],
             [
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 37,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    paddingTreasure: EdgeInsets(top: -3, leading: 0, bottom: 3, trailing: 0),
                     treasure: 9
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 38,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
-                    paddingMonster: EdgeInsets(top: -90, leading: 0, bottom: 0, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -38, leading: 0, bottom: 38, trailing: 0),
                     monster: 11
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 39,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
@@ -1514,21 +1719,21 @@ struct PlatformsContainer: View {
             ],
             [
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 36,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 35,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
-                    paddingMonster: EdgeInsets(top: -90, leading: 0, bottom: 0, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -38, leading: 0, bottom: 38, trailing: 0),
                     monster: 10
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 34,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
                     padding1: nil,
@@ -1537,21 +1742,21 @@ struct PlatformsContainer: View {
             ],
             [
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 31,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
-                    paddingMonster: EdgeInsets(top: -60, leading: 0, bottom: 0, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -8, leading: 0, bottom: 8, trailing: 0),
                     monster: 9
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 32,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 33,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
@@ -1559,21 +1764,21 @@ struct PlatformsContainer: View {
             ],
             [
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 30,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 29,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
-                    paddingTreasure: EdgeInsets(top: -60, leading: 0, bottom: 0, trailing: 0),
+                    paddingTreasure: EdgeInsets(top: -28, leading: 0, bottom: 28, trailing: 0),
                     treasure: 7
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 28,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
                     padding1: nil
@@ -1581,19 +1786,19 @@ struct PlatformsContainer: View {
             ],
             [
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 25,
                     padding: EdgeInsets(top: 0, leading: 60, bottom: -60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 60, bottom: 0, trailing: 0)
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 26,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 30, trailing: 0)
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 27,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 60),
                     padding1: EdgeInsets(top: 0, leading: -50, bottom: 120, trailing: 0)
@@ -1601,45 +1806,46 @@ struct PlatformsContainer: View {
             ],
             [
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 24,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
-                    paddingMonster: EdgeInsets(top: -120, leading: 0, bottom: 0, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -68, leading: 0, bottom: 68, trailing: 0),
                     monster: 7
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 23,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 22,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
                     padding1: nil,
+                    paddingTreasure: EdgeInsets(top: 3, leading: 0, bottom: -3, trailing: 0),
                     treasure: 5
                 )
             ],
             [
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 19,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
                     treasure: 4
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 20,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
-                    paddingMonster: EdgeInsets(top: -90, leading: 0, bottom: 0, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -38, leading: 0, bottom: 38, trailing: 0),
                     monster: 6
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 21,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
@@ -1648,21 +1854,21 @@ struct PlatformsContainer: View {
             [
                 
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 18,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
-                    paddingMonster: EdgeInsets(top: -120, leading: 0, bottom: 0, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -68, leading: 0, bottom: 68, trailing: 0),
                     monster: 5
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 17,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 16,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
                     padding1: nil
@@ -1670,7 +1876,7 @@ struct PlatformsContainer: View {
             ],
             [
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 13,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
@@ -1678,61 +1884,61 @@ struct PlatformsContainer: View {
                     treasure: 3
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 14,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 15,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
-                    paddingMonster: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -68, leading: 0, bottom: 68, trailing: 0),
                     monster: 8
                 )
             ],
             [
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 12,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
-                    paddingMonster: EdgeInsets(top: -120, leading: 0, bottom: 0, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -68, leading: 0, bottom: 68, trailing: 0),
                     monster: 4
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 11,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 10,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
                     padding1: nil,
-                    paddingMonster: EdgeInsets(top: -60, leading: 10, bottom: 0, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -20, leading: 10, bottom: 20, trailing: 0),
                     monster: 3
                 )
             ],
             [
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 7,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
-                    paddingMonster: EdgeInsets(top: -60, leading: 0, bottom: 0, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -8, leading: 0, bottom: 8, trailing: 0),
                     monster: 1
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 8,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 9,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
@@ -1742,70 +1948,62 @@ struct PlatformsContainer: View {
             ],
             [
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 6,
                     padding: EdgeInsets(top: -30, leading: 0, bottom: 0, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 90, trailing: 0)
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 5,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 4,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: -30, trailing: 0),
                     padding1: nil,
-                    paddingTreasure: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    paddingTreasure: EdgeInsets(top: -21, leading: 0, bottom: 21, trailing: 0),
                     treasure: 1
                 )
             ],
             [
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 1,
                     padding: EdgeInsets(top: 30, leading: 0, bottom: 0, trailing: 0),
                     padding1: EdgeInsets(top: -30, leading: 0, bottom: 0, trailing: 0)
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 2,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
                     padding1: EdgeInsets(top: -40, leading: 0, bottom: 0, trailing: 0)
                 ),
                 PlatformData(
-                    imageName: self.platformImageName,
+                    imageName: platformImageName,
                     position: 3,
                     padding: EdgeInsets(top: -30, leading: 0, bottom: 0, trailing: 0),
                     padding1: EdgeInsets(top: -60, leading: 0, bottom: 0, trailing: 0),
-                    paddingMonster: EdgeInsets(top: -110, leading: 0, bottom: 0, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -53, leading: 0, bottom: 53, trailing: 0),
                     monster: 2
                 )
             ],
         ]
-        self.platformDatas = Self.makeUpperFloorDatas() + lowerFloorDatas
     }
 
-    private static func makeUpperFloorDatas() -> [[PlatformData]] {
-        let monsterPositions = Array(stride(from: 55, through: 97, by: 3)) + [99]
-        let monsterByPosition = Dictionary(
-            uniqueKeysWithValues: zip(monsterPositions, Array(17...32))
-        )
-        let treasureByPosition: [Int: Int] = [
-            60: 13,
-            69: 14,
-            78: 15,
-            87: 16,
-            96: 17
-        ]
-
-        func makePlatform(position: Int, index: Int, ascending: Bool) -> PlatformData {
+    private static func makeGeneratedFloorDatas() -> [[PlatformData]] {
+        func makePlatform(
+            position: Int,
+            index: Int,
+            ascending: Bool,
+            segment: DungeonFloorPlan.Segment
+        ) -> PlatformData {
             let platformBottomOffsets: [CGFloat] = ascending ? [-60, 0, 60] : [60, 0, -60]
             let avatarBottomOffsets: [CGFloat] = ascending ? [0, 60, 120] : [120, 60, 0]
-            let monster = monsterByPosition[position] ?? 0
-            let treasure = treasureByPosition[position] ?? 0
+            let monster = segment.monsterByPosition[position] ?? 0
+            let treasure = segment.treasureByPosition[position] ?? 0
 
             return PlatformData(
                 imageName: DungeonTheme.platformImageName(for: position),
@@ -1833,44 +2031,47 @@ struct PlatformsContainer: View {
             )
         }
 
-        var rows: [[PlatformData]] = [
-            [
+        func makeRows(for segment: DungeonFloorPlan.Segment) -> [[PlatformData]] {
+            var rows: [[PlatformData]] = [[
                 PlatformData(
-                    imageName: DungeonTheme.platformImageName(for: 100),
-                    position: 100,
+                    imageName: DungeonTheme.platformImageName(for: segment.bossFloor),
+                    position: segment.bossFloor,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
                     padding1: nil,
-                    boss: 150
+                    boss: segment.bossID
                 )
-            ]
-        ]
+            ]]
 
-        var rowTop = 99
-        while rowTop >= 57 {
-            let ascendingPositions = Array((rowTop - 2)...rowTop)
-            rows.append(
-                ascendingPositions.enumerated().map { index, position in
-                    makePlatform(position: position, index: index, ascending: true)
-                }
-            )
+            var rowTop = segment.bossFloor - 1
+            var ascending = true
+            while rowTop >= segment.startFloor {
+                let rowBottom = max(rowTop - 2, segment.startFloor)
+                let positions = ascending
+                    ? Array(rowBottom...rowTop)
+                    : Array(stride(from: rowTop, through: rowBottom, by: -1))
+                rows.append(
+                    positions.enumerated().map { index, position in
+                        makePlatform(
+                            position: position,
+                            index: index,
+                            ascending: ascending,
+                            segment: segment
+                        )
+                    }
+                )
+                rowTop -= 3
+                ascending.toggle()
+            }
 
-            let descendingPositions = Array(
-                stride(from: rowTop - 3, through: max(rowTop - 5, 53), by: -1)
-            )
-            rows.append(
-                descendingPositions.enumerated().map { index, position in
-                    makePlatform(position: position, index: index, ascending: false)
-                }
-            )
-            rowTop -= 6
+            return rows
         }
 
-        return rows
+        return DungeonFloorPlan.segments.reversed().flatMap(makeRows)
     }
     
     var body: some View {
         ZStack {
-            VStack(spacing: 0){
+            LazyVStack(spacing: 0){
                 // 外側のForEachをインデックスで回す
                 ForEach(platformDatas.indices, id: \.self) { index in
                     let platformSet = platformDatas[index]
@@ -1897,9 +2098,10 @@ struct PlatformsContainer: View {
                             }
                         }
                     }
-                    .id("dungeon-row-\(index)")
+                    .id(StoryDungeonScrollTarget.row(index))
                 }
             }
+            .dungeonScrollTargetLayout()
         }
     }
 }
@@ -1939,7 +2141,7 @@ struct PlatformView: View {
     }
 
     private var isBossFloor: Bool {
-        position == 52 || position == 100
+        DungeonTheme.isBossFloor(position)
     }
 
     private var platformContentYOffset: CGFloat {
@@ -1951,32 +2153,38 @@ struct PlatformView: View {
         18
     }
 
+    /// 上層のモンスター/宝箱は画像ごとに余白量が違うため、1体ずつ基準値を持たせる。
+    /// 値は「その画像の不透明部分の下端」と「その階の足場画像の上端」から算出しており、
+    /// スプライトの見た目の足元が足場の立ち面に載るようにしている。
+    /// （画像を差し替えたときは、この表の値も合わせて更新すること）
+    private static let upperFloorMonsterBaselines: [Int: CGFloat] = [
+        17: -50, 18: -63, 19: -48, 20: -46, 21: -45, 22: -43,
+        23: -51, 24: -49, 25: -48, 26: -53, 27: -44, 28: -48,
+        29: -43, 30: -51, 31: -61, 32: -52, 33: -60, 34: -62,
+        35: -53, 36: -58, 37: -59, 38: -58, 39: -63, 40: -62,
+        41: -64, 42: -59, 43: -58, 44: -59, 45: -57, 46: -57,
+        47: -60, 48: -60, 49: -62, 50: -58, 51: -61, 52: -60,
+        53: -61, 54: -58, 55: -61, 56: -60, 57: -63, 58: -60,
+        59: -61, 60: -56, 61: -62, 62: -63, 63: -62, 64: -63,
+        65: -61, 66: -52, 67: -56, 68: -49, 69: -59, 70: -58,
+        71: -51, 72: -54, 73: -57, 74: -55, 75: -51, 76: -54,
+        77: -55, 78: -56, 79: -57, 80: -60, 81: -52, 82: -53,
+        83: -54, 84: -54, 85: -54, 86: -57, 87: -56, 88: -52,
+        89: -53, 90: -61, 91: -55, 92: -58, 93: -55, 94: -55,
+        95: -60, 96: -59, 97: -57, 98: -58,
+    ]
+
+    private static let upperFloorTreasureBaselines: [Int: CGFloat] = [
+        13: -48, 14: -48, 15: -55, 16: -49, 17: -54, 18: -60,
+        19: -53,
+    ]
+
     /// Upper-floor monsters use 1024px images with different transparent margins.
     /// Align each visible bottom edge with the top surface of its own platform.
     private var upperFloorMonsterYOffset: CGFloat {
         guard let monster, monster >= 17 else { return 0 }
 
-        let imageBaselineOffset: CGFloat
-
-        switch monster {
-        case 17: imageBaselineOffset = -50
-        case 18: imageBaselineOffset = -47
-        case 19: imageBaselineOffset = -48
-        case 20: imageBaselineOffset = -46
-        case 21: imageBaselineOffset = -45
-        case 22: imageBaselineOffset = -43
-        case 23: imageBaselineOffset = -51
-        case 24: imageBaselineOffset = -49
-        case 25: imageBaselineOffset = -48
-        case 26: imageBaselineOffset = -53
-        case 27: imageBaselineOffset = -44
-        case 28: imageBaselineOffset = -48
-        case 29: imageBaselineOffset = -43
-        case 30: imageBaselineOffset = -51
-        case 31: imageBaselineOffset = -61
-        case 32: imageBaselineOffset = -52
-        default: imageBaselineOffset = -48
-        }
+        let imageBaselineOffset = Self.upperFloorMonsterBaselines[monster] ?? -57
 
         return platformContentYOffset + imageBaselineOffset + platformSurfaceInset
     }
@@ -1986,16 +2194,7 @@ struct PlatformView: View {
     private var upperFloorTreasureYOffset: CGFloat {
         guard let treasure, treasure >= 13 else { return 0 }
 
-        let imageBaselineOffset: CGFloat
-
-        switch treasure {
-        case 13: imageBaselineOffset = -48
-        case 14: imageBaselineOffset = -48
-        case 15: imageBaselineOffset = -55
-        case 16: imageBaselineOffset = -49
-        case 17: imageBaselineOffset = -54
-        default: imageBaselineOffset = -60
-        }
+        let imageBaselineOffset = Self.upperFloorTreasureBaselines[treasure] ?? -53
 
         return platformContentYOffset + imageBaselineOffset + platformSurfaceInset
     }
@@ -2064,17 +2263,19 @@ struct PlatformView: View {
             
             // アバター表示
             if position == userPosition {
-                Image("\(viewModel.avatarName)")
+                avatarArtworkImage(for: viewModel.avatarName)
                     .resizable()
                     .frame(width: 80, height: 80)
                     .padding(.top, -45)
                     .padding(padding1 ?? EdgeInsets())
                     .offset(y: isMovingUp ? -3 : 3)
+                    // withAnimation で repeatForever を掛けると、同じトランザクションで起きた
+                    // LazyVStack の行配置の変化まで永久アニメーションになり足場が揺れ続ける。
+                    // アニメーションはこの offset だけに限定する。
+                    .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: isMovingUp)
                     .id(StoryDungeonScrollTarget.currentPosition(position))
                     .onAppear {
-                        withAnimation(Animation.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
-                            isMovingUp.toggle()
-                        }
+                        isMovingUp = true
                     }
             } else {
             }
@@ -2088,7 +2289,7 @@ struct PlatformView: View {
                     .offset(y: treasure >= 13 ? upperFloorTreasureYOffset : 0)
                     .onTapGesture {
                         if viewModel.hasEnoughStamina(for: 10) {
-                            if position == userPosition + 1 {
+                            if position == userPosition + 1 || PositionViewModel.isDeveloperMode {
                                 self.triggerHaptic()
                                 audioManager.playTittleSound()
                                 viewModel.coin = treasure
@@ -2111,7 +2312,7 @@ struct PlatformView: View {
                         .padding(monster >= 17 ? EdgeInsets() : (paddingMonster ?? EdgeInsets()))
                         .offset(y: monster >= 17 ? upperFloorMonsterYOffset : 0)
                         .onTapGesture {
-                            if position == userPosition + 1 {
+                            if position == userPosition + 1 || PositionViewModel.isDeveloperMode {
                                 self.triggerHaptic()
                                 audioManager.playSound()
                                 if viewModel.hasEnoughStamina(for: 10) {
@@ -2135,11 +2336,11 @@ struct PlatformView: View {
                     .resizable()
                     .scaledToFit()
                     .shadow(radius: 10)
-                    .frame(width: boss == 150 ? 260 : 200)
-                    .padding(.top, boss == 150 ? -80 : -30)
-                    .padding(.leading, boss == 150 ? 0 : 40)
+                    .frame(width: boss >= 150 ? 260 : 200)
+                    .padding(.top, boss >= 150 ? -80 : -30)
+                    .padding(.leading, boss >= 150 ? 0 : 40)
                     .onTapGesture {
-                        if position == userPosition + 1 {
+                        if position == userPosition + 1 || PositionViewModel.isDeveloperMode {
                             self.triggerHaptic()
                             audioManager.playSound()
                             if viewModel.hasEnoughStamina(for: 10) {
@@ -2162,6 +2363,8 @@ struct PlatformView: View {
                     .frame(width: 50, height: 50)
                     .padding(padding1 ?? EdgeInsets())
                     .scaleEffect(isPulsing ? 1.4 : 1.0)
+                    // アバターと同じく、永久アニメーションはこの拡大縮小だけに限定する。
+                    .animation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true), value: isPulsing)
                     .background(
                         GeometryReader { geometry in
                             Color.clear
@@ -2173,9 +2376,7 @@ struct PlatformView: View {
                     )
                     .padding(.top, -30)
                     .onAppear {
-                        withAnimation(Animation.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
-                            isPulsing.toggle()
-                        }
+                        isPulsing = true
                     }
                     .onTapGesture {
                         if viewModel.hasEnoughStamina(for: 10) {

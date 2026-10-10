@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct StorySutaminaModalView: View {
-    @StateObject var reward = Reward()
+    @StateObject var reward = Reward(placement: .stamina)
     @State private var showAlert: Bool = false
     @Binding var isPresented: Bool
     @ObservedObject var audioManager = AudioManager()
@@ -47,7 +47,11 @@ struct StorySutaminaModalView: View {
                 .fontWeight(.bold)
                 Button(action: {
                                 generateHapticFeedback()
-                    reward.ShowSutaminaReward()
+                    if reward.rewardLoadFailed {
+                        reward.retryLoading()
+                    } else {
+                        reward.ShowSutaminaReward()
+                    }
                 }) {
                     if reward.rewardLoaded {
                         Image("スタミナボタン")
@@ -60,12 +64,18 @@ struct StorySutaminaModalView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 300)
-                            ProgressView()
-                                .scaleEffect(3)
+                            if reward.rewardLoadFailed {
+                                Text("広告を再読み込み")
+                                    .font(.headline)
+                                    .foregroundStyle(.white)
+                            } else {
+                                ProgressView()
+                                    .scaleEffect(3)
+                            }
                         }
                     }
                 }
-                .disabled(!reward.rewardLoaded)
+                .disabled(!reward.rewardLoaded && !reward.rewardLoadFailed)
                 .onChange(of: reward.rewardEarned) { rewardEarned in
                     showAlert = rewardEarned
                 }
@@ -116,6 +126,7 @@ struct StorySutaminaModalView: View {
         .onAppear() {
             reward.LoadStoryReward()
         }
+        .onDisappear { reward.stopPreloading() }
     }
 }
 

@@ -1,356 +1,459 @@
 //
 //  GachaAnimationView.swift
-//  it
+//  drill
 //
-//  Created by hashimo ryoya on 2023/09/18.
+//  itQuiz と同じ召喚演出（召喚陣 → 宝珠落下 → ひび割れ・予告 → 光の柱 → 登場）。
 //
 
 import SwiftUI
-import AVKit
-import AVFoundation
 
-struct AVPlayerViewControllerRepresentable: UIViewControllerRepresentable {
-    @Binding var player: AVPlayer?
-    @Binding var showAnimation: Bool
+// MARK: - Animation View
+/// 召喚演出（約4.8秒）。暗転・召喚陣 → 宝珠落下 → ひび割れ・予告 → 光の柱 → 登場。
+struct GachaAnimationView: View {
+    let rarity: GachaRarity?
+    /// 登場させるおとも。省略時はレア度だけを表示する。
+    var item: GachaManager.Item? = nil
+    let onFinished: () -> Void
 
-    func makeUIViewController(context: Context) -> AVPlayerViewController {
-        let controller = AVPlayerViewController()
-        controller.player = player
-        controller.showsPlaybackControls = false
-        return controller
+    /// 演出の段階。
+    enum SummonPhase: Int {
+        case idle
+        case circle      // 0.0s 暗転・召喚陣
+        case orbDrop     // 0.8s 宝珠落下
+        case crack       // 1.8s ひび割れ・レア度の予告
+        case pillar      // 2.8s 光の柱・ホワイトアウト
+        case reveal      // 3.6s 登場
+        case done
     }
 
-    func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {
-        if uiViewController.player == nil {
-          uiViewController.player = player
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    @State private var phase: SummonPhase = .idle
+    @State private var sequence: Task<Void, Never>?
+    @State private var didFinish = false
+
+    // 召喚陣
+    @State private var circleScale: CGFloat = 0.2
+    @State private var circleOpacity: Double = 0
+    // 宝珠
+    @State private var orbOffset: CGFloat = -560
+    @State private var orbOpacity: Double = 0
+    @State private var orbScale: CGFloat = 1
+    @State private var trailOpacity: Double = 0
+    @State private var isShaking = false
+    @State private var crackProgress: CGFloat = 0
+    @State private var hintColor: Color = GachaTheme.goldLight
+    @State private var hintGlow: Double = 0
+    @State private var isRainbow = false
+    @State private var rainbowSpin = false
+    // 光の柱・白飛び
+    @State private var pillarScale: CGFloat = 0
+    @State private var pillarOpacity: Double = 0
+    @State private var flashOpacity: Double = 0
+    // 登場
+    @State private var revealOpacity: Double = 0
+    @State private var raysRotation: Double = 0
+    @State private var avatarScale: CGFloat = 0.6
+    @State private var bannerOffset: CGFloat = -600
+    @State private var bannerOpacity: Double = 0
+
+    private static let rainbowColors: [Color] = [
+        Color(hex: "FF5A5A"), Color(hex: "FFB347"), Color(hex: "FFF07A"),
+        Color(hex: "6BFF8E"), Color(hex: "5AD8FF"), Color(hex: "7A7BFF"),
+        Color(hex: "E07BFF"), Color(hex: "FF5A5A")
+    ]
+
+    var body: some View {
+        GeometryReader { proxy in
+            let size = proxy.size
+            let floorY = size.height * 0.64
+            let orbRestY = floorY - 46
+            let revealY = size.height * 0.42
+
+            ZStack {
+                Color.black
+
+                // 5. 登場
+                revealLayer(size: size, centerY: revealY)
+                    .opacity(revealOpacity)
+
+                // 1. 召喚陣（床に寝かせた楕円）
+                ZStack {
+                    Ellipse()
+                        .fill(
+                            RadialGradient(
+                                colors: [hintColor.opacity(0.35 + hintGlow * 0.3), .clear],
+                                center: .center,
+                                startRadius: 0,
+                                endRadius: 170
+                            )
+                        )
+                        .frame(width: 340, height: 130)
+
+                    GachaSummoningCircle(size: 300, color: GachaTheme.gold)
+                        .scaleEffect(x: 1, y: 0.36)
+                }
+                .scaleEffect(circleScale)
+                .opacity(circleOpacity)
+                .position(x: size.width / 2, y: floorY)
+
+                // 2〜3. 宝珠
+                orbLayer
+                    .offset(y: orbOffset)
+                    .opacity(orbOpacity)
+                    .position(x: size.width / 2, y: orbRestY)
+
+                // 4. 光の柱
+                LinearGradient(
+                    colors: [.clear, pillarColor.opacity(0.9), .white, pillarColor.opacity(0.9), .clear],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+                .frame(width: 150)
+                .scaleEffect(x: pillarScale, y: 1)
+                .opacity(pillarOpacity)
+                .blur(radius: 6)
+                .frame(maxHeight: .infinity)
+                .position(x: size.width / 2, y: size.height / 2)
+                .allowsHitTesting(false)
+
+                Color.white
+                    .opacity(flashOpacity)
+                    .allowsHitTesting(false)
+            }
+            .frame(width: size.width, height: size.height)
         }
-        if showAnimation {
-          uiViewController.player?.play()
+        .ignoresSafeArea()
+        .overlay(alignment: .topTrailing) {
+            skipButton
+        }
+        .onAppear {
+            guard sequence == nil else { return }
+            sequence = Task { @MainActor in
+                if reduceMotion {
+                    await runReducedSequence()
+                } else {
+                    await runSequence()
+                }
+            }
+        }
+        .onDisappear {
+            sequence?.cancel()
+        }
+    }
+
+    // MARK: Layers
+    private var pillarColor: Color {
+        isRainbow ? GachaTheme.goldHighlight : hintColor
+    }
+
+    private var orbLayer: some View {
+        ZStack {
+            // 落下時の光の尾
+            Capsule()
+                .fill(
+                    LinearGradient(
+                        colors: [GachaTheme.goldLight.opacity(0), GachaTheme.goldLight.opacity(0.85)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .frame(width: 26, height: 240)
+                .offset(y: -130)
+                .blur(radius: 4)
+                .opacity(trailOpacity)
+
+            // 漏れる光
+            Group {
+                if isRainbow {
+                    Circle()
+                        .fill(AngularGradient(colors: Self.rainbowColors, center: .center))
+                        .hueRotation(.degrees(rainbowSpin ? 360 : 0))
+                } else {
+                    Circle().fill(hintColor)
+                }
+            }
+            .frame(width: 150, height: 150)
+            .blur(radius: 28)
+            .opacity(hintGlow)
+
+            // 宝珠本体
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [Color.white, GachaTheme.goldLight, GachaTheme.gold, Color(hex: "8C5F10")],
+                        center: UnitPoint(x: 0.38, y: 0.32),
+                        startRadius: 0,
+                        endRadius: 44
+                    )
+                )
+                .frame(width: 70, height: 70)
+                .overlay(
+                    GachaOrbCrackShape()
+                        .trim(from: 0, to: crackProgress)
+                        .stroke(isRainbow ? Color.white : hintColor, style: StrokeStyle(lineWidth: 2.5, lineCap: .round, lineJoin: .round))
+                        .shadow(color: isRainbow ? .white : hintColor, radius: 4)
+                )
+                .shadow(color: GachaTheme.gold.opacity(0.8), radius: 16)
+        }
+        .scaleEffect(orbScale)
+        .rotationEffect(.degrees(phase == .crack ? (isShaking ? 3 : -3) : 0))
+    }
+
+    private func revealLayer(size: CGSize, centerY: CGFloat) -> some View {
+        let diameter = max(size.width, size.height) * 1.6
+
+        return ZStack {
+            GachaSunburst(opacity: 0.16)
+                .frame(width: diameter, height: diameter)
+                .rotationEffect(.degrees(raysRotation))
+                .position(x: size.width / 2, y: centerY)
+
+            GachaRadialGlow(opacity: 0.35, radius: 220)
+                .position(x: size.width / 2, y: centerY)
+
+            avatarImage
+                .frame(width: 250, height: 250)
+                .shadow(color: GachaTheme.gold.opacity(0.5), radius: 24)
+                .scaleEffect(avatarScale)
+                .position(x: size.width / 2, y: centerY)
+
+            nameBanner
+                .offset(x: bannerOffset)
+                .opacity(bannerOpacity)
+                .position(x: size.width / 2, y: centerY + 170)
+        }
+    }
+
+    @ViewBuilder
+    private var avatarImage: some View {
+        if let item, UIImage(named: item.name) != nil {
+            Image(item.name)
+                .resizable()
+                .scaledToFit()
+                .accessibilityLabel(item.name)
         } else {
-          uiViewController.player?.pause()
+            Image(systemName: "sparkles")
+                .resizable()
+                .scaledToFit()
+                .padding(60)
+                .foregroundColor(GachaTheme.goldLight)
+                .accessibilityHidden(true)
         }
+    }
+
+    private var nameBanner: some View {
+        HStack(spacing: 10) {
+            if let rarity {
+                GachaTag(text: rarity.displayString, useLabelFont: false, size: 12)
+            }
+            Text(item?.name ?? rarity?.displayString ?? "")
+                .font(GachaFont.display(22, relativeTo: .title2))
+                .tracking(GachaFont.tracking(22))
+                .foregroundColor(GachaTheme.goldHighlight)
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+                .gachaGoldTextGlow()
+        }
+        .padding(.horizontal, 20)
+        .frame(maxWidth: .infinity)
+        .frame(height: 56)
+        .background(Color.black.opacity(0.85))
+        .overlay(alignment: .top) {
+            Rectangle().fill(GachaTheme.gold).frame(height: 1)
+        }
+        .overlay(alignment: .bottom) {
+            Rectangle().fill(GachaTheme.gold).frame(height: 1)
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    private var skipButton: some View {
+        Button(action: finish) {
+            HStack(spacing: 4) {
+                Text("スキップ")
+                    .font(.system(size: 13, weight: .bold))
+                Image(systemName: "forward.end.fill")
+                    .font(.system(size: 11, weight: .bold))
+            }
+            .foregroundColor(GachaTheme.goldLight)
+            .padding(.horizontal, 14)
+            .frame(minWidth: 44, minHeight: 44)
+            .background(
+                Capsule()
+                    .fill(Color.black.opacity(0.5))
+                    .overlay(Capsule().stroke(GachaTheme.line, lineWidth: 1))
+            )
+            .contentShape(Capsule())
+        }
+        .buttonStyle(ScaleButtonStyle())
+        .padding(.trailing, 16)
+        .padding(.top, 8)
+        .accessibilityLabel("演出をスキップ")
+    }
+
+    // MARK: Sequence
+    private func runSequence() async {
+        // 1. 0.0s 暗転・召喚陣
+        phase = .circle
+        withAnimation(.easeOut(duration: 0.8)) {
+            circleScale = 1
+            circleOpacity = 1
+        }
+        guard await pause(0.8) else { return }
+
+        // 2. 0.8s 宝珠が降ってくる
+        phase = .orbDrop
+        orbOpacity = 1
+        trailOpacity = 1
+        withAnimation(.easeIn(duration: 0.55)) {
+            orbOffset = 0
+        }
+        guard await pause(0.55) else { return }
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        orbScale = 0.86
+        withAnimation(.easeOut(duration: 0.35)) {
+            trailOpacity = 0
+        }
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.45)) {
+            orbScale = 1
+        }
+        guard await pause(0.45) else { return }
+
+        // 3. 1.8s ひび割れ・レア度の予告
+        phase = .crack
+        withAnimation(.easeInOut(duration: 0.05).repeatForever(autoreverses: true)) {
+            isShaking = true
+        }
+        withAnimation(.easeIn(duration: 1.0)) {
+            orbScale = 1.4
+            crackProgress = 1
+        }
+        let stages = rarity?.summonHint.stages ?? []
+        if stages.isEmpty {
+            // ノーマルは色が上がらない
+            withAnimation(.easeIn(duration: 0.6)) { hintGlow = 0.35 }
+            guard await pause(1.0) else { return }
+        } else {
+            let step = 1.0 / Double(stages.count)
+            for (index, stage) in stages.enumerated() {
+                withAnimation(.easeInOut(duration: min(0.25, step))) {
+                    hintColor = stage.color ?? GachaTheme.goldLight
+                    hintGlow = 0.45 + 0.45 * Double(index + 1) / Double(stages.count)
+                    isRainbow = stage == .rainbow
+                }
+                if stage == .rainbow {
+                    withAnimation(.linear(duration: 1.2).repeatForever(autoreverses: false)) {
+                        rainbowSpin = true
+                    }
+                }
+                guard await pause(step) else { return }
+            }
+        }
+
+        // 4. 2.8s 光の柱・ホワイトアウト
+        phase = .pillar
+        UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+        withAnimation(.linear(duration: 0.01)) { isShaking = false }
+        withAnimation(.easeOut(duration: 0.2)) {
+            orbOpacity = 0
+            orbScale = 1.8
+            pillarScale = 1
+            pillarOpacity = 1
+        }
+        withAnimation(.easeIn(duration: 0.1)) { flashOpacity = 1 }
+        guard await pause(0.2) else { return }
+        withAnimation(.easeOut(duration: 0.5)) { flashOpacity = 0 }
+        guard await pause(0.6) else { return }
+
+        // 5. 3.6s 登場
+        phase = .reveal
+        withAnimation(.easeOut(duration: 0.4)) {
+            pillarOpacity = 0
+            circleOpacity = 0
+            revealOpacity = 1
+        }
+        withAnimation(.linear(duration: 40).repeatForever(autoreverses: false)) {
+            raysRotation = 360
+        }
+        withAnimation(.easeOut(duration: 0.22)) { avatarScale = 1.08 }
+        guard await pause(0.22) else { return }
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) { avatarScale = 1 }
+        guard await pause(0.13) else { return }
+        withAnimation(.spring(response: 0.45, dampingFraction: 0.85)) {
+            bannerOffset = 0
+            bannerOpacity = 1
+        }
+        guard await pause(0.85) else { return }
+        finish()
+    }
+
+    /// Reduce Motion 用：回転・発光のループは使わず、短いフェードだけでつなぐ。
+    private func runReducedSequence() async {
+        phase = .circle
+        circleScale = 1
+        orbOffset = 0
+        hintColor = rarity?.summonHintColor ?? GachaTheme.goldLight
+        hintGlow = rarity?.summonHint == GachaSummonHint.none ? 0.3 : 0.7
+        crackProgress = 1
+        withAnimation(.easeOut(duration: 0.25)) {
+            circleOpacity = 1
+            orbOpacity = 1
+        }
+        guard await pause(0.7) else { return }
+
+        phase = .reveal
+        avatarScale = 1
+        bannerOffset = 0
+        withAnimation(.easeInOut(duration: 0.3)) {
+            circleOpacity = 0
+            orbOpacity = 0
+            revealOpacity = 1
+            bannerOpacity = 1
+        }
+        guard await pause(1.0) else { return }
+        finish()
+    }
+
+    /// 指定秒待つ。キャンセル・スキップされたら false。
+    private func pause(_ seconds: Double) async -> Bool {
+        try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+        return !Task.isCancelled && !didFinish
+    }
+
+    private func finish() {
+        guard !didFinish else { return }
+        didFinish = true
+        phase = .done
+        sequence?.cancel()
+        onFinished()
     }
 }
 
-// MARK: - Animation View
-struct GachaAnimationView: View {
-    let rarity: GachaRarity?
-    let onFinished: () -> Void
-    
-    @State private var scale: CGFloat = 0.3
-    @State private var rotation: Double = 0
-    @State private var opacity: Double = 0
-    @State private var showRays: Bool = false
-    @State private var particleOpacity: Double = 0
-    @State private var pulseScale: CGFloat = 1.0
-    @State private var ringScale: CGFloat = 0.3
-    @State private var showText: Bool = false
-    @State private var shimmerOffset: CGFloat = -300
-    @State private var hexagonRotation: Double = 0
-    @State private var starBurst: Bool = false
-    @State private var energyWave: CGFloat = 0
-    
-    var rarityColors: [Color] {
-        rarity?.gradientColors ?? [.gray, .gray]
-    }
-    
-    var body: some View {
-        ZStack {
-            // 背景グラデーション（アニメーション付き）
-            ZStack {
-                LinearGradient(
-                    gradient: Gradient(colors: rarityColors),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
+/// 宝珠のひび（中心から外へ伸びる折れ線）。
+struct GachaOrbCrackShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let radius = min(rect.width, rect.height) / 2
+        // (角度, 半径に対する割合)
+        let branches: [[(Double, CGFloat)]] = [
+            [(-80, 0.05), (-68, 0.35), (-95, 0.62), (-82, 0.98)],
+            [(15, 0.05), (32, 0.4), (8, 0.7), (24, 0.98)],
+            [(150, 0.05), (138, 0.45), (166, 0.75), (152, 0.98)],
+            [(235, 0.05), (250, 0.5), (226, 0.95)],
+            [(-30, 0.4), (-42, 0.75)]
+        ]
+        var path = Path()
+        for branch in branches {
+            for (index, point) in branch.enumerated() {
+                let angle = point.0 * .pi / 180
+                let p = CGPoint(
+                    x: center.x + radius * point.1 * CGFloat(cos(angle)),
+                    y: center.y + radius * point.1 * CGFloat(sin(angle))
                 )
-                .ignoresSafeArea()
-                
-                // 動的グラデーションオーバーレイ
-                RadialGradient(
-                    colors: [
-                        rarityColors[0].opacity(0.6),
-                        Color.clear
-                    ],
-                    center: .center,
-                    startRadius: 0,
-                    endRadius: 400
-                )
-                .scaleEffect(pulseScale)
-                .opacity(opacity * 0.5)
-            }
-            
-            // エネルギーウェーブ（複数層）
-            ForEach(0..<3) { index in
-                Circle()
-                    .stroke(Color.white.opacity(0.3), lineWidth: 2)
-                    .scaleEffect(energyWave + CGFloat(index) * 0.3)
-                    .opacity(1 - energyWave)
-            }
-            
-            // 六角形の回転エフェクト
-            ForEach(0..<6) { index in
-                HexagonShape()
-                    .stroke(
-                        LinearGradient(
-                            colors: [.white.opacity(0.6), rarityColors[0].opacity(0.8), .white.opacity(0.3)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 3
-                    )
-                    .frame(width: CGFloat(180 + index * 40), height: CGFloat(180 + index * 40))
-                    .rotationEffect(.degrees(hexagonRotation + Double(index * 20)))
-                    .scaleEffect(ringScale)
-                    .opacity(opacity * (0.8 - Double(index) * 0.1))
-            }
-            
-            // スターバーストエフェクト
-            if starBurst {
-                ForEach(0..<16) { index in
-                    DiamondShape()
-                        .fill(
-                            LinearGradient(
-                                colors: [.white, rarityColors[1].opacity(0.6), .clear],
-                                startPoint: .center,
-                                endPoint: .trailing
-                            )
-                        )
-                        .frame(width: 200, height: 8)
-                        .offset(x: 100)
-                        .rotationEffect(.degrees(Double(index) * 22.5 + rotation * 2))
-                        .opacity(opacity * 0.9)
-                        .blur(radius: 0.5)
-                }
-            }
-            
-            // 光線エフェクト（改良版）
-            if showRays {
-                // メインの光線（太め）
-                ForEach(0..<12) { index in
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    .white.opacity(0.9),
-                                    rarityColors[0].opacity(0.7),
-                                    .clear
-                                ],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .frame(width: 600, height: 16)
-                        .offset(x: 300)
-                        .rotationEffect(.degrees(Double(index) * 30 + rotation))
-                        .opacity(opacity * 0.85)
-                        .blur(radius: 1)
-                }
-                
-                // サブ光線（細め、逆回転）
-                ForEach(0..<24) { index in
-                    Rectangle()
-                        .fill(
-                            LinearGradient(
-                                colors: [.white.opacity(0.6), .clear],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .frame(width: 400, height: 4)
-                        .offset(x: 200)
-                        .rotationEffect(.degrees(Double(index) * 15 - rotation * 1.8))
-                        .opacity(opacity * 0.6)
-                }
-            }
-            
-            // 改良されたパーティクルシステム
-            ForEach(0..<80, id: \.self) { index in
-                let angle = Double(index) * (360.0 / 80.0)
-                let radius = CGFloat.random(in: 120...300)
-                let size = CGFloat.random(in: 2...6)
-                
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [.white, rarityColors[1].opacity(0.8), .clear],
-                            center: .center,
-                            startRadius: 0,
-                            endRadius: size / 2
-                        )
-                    )
-                    .frame(width: size, height: size)
-                    .position(
-                        x: UIScreen.main.bounds.width / 2 + cos(angle * .pi / 180) * radius,
-                        y: UIScreen.main.bounds.height / 2 + sin(angle * .pi / 180) * radius
-                    )
-                    .opacity(particleOpacity * Double.random(in: 0.5...1.0))
-                    .blur(radius: 0.5)
-            }
-            
-            // 中央のメインエフェクト
-            ZStack {
-                // 最外側の爆発エフェクト
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [
-                                .white.opacity(0.95),
-                                rarityColors[0].opacity(0.7),
-                                rarityColors[1].opacity(0.4),
-                                .clear
-                            ],
-                            center: .center,
-                            startRadius: 20,
-                            endRadius: 220
-                        )
-                    )
-                    .frame(width: 440, height: 440)
-                    .scaleEffect(pulseScale)
-                    .opacity(opacity * 0.9)
-                    .blur(radius: 8)
-                
-                // 中間のグロー
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [
-                                .white.opacity(1.0),
-                                rarityColors[1].opacity(0.8),
-                                rarityColors[0].opacity(0.4)
-                            ],
-                            center: .center,
-                            startRadius: 30,
-                            endRadius: 140
-                        )
-                    )
-                    .frame(width: 280, height: 280)
-                    .scaleEffect(scale)
-                    .opacity(opacity)
-                    .blur(radius: 3)
-                
-                // メインの光球
-                ZStack {
-                    // アウターリング
-                    Circle()
-                        .stroke(
-                            LinearGradient(
-                                colors: [.white, rarityColors[0].opacity(0.8)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 6
-                        )
-                        .frame(width: 200, height: 200)
-                        .shadow(color: .white.opacity(0.8), radius: 15)
-                    
-                    // インナーグロー
-                    Circle()
-                        .fill(
-                            RadialGradient(
-                                colors: [
-                                    .white.opacity(0.9),
-                                    rarityColors[1].opacity(0.6),
-                                    rarityColors[0].opacity(0.3)
-                                ],
-                                center: .center,
-                                startRadius: 0,
-                                endRadius: 90
-                            )
-                        )
-                        .frame(width: 180, height: 180)
-                }
-                .scaleEffect(scale)
-                .opacity(opacity)
-                .shadow(color: rarityColors[0].opacity(0.9), radius: 30)
-                
+                if index == 0 { path.move(to: p) } else { path.addLine(to: p) }
             }
         }
-        .onAppear {
-            startAnimation()
-        }
-    }
-    
-    private func startAnimation() {
-        // フェーズ1: 初期爆発 (0-0.5秒)
-        withAnimation(.easeOut(duration: 0.5)) {
-            opacity = 1.0
-            scale = 1.1
-            ringScale = 1.0
-        }
-        
-        // エネルギーウェーブ
-        withAnimation(.easeOut(duration: 1.2)) {
-            energyWave = 2.0
-        }
-        
-        // パルスエフェクト
-        withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
-            pulseScale = 1.15
-        }
-        
-        // フェーズ2: スターバースト (0.15秒後)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-            starBurst = true
-        }
-        
-        // フェーズ3: 光線表示 (0.25秒後)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-            showRays = true
-            // 回転アニメーション
-            withAnimation(.linear(duration: 4.0).repeatForever(autoreverses: false)) {
-                rotation = 360
-            }
-            // 六角形回転
-            withAnimation(.linear(duration: 6.0).repeatForever(autoreverses: false)) {
-                hexagonRotation = -360
-            }
-        }
-        
-        // フェーズ4: パーティクル爆発 (0.35秒後)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-            withAnimation(.easeOut(duration: 0.5)) {
-                particleOpacity = 1.0
-            }
-        }
-        
-        // フェーズ5: スケール調整 (0.6秒後)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-            withAnimation(.spring(response: 0.5, dampingFraction: 0.6)) {
-                scale = 1.0
-            }
-        }
-        
-        // フェーズ6: テキスト登場 (0.9秒後)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
-            withAnimation(.spring(response: 0.7, dampingFraction: 0.65)) {
-                showText = true
-            }
-            
-            // シマーエフェクト
-            withAnimation(.easeInOut(duration: 1.2)) {
-                shimmerOffset = 350
-            }
-        }
-        
-        // フェーズ7: 強調バウンス (1.4秒後)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.5).repeatCount(3, autoreverses: true)) {
-                scale = 1.12
-            }
-        }
-        
-        // フェーズ8: フェードアウト開始 (2.8秒後)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.8) {
-            withAnimation(.easeOut(duration: 0.5)) {
-                opacity = 0
-                scale = 1.4
-                particleOpacity = 0
-            }
-            
-            // 完全終了
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                onFinished()
-            }
-        }
+        return path
     }
 }

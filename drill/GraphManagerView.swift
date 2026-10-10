@@ -32,11 +32,10 @@ struct GraphManagerView: View {
     let list: [String] = ["回答数(月間)","正答率"]
     @State private var selectedTab: Int = 0
     @State private var preFlag: Bool = false
-    @State private var userPreFlag: Int = 0
-    private let isGraphPremiumTemporarilyUnlocked = true
+    @ObservedObject private var appState = AppState.shared
 
     private var hasGraphPremiumAccess: Bool {
-        isGraphPremiumTemporarilyUnlocked || userPreFlag == 1
+        appState.isSubscribed
     }
 
     var body: some View {
@@ -50,15 +49,12 @@ struct GraphManagerView: View {
             }
         }
         .fullScreenCover(isPresented: $preFlag) {
-                PreView(audioManager: audioManager)
+                PreView(audioManager: audioManager, source: .graph)
             }
         .frame(maxWidth:.infinity,maxHeight: .infinity)
         .navigationTitle("分析")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            authManager.fetchPreFlag { preFlag in
-                userPreFlag = preFlag
-            }
             if let soundURL = Bundle.main.url(forResource: "soundKettei", withExtension: "mp3") {
                 do {
                     audioPlayerKettei = try AVAudioPlayer(contentsOf: soundURL)

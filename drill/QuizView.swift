@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 import AVFoundation
 import Firebase
 
@@ -479,7 +480,6 @@ struct IncorrectAnswer {
 func quizQuestion(fromIncorrectAnswerDict dict: [String: Any], quizId: String) -> QuizQuestion? {
     guard
         let question = dict["quizQuestion"] as? String,
-        let choices = dict["choices"] as? [String],
         let explanation = dict["explanation"] as? String
     else {
         return nil
@@ -495,6 +495,9 @@ func quizQuestion(fromIncorrectAnswerDict dict: [String: Any], quizId: String) -
     }
 
     let format = QuizQuestionFormat(rawValue: dict["format"] as? String ?? "") ?? .multipleChoice
+    // Firebase omits empty arrays on input-answer questions.
+    let choices = dict["choices"] as? [String] ?? []
+    guard format != .multipleChoice || choices.indices.contains(correctAnswerIndex) else { return nil }
     let acceptableAnswers = dict["acceptableAnswers"] as? [String] ?? []
     let orderedChoices = dict["orderedChoices"] as? [String] ?? []
     let inputPlaceholder = dict["inputPlaceholder"] as? String ?? "答えを入力"
@@ -753,17 +756,227 @@ struct TimerArc: Shape {
     }
 }
 
+enum QuizAttackStyle: CaseIterable {
+    case slash
+    case crossSlash
+    case shockwave
+}
+
+// One event per hit keeps repeated attacks with the same damage animated.
+struct QuizAttackImpact: Identifiable {
+    static let delay: TimeInterval = 0.15
+
+    let id = UUID()
+    let damage: Int?
+    let isBoosted: Bool
+    let style: QuizAttackStyle
+    let comboStrength: Int
+
+    init(damage: Int?, isBoosted: Bool, sequence: Int, comboCount: Int = 0) {
+        self.damage = damage
+        self.isBoosted = isBoosted
+        self.style = QuizAttackStyle.allCases[(max(sequence, 1) - 1) % QuizAttackStyle.allCases.count]
+        self.comboStrength = comboCount >= 8 ? 3 : (comboCount >= 5 ? 2 : 1)
+    }
+
+    func playHaptic() {
+        UIImpactFeedbackGenerator(style: .rigid)
+            .impactOccurred(intensity: isBoosted ? 1.0 : 0.8)
+    }
+}
+
+private struct QuizAttackEffectView: View {
+    let impact: QuizAttackImpact
+    let width: CGFloat
+    let isVisible: Bool
+    let reduceMotion: Bool
+
+    var body: some View {
+        ZStack {
+            if impact.comboStrength > 1 {
+                Circle()
+                    .stroke(impact.comboStrength == 3 ? Color.orange : Color.cyan, lineWidth: impact.comboStrength == 3 ? 5 : 3)
+                    .frame(width: width * 0.95, height: width * 0.95)
+                    .scaleEffect(reduceMotion ? 1 : (isVisible ? 1.2 : 0.45))
+                    .opacity(isVisible ? 0.75 : 0)
+            }
+
+            switch impact.style {
+            case .slash:
+                Image("attack1")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: width * 1.25)
+                    .rotationEffect(.degrees(-12))
+            case .crossSlash:
+                ZStack {
+                    Image("attack1")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: width * 1.1)
+                        .rotationEffect(.degrees(-20))
+                        .offset(x: -width * 0.06, y: -width * 0.04)
+                    Image("attack1")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: width * 1.1)
+                        .rotationEffect(.degrees(78))
+                        .offset(x: width * 0.06, y: width * 0.04)
+                }
+            case .shockwave:
+                ZStack {
+                    QuizImpactBurstShape()
+                        .fill(
+                            RadialGradient(
+                                colors: [.white, impact.comboStrength == 3 ? .orange : .cyan, .clear],
+                                center: .center,
+                                startRadius: 2,
+                                endRadius: width * 0.6
+                            )
+                        )
+                        .frame(width: width * 1.1, height: width * 1.1)
+                    Circle()
+                        .stroke(.white.opacity(0.9), lineWidth: 3)
+                        .frame(width: width * 0.64, height: width * 0.64)
+                }
+            }
+        }
+        .frame(width: width * 1.35, height: width * 1.2)
+        .scaleEffect(reduceMotion ? 1 : (isVisible ? 1.08 : 0.65))
+        .opacity(isVisible ? 1 : 0)
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+}
+
+private struct QuizImpactBurstShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let outerRadius = min(rect.width, rect.height) * 0.5
+        let innerRadius = outerRadius * 0.37
+        let pointCount = 24
+        var path = Path()
+
+        for point in 0..<pointCount {
+            let angle = Double(point) * .pi * 2 / Double(pointCount) - .pi / 2
+            let radius = point.isMultiple(of: 2) ? outerRadius : innerRadius
+            let position = CGPoint(
+                x: center.x + CGFloat(cos(angle)) * radius,
+                y: center.y + CGFloat(sin(angle)) * radius
+            )
+            if point == 0 { path.move(to: position) }
+            else { path.addLine(to: position) }
+        }
+        path.closeSubpath()
+        return path
+    }
+}
+
+struct QuizMonsterImpactView: View {
+    let imageName: String
+    let width: CGFloat
+    let impact: QuizAttackImpact?
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var isRecoiling = false
+    @State private var isFlashing = false
+    @State private var showsStrike = false
+    @State private var showsDamage = false
+    @State private var damageHasRisen = false
+
+    var body: some View {
+        Image(imageName)
+            .resizable()
+            .scaledToFit()
+            .frame(width: width)
+            .shadow(radius: 10)
+            .brightness(isFlashing ? 0.5 : 0)
+            .scaleEffect(reduceMotion || !isRecoiling ? 1 : 0.94)
+            .rotationEffect(.degrees(reduceMotion || !isRecoiling ? 0 : -7))
+            .offset(x: reduceMotion || !isRecoiling ? 0 : 12,
+                    y: reduceMotion || !isRecoiling ? 0 : -6)
+            // Overlays keep the question and answer layout still during impact.
+            .overlay {
+                if let impact {
+                    QuizAttackEffectView(
+                        impact: impact,
+                        width: width,
+                        isVisible: showsStrike,
+                        reduceMotion: reduceMotion
+                    )
+                }
+            }
+            .overlay {
+                if let impact, let damage = impact.damage, damage > 0 {
+                    Text("−\(damage)")
+                        .font(.system(size: width < 120 ? 32 : 42, weight: .black, design: .rounded))
+                        .monospacedDigit()
+                        .foregroundColor(impact.isBoosted ? .yellow : .white)
+                        .shadow(color: .black.opacity(0.9), radius: 2, x: 0, y: 2)
+                        .shadow(color: impact.isBoosted ? .orange : .black.opacity(0.5), radius: 7)
+                        .fixedSize()
+                        .scaleEffect(reduceMotion ? 1 : (showsDamage ? 1 : 0.65))
+                        .offset(y: -width * 0.22 - (reduceMotion || !damageHasRisen ? 0 : 28))
+                        .opacity(showsDamage ? 1 : 0)
+                        .allowsHitTesting(false)
+                        .accessibilityHidden(true)
+                }
+            }
+            .task(id: impact?.id) {
+                resetImpact()
+                guard impact != nil else { return }
+
+                isFlashing = !reduceMotion
+                withAnimation(reduceMotion ? nil : .spring(response: 0.18, dampingFraction: 0.55)) {
+                    isRecoiling = true
+                    showsStrike = true
+                    showsDamage = true
+                }
+
+                do {
+                    try await Task.sleep(nanoseconds: 80_000_000)
+                    withAnimation(.easeOut(duration: 0.1)) { isFlashing = false }
+                    withAnimation(reduceMotion ? nil : .spring(response: 0.32, dampingFraction: 0.55)) {
+                        isRecoiling = false
+                    }
+                    withAnimation(reduceMotion ? nil : .easeOut(duration: 0.55)) {
+                        damageHasRisen = true
+                    }
+                    try await Task.sleep(nanoseconds: 120_000_000)
+                    withAnimation(.easeOut(duration: 0.16)) { showsStrike = false }
+                    try await Task.sleep(nanoseconds: 450_000_000)
+                    withAnimation(.easeOut(duration: 0.18)) { showsDamage = false }
+                } catch {
+                    // SwiftUI cancels the sequence when the hit changes or the view disappears.
+                }
+            }
+    }
+
+    private func resetImpact() {
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) {
+            isRecoiling = false
+            isFlashing = false
+            showsStrike = false
+            showsDamage = false
+            damageHasRisen = false
+        }
+    }
+}
+
 struct BattleComboTier {
     let requiredStreak: Int
     let multiplier: Double
+    let title: String
     let colors: [Color]
 }
 
 enum MonsterComboSystem {
     static let tiers: [BattleComboTier] = [
-        BattleComboTier(requiredStreak: 8, multiplier: 2.0, colors: [Color.red, Color.orange]),
-        BattleComboTier(requiredStreak: 5, multiplier: 1.5, colors: [Color.orange, Color.yellow]),
-        BattleComboTier(requiredStreak: 2, multiplier: 1.2, colors: [Color.blue, Color.cyan])
+        BattleComboTier(requiredStreak: 8, multiplier: 2.0, title: "必殺コンボ", colors: [Color.red, Color.orange]),
+        BattleComboTier(requiredStreak: 5, multiplier: 1.5, title: "連撃", colors: [Color.orange, Color.yellow]),
+        BattleComboTier(requiredStreak: 2, multiplier: 1.2, title: "コンボ開始", colors: [Color.blue, Color.cyan])
     ]
 
     static func tier(for comboCount: Int) -> BattleComboTier? {
@@ -779,70 +992,147 @@ enum MonsterComboSystem {
     }
 }
 
+// MARK: - Combo Badge View
+
 struct MonsterComboBadgeView: View {
     let comboCount: Int
     let multiplier: Double
     let isPulsing: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private var colors: [Color] {
-        MonsterComboSystem.tier(for: comboCount)?.colors ?? [Color.gray.opacity(0.9), Color.gray.opacity(0.7)]
+    private var tier: BattleComboTier? {
+        MonsterComboSystem.tier(for: comboCount)
     }
 
     var body: some View {
-        HStack(spacing: 6) {
-            Image(systemName: "flame.fill")
-                .font(.system(size: 18, weight: .bold))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [.white, .yellow],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
-                .shadow(color: colors.first?.opacity(0.8) ?? .clear, radius: 6)
+        VStack(alignment: .leading, spacing: 0) {
+            Text(tier?.title ?? "COMBO")
+                .font(.system(size: 10, weight: .heavy, design: .rounded))
 
-            VStack(alignment: .leading, spacing: 0) {
-                HStack(spacing: 3) {
-                    Text("\(comboCount)")
-                        .font(.system(size: 20, weight: .black, design: .rounded))
-                    Text("COMBO")
-                        .font(.system(size: 11, weight: .heavy, design: .rounded))
-                        .offset(y: 2)
-                }
-
-                Text(String(format: "ATK x%.1f", multiplier))
-                    .font(.system(size: 10, weight: .bold, design: .monospaced))
-                    .foregroundColor(.white.opacity(0.85))
+            HStack(alignment: .firstTextBaseline, spacing: 3) {
+                Text("\(comboCount)")
+                    .font(.system(size: 30, weight: .black, design: .rounded))
+                    .monospacedDigit()
+                Text("COMBO")
+                    .font(.system(size: 10, weight: .black, design: .rounded))
+                    .tracking(0.5)
             }
+
+            Text(String(format: "ATK x%.1f", multiplier))
+                .font(.system(size: 11, weight: .heavy, design: .rounded))
         }
         .foregroundColor(.white)
-        .padding(.leading, 10)
-        .padding(.trailing, 14)
-        .padding(.vertical, 8)
-        .background(
-            Capsule()
-                .fill(
-                    LinearGradient(
-                        colors: colors + [colors.first?.opacity(0.8) ?? .clear],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                )
+        .fixedSize()
+        .shadow(color: .black.opacity(0.9), radius: 2, x: 0, y: 2)
+        .shadow(color: .black.opacity(0.55), radius: 7, x: 0, y: 2)
+        .scaleEffect(reduceMotion || !isPulsing ? 1 : 1.14)
+        .animation(reduceMotion ? nil : .spring(response: 0.28, dampingFraction: 0.58), value: isPulsing)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(comboCount)コンボ、攻撃倍率\(String(format: "%.1f", multiplier))倍")
+    }
+}
+
+// MARK: - Combo Burst View
+
+struct MonsterComboBurstView: View {
+    let title: String
+    let subtitle: String
+    let colors: [Color]
+    let isVisible: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        VStack(spacing: 3) {
+            Text(title)
+                .font(.system(size: title == "COMBO BREAK" ? 32 : 42, weight: .black, design: .rounded))
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+                .foregroundColor(.white)
+
+            Text(subtitle)
+                .font(.system(size: 14, weight: .heavy, design: .rounded))
+                .foregroundColor(.white)
+        }
+        .padding(.horizontal, 16)
+        .shadow(color: .black.opacity(0.9), radius: 3, x: 0, y: 2)
+        .shadow(color: .black.opacity(0.6), radius: 9, x: 0, y: 3)
+        .scaleEffect(reduceMotion || isVisible ? 1 : 1.13)
+        .opacity(isVisible ? 1.0 : 0.0)
+        .offset(y: reduceMotion || isVisible ? 0 : 12)
+        .animation(reduceMotion ? nil : .spring(response: 0.3, dampingFraction: 0.65), value: isVisible)
+    }
+}
+
+// MARK: - Battle Layout
+
+/// Answer space depends on the viewport, never on the current question's length.
+/// The answer area stays put while the question and monster share the space above it.
+struct QuizBattleLayoutMetrics {
+    let availableHeight: CGFloat
+    let isPad: Bool
+    var reservedFooterHeight: CGFloat = 0
+
+    var answerHeight: CGFloat {
+        let fourAnswerHeight: CGFloat = isPad ? 352 : 276
+        return min(fourAnswerHeight, availableHeight * 0.46)
+    }
+
+    var monsterSize: CGFloat {
+        let maximumSize: CGFloat = isPad ? 190 : 160
+        let minimumSize: CGFloat = reservedFooterHeight > 0 ? 88 : 116
+        let readingHeight = availableHeight - reservedFooterHeight
+        return min(maximumSize, max(minimumSize, (readingHeight - 440) * 0.5))
+    }
+
+    var questionMaximumHeight: CGFloat {
+        min(isPad ? 260 : 210, max(88, availableHeight * 0.28))
+    }
+}
+
+/// Keeps short questions compact while allowing long questions to use the available space.
+struct QuizQuestionHeightLayout: Layout {
+    let maximumHeight: CGFloat
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let width = proposal.width ?? 0
+        let naturalHeight = subviews.first?.sizeThatFits(.init(width: width, height: nil)).height ?? 88
+        let availableHeight = proposal.height ?? maximumHeight
+        return CGSize(width: width, height: min(max(88, naturalHeight), maximumHeight, availableHeight))
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        subviews.last?.place(
+            at: CGPoint(x: bounds.midX, y: bounds.midY),
+            anchor: .center,
+            proposal: .init(width: bounds.width, height: bounds.height)
         )
-        .overlay(
-            Capsule()
-                .stroke(
-                    LinearGradient(
-                        colors: [.white.opacity(0.6), .white.opacity(0.15)],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    ),
-                    lineWidth: 1.5
-                )
-        )
-        .shadow(color: colors.first?.opacity(0.5) ?? .clear, radius: isPulsing ? 16 : 10, x: 0, y: 4)
-        .scaleEffect(isPulsing ? 1.1 : 1.0)
-        .animation(.spring(response: 0.3, dampingFraction: 0.5), value: isPulsing)
+    }
+}
+
+/// Reset only the scroll position between questions, preserving answer feedback state.
+struct QuizAnswerScrollView<Content: View>: View {
+    let questionIndex: Int
+    @ViewBuilder var content: Content
+
+    private let topID = "quiz.answers.top"
+
+    var body: some View {
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(spacing: 0) {
+                    Color.clear.frame(height: 0).id(topID)
+                    content
+                }
+            }
+            .onChange(of: questionIndex) { _ in
+                var transaction = Transaction()
+                transaction.disablesAnimations = true
+                withTransaction(transaction) {
+                    proxy.scrollTo(topID, anchor: .top)
+                }
+            }
+        }
     }
 }
 
@@ -881,7 +1171,6 @@ struct QuizView: View {
     @State private var userHp: Int = 100
     @State private var userMaxHp: Int = 100
     @State private var userFlag: Int = 0
-    @State private var userPreFlag: Int = 0
     @State private var avatarHp: Int = 100
     @State private var userAttack: Int = 30
     @State private var tutorialNum: Int = 0
@@ -893,6 +1182,10 @@ struct QuizView: View {
     @State var showExplanationModal: Bool = false
     @State private var showMonsterDownImage: Bool = false
     @State private var showIncorrectBackground: Bool = false
+    @State private var showsFullQuestion = false
+    @State private var keyboardVisible = false
+    private var inputFocusMode: Bool { keyboardVisible && currentQuiz.usesTextInput && !hasAnswered }
+
     @State private var hasAnswered: Bool = false
     @Binding var isPresenting: Bool
     @State var showHomeModal: Bool = false
@@ -915,6 +1208,11 @@ struct QuizView: View {
     @State private var rewardFlag: Int = 0
     @State private var comboCount: Int = 0
     @State private var comboPulse: Bool = false
+    @State private var attackImpact: QuizAttackImpact?
+    @State private var comboBurstTitle: String = ""
+    @State private var comboBurstSubtitle: String = ""
+    @State private var comboBurstColors: [Color] = [Color.blue, Color.cyan]
+    @State private var showComboBurst: Bool = false
 
     private var isDeveloperMode: Bool {
         #if DEBUG
@@ -938,24 +1236,6 @@ struct QuizView: View {
     }
 
     @ViewBuilder
-    private var topContentSpacer: some View {
-        if isCompactAnswerQuiz {
-            Color.clear.frame(height: 2)
-        } else {
-            Spacer()
-        }
-    }
-
-    @ViewBuilder
-    private var answerContentSpacer: some View {
-        if isCompactAnswerQuiz {
-            Color.clear.frame(height: 2)
-        } else {
-            Spacer()
-        }
-    }
-
-    @ViewBuilder
     private var answerInputSection: some View {
         Group {
             if isCalculatorQuiz {
@@ -969,7 +1249,7 @@ struct QuizView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.bottom, 2)
             } else {
-                ScrollView{
+                QuizKeyboardAnswerScrollView {
                     VStack(spacing: 0){
                         answerInputContent
 
@@ -978,8 +1258,8 @@ struct QuizView: View {
                         }
                     }
                 }
-                .frame(maxWidth: .infinity,maxHeight:.infinity)
-                .padding(.bottom, 12)
+                .frame(maxWidth: .infinity, maxHeight: inputFocusMode ? nil : .infinity)
+                .padding(.bottom, inputFocusMode ? 2 : 12)
             }
         }
     }
@@ -1107,6 +1387,7 @@ struct QuizView: View {
 
     private func advanceQuizIndex() {
         guard !quizzes.isEmpty else { return }
+        attackImpact = nil
 
         if isDeveloperMode {
             currentQuizIndex = (currentQuizIndex + 1) % quizzes.count
@@ -1255,17 +1536,26 @@ struct QuizView: View {
                 let damage = comboAdjustedDamage()
                 GuildManager.shared.attackRaidBossIfPossible(damage: damage)
                 audioManager.playCorrectSound()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + QuizAttackImpact.delay) {
                     audioManager.playAttackSound()
 
-                    self.showAttackImage = true
                     registerSuccessfulCombo()
                     correctAnswerCount += 1 // 正解の場合、正解数をインクリメント
                     incorrectCount -= 1
                     answerCount += 1
+                    var displayedDamage: Int?
                     if quizLevel != .incorrectAnswer && quizLevel != .incorrectSansuAnswer && quizLevel != .incorrectShakaiAnswer && quizLevel != .incorrectRikaAnswer && quizLevel != .incorrectKokugoAnswer && quizLevel != .incorrectITStrategyAnswer {
                         monsterHP -= damage
+                        displayedDamage = damage
                     }
+                    let impact = QuizAttackImpact(
+                        damage: displayedDamage,
+                        isBoosted: damage > userAttack,
+                        sequence: correctAnswerCount,
+                        comboCount: comboCount
+                    )
+                    attackImpact = impact
+                    impact.playHaptic()
                     if monsterHP <= 0 {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             audioManager.playDownSound()
@@ -1351,12 +1641,13 @@ struct QuizView: View {
                     }
                     // 苦手克服(間隔反復)の復習キューにも並行して登録する
                     if let userId = authManager.currentUserId {
+                        if currentQuiz.format == .multipleChoice {
+                            WeaknessCourseStore.shared.recordMistake(question: currentQuiz,
+                                selectedIndex: selectionIndex, userID: userId)
+                        }
                         ReviewScheduleService.saveIncorrectAnswer(
                             userId: userId,
-                            quizQuestion: currentQuiz.question,
-                            choices: currentQuiz.choices,
-                            correctAnswerIndex: currentQuiz.correctAnswerIndex,
-                            explanation: currentQuiz.explanation,
+                            quiz: currentQuiz,
                             sourceQuizLevel: quizLevel.description
                         )
                     }
@@ -1383,6 +1674,7 @@ struct QuizView: View {
                 isCorrect: isAnswerCorrect
             )
             quizResults.append(result)
+
             self.showAttackImage = false
             hasAnswered = true
         }
@@ -1397,26 +1689,61 @@ struct QuizView: View {
     }
 
     private func registerSuccessfulCombo() {
+        let previousTier = MonsterComboSystem.tier(for: comboCount)
         comboCount += 1
         triggerComboPulse()
+
+        guard let currentTier = MonsterComboSystem.tier(for: comboCount) else { return }
+        // ティアが変わった時だけバーストを表示
+        guard previousTier?.requiredStreak != currentTier.requiredStreak else { return }
+        let subtitle = "\(currentTier.title)  ·  ATK x\(String(format: "%.1f", currentTier.multiplier))"
+        presentComboBurst(title: "\(comboCount) COMBO", subtitle: subtitle, colors: currentTier.colors)
     }
 
     private func applyTimeoutComboPenalty() {
         guard comboCount > 0 else { return }
-        comboCount = MonsterComboSystem.reducedComboCountAfterTimeout(from: comboCount)
+        let reducedCombo = MonsterComboSystem.reducedComboCountAfterTimeout(from: comboCount)
+        comboCount = reducedCombo
         comboPulse = false
+
+        if reducedCombo >= 3, let tier = MonsterComboSystem.tier(for: reducedCombo) {
+            presentComboBurst(
+                title: "TIME OUT",
+                subtitle: "\(reducedCombo) COMBO まで減少",
+                colors: tier.colors
+            )
+        } else {
+            comboCount = 0
+            presentComboBurst(
+                title: "TIME OUT",
+                subtitle: "コンボ消失",
+                colors: [Color.gray, Color.black.opacity(0.8)]
+            )
+        }
     }
 
     private func resetCombo() {
         guard comboCount > 0 else { return }
         comboCount = 0
         comboPulse = false
+        presentComboBurst(title: "COMBO BREAK", subtitle: "倍率リセット", colors: [Color.gray, Color.black.opacity(0.8)])
     }
 
     private func triggerComboPulse() {
         comboPulse = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.28) {
             comboPulse = false
+        }
+    }
+
+    private func presentComboBurst(title: String, subtitle: String, colors: [Color]) {
+        comboBurstTitle = title
+        comboBurstSubtitle = subtitle
+        comboBurstColors = colors
+        showComboBurst = true
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.95) {
+            showComboBurst = false
         }
     }
 
@@ -1594,13 +1921,48 @@ struct QuizView: View {
             .padding()
         } else {
             quizContent
+                .quizKeyboardVisibility($keyboardVisible)
+                .environment(\.quizInputFocusMode, inputFocusMode)
+                .sheet(isPresented: $showsFullQuestion) { QuizFullQuestionView(question: currentQuiz) }
                 .onAppear {
                     // 結果画面のインタースティシャルを先読みしておく。
                     // 表示直前にロードすると読み込み待ちで表示機会を落とすため、必ずクイズ開始時に呼ぶ。
-                    if !appState.isSubscribed {
+                    if appState.shouldShowAds {
                         interstitial.preloadIfNeeded()
                     }
                 }
+        }
+    }
+
+    private func monsterStage(size: CGFloat) -> some View {
+        ZStack {
+            ZStack{
+                QuizMonsterImpactView(
+                    imageName: "\(quizLevel)Monster\(monsterType)",
+                    width: size,
+                    impact: attackImpact
+                )
+                // 敵キャラを倒した
+                if showMonsterDownImage && monsterHP <= 0 {
+                    Image("倒す")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: min(80, size))
+                }
+            }
+
+            // コンボバッジをモンスターの右に表示(ZStackで重ねて表示位置がずれない)
+            if comboCount >= 2 {
+                MonsterComboBadgeView(
+                    comboCount: comboCount,
+                    multiplier: MonsterComboSystem.multiplier(for: comboCount),
+                    isPulsing: comboPulse
+                )
+                .scaleEffect(min(1, size / 72))
+                .offset(x: isSmallDevice() ? 65 : 90, y: 0)
+                .transition(.scale.combined(with: .opacity))
+                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: comboCount)
+            }
         }
     }
 
@@ -1610,10 +1972,24 @@ struct QuizView: View {
                 Image("\(monsterBackground)")
                      .resizable()
                      .edgesIgnoringSafeArea(.all)
-                VStack {
+                GeometryReader { geometry in
+                let layout = QuizBattleLayoutMetrics(
+                    availableHeight: geometry.size.height,
+                    isPad: isIPad()
+                )
+                let monsterSize = isCompactAnswerQuiz ? (isSmallDevice() ? 82 : 130) : layout.monsterSize
+                VStack(spacing: 8) {
+                    if inputFocusMode {
+                        QuizInputFocusHeader(question: currentQuiz, remainingSeconds: remainingSeconds, onSettings: {
+                            generateHapticFeedback()
+                            showHomeModal.toggle()
+                            audioManager.playSound()
+                        }, onRead: { showsFullQuestion = true })
+                        QuizInputFocusStatus(enemyHP: monsterHP, enemyMaxHP: monsterUnderHP, playerHP: playerHP, playerMaxHP: userMaxHp)
+                    } else {
                     HStack{
                         Button(action: {
-                        generateHapticFeedback()
+                            generateHapticFeedback()
                             showHomeModal.toggle()
                             audioManager.playSound()
                         }) {
@@ -1622,7 +1998,7 @@ struct QuizView: View {
                                     .fill(Color.white)
                                     .frame(width: 52, height: 52)
                                     .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
-                                
+
                                 Image(systemName: "gearshape.fill")
                                     .font(.system(size: 22, weight: .semibold))
                                     .foregroundColor(Color("fontGray"))
@@ -1630,7 +2006,6 @@ struct QuizView: View {
                         }
                         .padding(.leading)
                         .foregroundColor(.gray)
-                        Spacer()
                         Spacer()
                         TimerView(remainingSeconds: $remainingSeconds)
                             .background(GeometryReader { geometry in
@@ -1659,65 +2034,38 @@ struct QuizView: View {
                         }
                     }
                     .padding(.trailing)
-                    //                    .padding(.top,40)
-                    topContentSpacer
-                    // 正解の場合の赤い円
-                    if let selected = selectedAnswerIndex, selected == currentQuiz.correctAnswerIndex {
+                    .fixedSize(horizontal: false, vertical: true)
                     }
-                    VStack{
+                    VStack(spacing: 8) {
+                        if !isCompactAnswerQuiz {
+                            Spacer(minLength: 0)
+                        }
                         QuestionCardView(
                             question: currentQuiz.question,
                             selectedAnswerIndex: selectedAnswerIndex,
                             correctAnswerIndex: currentQuiz.correctAnswerIndex,
-                            compactMode: isCompactAnswerQuiz
+                            compactMode: isCompactAnswerQuiz,
+                            maximumHeight: layout.questionMaximumHeight,
+                            focusQuestion: inputFocusMode ? currentQuiz : nil
                         )
                         .background(GeometryReader { geometry in
                             Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
                         })
                         .padding(.horizontal, 16)
-
-                        ZStack{
-                                        Image("\(quizLevel)Monster\(monsterType)")
-                                .resizable()
-                                .scaledToFit()
-                                .shadow(radius: 10)
-                                .scaleEffect(comboPulse ? 1.04 : 1.0)
-                                .animation(.spring(response: 0.32, dampingFraction: 0.55), value: comboPulse)
-                                .frame(width: isCompactAnswerQuiz ? (isSmallDevice() ? 82 : 130) : (isSmallDevice() ? 100 : 160))
-                            
-                            
-                            // 問題に正解して敵キャラにダメージ
-                            if let selected = selectedAnswerIndex {
-                                if selected == currentQuiz.correctAnswerIndex {
-                                    if showAttackImage {
-                                        Image("attack1")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(height:isCompactAnswerQuiz ? (isSmallDevice() ? 58 : 92) : (isSmallDevice() ? 80 : 130))
-                                    }
-                                }
+                        if !isCompactAnswerQuiz {
+                            Spacer(minLength: 0)
+                        }
+                        if !inputFocusMode {
+                        if isCompactAnswerQuiz {
+                            // キーボード表示中など縦が足りないときは、問題カードに重ならないようモンスターを縮める
+                            GeometryReader { slot in
+                                monsterStage(size: min(monsterSize, slot.size.height))
+                                    .frame(width: slot.size.width, height: slot.size.height)
                             }
-                                        // 敵キャラを倒した
-                                        if showMonsterDownImage && monsterHP <= 0 {
-                                            Image("倒す")
-                                                .resizable()
-                                                 .scaledToFit()
-                                                 .frame(height:80)
-                                        }
-
-                            if comboCount >= 2 {
-                                MonsterComboBadgeView(
-                                    comboCount: comboCount,
-                                    multiplier: MonsterComboSystem.multiplier(for: comboCount),
-                                    isPulsing: comboPulse
-                                )
-                                .offset(
-                                    x: isCompactAnswerQuiz ? (isSmallDevice() ? 72 : 98) : (isSmallDevice() ? 90 : 120),
-                                    y: 40
-                                )
-                                .transition(.scale.combined(with: .opacity))
-                                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: comboCount)
-                            }
+                            .frame(minHeight: 0, maxHeight: monsterSize)
+                        } else {
+                            monsterStage(size: monsterSize)
+                                .frame(height: monsterSize)
                         }
                         if quizLevel != .incorrectAnswer && quizLevel != .incorrectITAnswer && quizLevel != .incorrectInfoAnswer && quizLevel != .incorrectAppliedAnswer && quizLevel != .incorrectESAnswer && quizLevel != .incorrectITStrategyAnswer && quizLevel != .incorrectSansuAnswer && quizLevel != .incorrectKokugoAnswer && quizLevel != .incorrectShakaiAnswer && quizLevel != .incorrectRikaAnswer {
                             ZStack{
@@ -1735,7 +2083,7 @@ struct QuizView: View {
                                     .padding(.horizontal)
                                     // 味方キャラのHP
                                     HStack{
-                                        Image(avator.isEmpty ? "defaultIcon" : (avator.first?["name"] as? String) ?? "")
+                                        avatarArtworkImage(for: avator.isEmpty ? "defaultIcon" : (avator.first?["name"] as? String) ?? "")
                                             .resizable()
                                             .frame(width: 30,height:30)
                                         ProgressBar3(value: Double(playerHP), maxValue: Double(self.userMaxHp), color: Color("hpUserColor"))
@@ -1749,17 +2097,17 @@ struct QuizView: View {
                                     }
                                     .padding(.horizontal)
                                 }
-                                    // 味方がダメージをくらう
-                                    if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
-                                        if showAttackImage{
-                                            Image("beginnerMonsterAttack\(monsterType)")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(height:90)
-                                                .padding(.bottom, -30)
-                                        }
+                                // 味方がダメージをくらう
+                                if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
+                                    if showAttackImage{
+                                        Image("beginnerMonsterAttack\(monsterType)")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(height:90)
+                                            .padding(.bottom, -30)
                                     }
                                 }
+                            }
                             .background(GeometryReader { geometry in
                                 Color.clear.preference(key: ViewPositionKey2.self, value: [geometry.frame(in: .global)])
                             })
@@ -1774,16 +2122,31 @@ struct QuizView: View {
                                 ProgressBar3(value: Double(incorrectCount), maxValue: Double(self.incorrectAnswerCount), color: Color("loading"))
                                     .frame(height: 20)
                             }
-                            .padding()
+                            .padding(.horizontal)
+                        }
                         }
                     }
-                    answerContentSpacer
-                    answerInputSection
-                    
-                    .sheet(isPresented: $showModal) {
-                        ExperienceModalView(showModal: $showModal, addedExperience: 10, addedMoney: 10, authManager: authManager)
+                    .frame(maxWidth: .infinity, maxHeight: inputFocusMode || !isCompactAnswerQuiz ? .infinity : nil)
+                    if isCompactAnswerQuiz {
+                        answerInputSection
+                    } else {
+                        QuizAnswerScrollView(questionIndex: currentQuizIndex) {
+                            VStack(spacing: 0) {
+                                answerInputContent
+
+                                if showCompletionMessage {
+                                    NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: 0,quizLevel: quizLevel, interstitial: interstitial).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+                                }
+                            }
+                        }
+                        .frame(height: layout.answerHeight)
+                        .padding(.bottom, 8)
                     }
-                }.background(showIncorrectBackground ? Color(.red).opacity(0.1) : Color(.white).opacity(0))
+                }
+                .sheet(isPresented: $showModal) {
+                    ExperienceModalView(showModal: $showModal, addedExperience: 10, addedMoney: 10, authManager: authManager)
+                }
+                .background(showIncorrectBackground ? Color(.red).opacity(0.1) : Color(.white).opacity(0))
                     .onPreferenceChange(ViewPositionKey.self) { positions in
                         self.buttonRect = positions.first ?? .zero
                     }
@@ -1796,6 +2159,7 @@ struct QuizView: View {
                     .onPreferenceChange(ViewPositionKey3.self) { positions in
                         self.buttonRect3 = positions.first ?? .zero
                     }
+                }
                 if showExplanationModal {
                     ZStack {
                         Color.black.opacity(0.7)
@@ -1900,6 +2264,16 @@ struct QuizView: View {
                         }
                     )
                 }
+                MonsterComboBurstView(
+                    title: comboBurstTitle,
+                    subtitle: comboBurstSubtitle,
+                    colors: comboBurstColors,
+                    isVisible: showComboBurst
+                )
+                .offset(y: -100)
+                .allowsHitTesting(false)
+                .accessibilityHidden(!showComboBurst)
+
                 if showCountdown {
                     ZStack {
                         // 背景
@@ -2046,10 +2420,8 @@ struct QuizView: View {
                         userAttack = 0
                     }
                 }else if quizLevel == .incorrectAnswer {
-                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                        self.incorrectAnswerCount = count
-                        incorrectCount = count
-                    }
+                    self.incorrectAnswerCount = quizzes.count
+                    incorrectCount = quizzes.count
                     if quizLevel == .incorrectAnswer {
                         userAttack = 0
                     }
@@ -2058,14 +2430,13 @@ struct QuizView: View {
                 if quizLevel == .incorrectAnswer {
                     userAttack = 0
                 }
-                authManager.fetchPreFlag()
                 authManager.fetchUserFlag()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                     userFlag = authManager.userFlag
-                    userPreFlag = authManager.userPreFlag
                 }
             }
             .onDisappear {
+                attackImpact = nil
                 // QuizViewが閉じるときの時刻を記録する
                 // ただし、playerExperienceとplayerMoneyが5以外の時だけ
                 // ここで条件を確認してください
@@ -3642,54 +4013,92 @@ struct QuestionCardView: View {
     let selectedAnswerIndex: Int?
     let correctAnswerIndex: Int
     var compactMode: Bool = false
+    var maximumHeight: CGFloat = 210
+    var focusQuestion: QuizQuestion? = nil
     @State private var appearAnimation = false
-    
+
     var body: some View {
-        ZStack {
-            // カード背景
-            RoundedRectangle(cornerRadius: 20)
-                .fill(SocialPalette.cardOpaque)
-                .shadow(color: SocialPalette.cardShadow, radius: 15, x: 0, y: 8)
-            
-            // 問題テキスト
-            VStack(spacing: 0) {
-                Text(question)
-                    .font(.system(size: compactMode ? (isSmallDevice() ? 13 : 15) : (isSmallDevice() ? 15 : 17), weight: .semibold))
-                    .foregroundColor(Color("fontGray"))
-                    .lineSpacing(4)
-                    .padding(.horizontal, compactMode ? 16 : 20)
-                    .padding(.vertical, compactMode ? 12 : 16)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .frame(minHeight: compactMode ? 72 : nil)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .lineLimit(nil)
-                    .minimumScaleFactor(0.75)
+        Group {
+            if let focusQuestion {
+                ScrollView(.vertical) {
+                    QuizFocusQuestionContent(question: focusQuestion)
+                }
+                .scrollDismissesKeyboard(.never)
+                .id(question)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                questionContent
             }
-            
-            // 正解/不正解マーク
-            if let selected = selectedAnswerIndex {
-                if selected == correctAnswerIndex {
-                    Circle()
-                        .stroke(Color.red, lineWidth: 8)
-                        .frame(width: 80, height: 80)
-                        .opacity(0.8)
-                        .transition(.scale.combined(with: .opacity))
-                } else {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 60, weight: .bold))
-                        .foregroundColor(.blue)
-                        .opacity(0.8)
-                        .transition(.scale.combined(with: .opacity))
+        }
+            .background {
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(SocialPalette.cardOpaque)
+                    .shadow(color: SocialPalette.cardShadow, radius: 15, x: 0, y: 8)
+            }
+            .overlay {
+                // 正解/不正解マーク。カードの高さを変えず、スクロールも妨げない
+                if let selected = selectedAnswerIndex {
+                    Group {
+                        if selected == correctAnswerIndex {
+                            Circle()
+                                .stroke(Color.red, lineWidth: 8)
+                                .frame(width: 80, height: 80)
+                        } else {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 60, weight: .bold))
+                                .foregroundColor(.blue)
+                        }
+                    }
+                    .opacity(0.8)
+                    .transition(.scale.combined(with: .opacity))
+                    .allowsHitTesting(false)
+                }
+            }
+            .scaleEffect(appearAnimation ? 1.0 : 0.95)
+            .opacity(appearAnimation ? 1.0 : 0)
+            .onAppear {
+                withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                    appearAnimation = true
+                }
+            }
+    }
+
+    private var questionContent: some View {
+        QuizQuestionHeightLayout(maximumHeight: maximumHeight) {
+            // 全文の高さを測る(ScrollView は表示領域の高さしか返さないため)
+            questionText(compact: compactMode).hidden()
+            ViewThatFits(in: .vertical) {
+                questionText(compact: compactMode)
+                // スクロールが必要になる前に、少しだけ詰めた文字組みを試す
+                questionText(compact: true)
+                VStack(spacing: 0) {
+                    ScrollView(.vertical) {
+                        questionText(compact: true)
+                    }
+                    // 長い問題の後でも、次の問題は先頭から表示する
+                    .id(question)
+                    Image(systemName: "chevron.down")
+                        .accessibilityLabel("スクロールして続きを読む")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(.secondary)
+                        .padding(.bottom, 6)
                 }
             }
         }
-        .scaleEffect(appearAnimation ? 1.0 : 0.95)
-        .opacity(appearAnimation ? 1.0 : 0)
-        .onAppear {
-            withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
-                appearAnimation = true
-            }
-        }
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+    }
+
+    private func questionText(compact: Bool) -> some View {
+        Text(question)
+            .font(.system(size: isSmallDevice() ? (compact ? 14 : 15) : (compact ? 16 : 17), weight: .semibold))
+            .foregroundColor(Color("fontGray"))
+            .multilineTextAlignment(.leading)
+            .lineSpacing(compact ? 3 : 4)
+            .lineLimit(nil)
+            .padding(.horizontal, 16)
+            .padding(.vertical, compact ? 12 : 16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .fixedSize(horizontal: false, vertical: true)
     }
 }
 

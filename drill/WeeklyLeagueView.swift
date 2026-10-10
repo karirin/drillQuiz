@@ -1169,8 +1169,8 @@ struct WeeklyLeagueMemberRow: View {
 
     private var avatar: some View {
         Group {
-            if UIImage(named: member.avatarName) != nil {
-                Image(member.avatarName)
+            if UIImage(named: avatarArtworkName(for: member.avatarName)) != nil {
+                avatarArtworkImage(for: member.avatarName)
                     .resizable()
                     .scaledToFit()
             } else {

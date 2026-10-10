@@ -20,6 +20,17 @@ enum MissionCategory: String, Codable, CaseIterable {
             return "通常"
         }
     }
+
+    var completionBonusCoin: Int {
+        switch self {
+        case .daily:
+            return 100
+        case .weekly:
+            return 500
+        case .normal:
+            return 0
+        }
+    }
 }
 
 enum MissionType: String, Codable {

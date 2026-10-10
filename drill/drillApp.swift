@@ -60,6 +60,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
     ) -> Bool {
+        guard !SubscriptionRuntime.isTesting else { return true }
         AppAdConfiguration.configureForKidsCategory()
         MobileAds.shared.start(completionHandler: nil)
         self.appState = AppState.shared
@@ -157,6 +158,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 
 @main
 struct drillApp: App {
+    @Environment(\.scenePhase) private var scenePhase
     @ObservedObject var authManager: AuthManager
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject var appState = AppState.shared
@@ -168,17 +170,33 @@ struct drillApp: App {
     
     var body: some Scene {
         WindowGroup {
-//            TopView(authManager: authManager)
+#if DEBUG
+            if ProcessInfo.processInfo.arguments.contains("-StoryAdventurePreview") {
+                StoryAdventurePreviewHost()
+            } else if ProcessInfo.processInfo.arguments.contains("-WeaknessReviewPreview") {
+                WeaknessReviewPreviewHost()
+            } else {
+                appContent
+            }
+#else
+            appContent
+#endif
+        }
+    }
+
+    @ViewBuilder private var appContent: some View {
+        if SubscriptionRuntime.isTesting {
+            // Tests must not run gameplay or sync purchases to Firebase.
+            Color.clear
+        } else {
             RootView(authManager: authManager)
                 .environmentObject(appState)
-                .onAppear{
-                    if authManager.currentUserId != nil {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                            guard appState.isBannerVisible,
-                                  let userId = AuthManager.shared.currentUserId else { return }
-                            AuthManager.shared.updatePreFlag(userId: userId, userPreFlag: 0){ success in
-                            }
-                        }
+                .task(id: authManager.currentUserId) {
+                    WeaknessCourseStore.shared.configure(userID: authManager.currentUserId)
+                }
+                .onChange(of: scenePhase) { phase in
+                    if phase == .active {
+                        Task { await appState.refreshSubscriptionState() }
                     }
                 }
         }

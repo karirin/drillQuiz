@@ -10,7 +10,7 @@ import SwiftUI
 struct StoryKokugoListView: View {
     @Binding var isPresenting: Bool
 
-    let quizBeginnerList: [QuizQuestion] = [
+    static let quizBeginnerList: [QuizQuestion] = [
         QuizQuestion(
             question: "次の文で正しい『あう』の漢字はどれですか？『友達に＿＿』",
             choices: [
@@ -3232,7 +3232,7 @@ QuizQuestion(
         self.monsterName = monsterName
         self.backgroundName = backgroundName
         self.viewModel = viewModel
-        _shuffledQuizList = State(initialValue: quizBeginnerList.shuffled())
+        _shuffledQuizList = State(initialValue: Self.quizBeginnerList.shuffled())
     }
     
     @StateObject var sharedInterstitial = Interstitial.story()

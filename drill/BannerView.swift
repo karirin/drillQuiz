@@ -9,20 +9,28 @@ import GoogleMobileAds
 import SwiftUI
 
 struct BannerAdView: View {
+    @ObservedObject private var appState = AppState.shared
+
     var body: some View {
-        AdaptiveBannerAdView(
-            productionAdUnitID: "ca-app-pub-4898800212808837/2226175914",
-            placementName: "ホーム"
-        )
+        if appState.shouldShowAds {
+            AdaptiveBannerAdView(
+                productionAdUnitID: "ca-app-pub-4898800212808837/2226175914",
+                placement: .homeBanner
+            )
+        }
     }
 }
 
 struct BannerStortyView: View {
+    @ObservedObject private var appState = AppState.shared
+
     var body: some View {
-        AdaptiveBannerAdView(
-            productionAdUnitID: "ca-app-pub-4898800212808837/8004927226",
-            placementName: "ストーリー"
-        )
+        if appState.shouldShowAds {
+            AdaptiveBannerAdView(
+                productionAdUnitID: "ca-app-pub-4898800212808837/8004927226",
+                placement: .storyBanner
+            )
+        }
     }
 }
 
@@ -35,7 +43,7 @@ private func anchoredAdaptiveAdSize(for width: CGFloat) -> AdSize {
 
 private struct AdaptiveBannerAdView: View {
     let productionAdUnitID: String
-    let placementName: String
+    let placement: AdPlacement
 
     @State private var availableWidth: CGFloat = 0
     @State private var adHeight: CGFloat = 0
@@ -53,13 +61,16 @@ private struct AdaptiveBannerAdView: View {
             if availableWidth > 0 {
                 AdaptiveBannerContainer(
                     adUnitID: adUnitID,
-                    placementName: placementName,
+                    placement: placement,
                     width: availableWidth
                 ) { newHeight in
                     guard abs(adHeight - newHeight) > 0.5 else { return }
                     adHeight = newHeight
                 }
                 .frame(width: availableWidth, height: adHeight)
+                // 広告クリエイティブがバナーの宣言サイズより大きく描画されることがあり、
+                // そのままだと画面外へはみ出すため枠で切り取る。
+                .clipped()
             } else {
                 Color.clear
             }
@@ -80,7 +91,11 @@ private struct AdaptiveBannerAdView: View {
     }
 
     private func updateWidth(_ width: CGFloat) {
-        let roundedWidth = floor(width)
+        // 背景画像が safe area を無視して広がる画面（ダンジョンなど）では、
+        // 親から画面幅より大きい幅が提案されることがある。
+        // そのまま使うとバナーが画面外へはみ出すため、画面幅で頭打ちにする。
+        let maxWidth = UIScreen.main.bounds.width
+        let roundedWidth = min(floor(width), maxWidth)
         guard roundedWidth > 0, abs(availableWidth - roundedWidth) > 0.5 else { return }
         availableWidth = roundedWidth
     }
@@ -88,7 +103,7 @@ private struct AdaptiveBannerAdView: View {
 
 private struct AdaptiveBannerContainer: UIViewRepresentable {
     let adUnitID: String
-    let placementName: String
+    let placement: AdPlacement
     let width: CGFloat
     let onHeightChange: (CGFloat) -> Void
 
@@ -101,6 +116,7 @@ private struct AdaptiveBannerContainer: UIViewRepresentable {
 
         context.coordinator.loadedWidth = width
         notifyHeight(for: adSize)
+        AdTelemetry.record("banner_load_started", placement: placement)
         bannerView.load(AppAdConfiguration.makeRequest())
 
         return bannerView
@@ -115,11 +131,12 @@ private struct AdaptiveBannerContainer: UIViewRepresentable {
         context.coordinator.loadedWidth = width
         bannerView.adSize = adSize
         notifyHeight(for: adSize)
+        AdTelemetry.record("banner_load_started", placement: placement)
         bannerView.load(AppAdConfiguration.makeRequest())
     }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(placementName: placementName)
+        Coordinator(placement: placement)
     }
 
     private func notifyHeight(for adSize: AdSize) {
@@ -141,19 +158,19 @@ private struct AdaptiveBannerContainer: UIViewRepresentable {
     }
 
     final class Coordinator: NSObject, BannerViewDelegate {
-        let placementName: String
+        let placement: AdPlacement
         var loadedWidth: CGFloat = 0
 
-        init(placementName: String) {
-            self.placementName = placementName
+        init(placement: AdPlacement) {
+            self.placement = placement
         }
 
         func bannerViewDidReceiveAd(_ bannerView: BannerView) {
-            print("\(placementName)アダプティブ広告の読み込み成功")
+            AdTelemetry.record("banner_loaded", placement: placement)
         }
 
         func bannerView(_ bannerView: BannerView, didFailToReceiveAdWithError error: Error) {
-            print("\(placementName)アダプティブ広告の読み込み失敗: \(error.localizedDescription)")
+            AdTelemetry.record("banner_load_failed", placement: placement, error: error)
         }
     }
 }

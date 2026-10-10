@@ -93,15 +93,11 @@ struct ImagePickerView: View {
     @State private var isImagePickerDisplay = false
     @ObservedObject private var authManager = AuthManager.shared
     @State private var showProfileCreation: Bool = false // 追加
-    @State private var selectedIcon: String = "ネッキー"
+    @State private var selectedIcon: String = Avatar.starter.name
     @State private var showingIconPicker = false
-    let defaultImage = UIImage(named: "defaultProfileImage")
+    let defaultImage = UIImage(named: "defaultIcon")
     @State private var selectedAvatar: Avatar? // 選択したアバターを保持するプロパティ
-    let avatars = [
-        Avatar(name: "ネッキー", attack: 10, health: 20, usedFlag: 1, count: 1),
-        Avatar(name: "ピョン吉", attack: 15, health: 15, usedFlag: 0, count: 1),
-        Avatar(name: "ルイーカ", attack: 20, health: 10, usedFlag: 0, count: 1)
-    ]
+    let avatars = [Avatar.starter]
     @Environment(\.presentationMode) var presentationMode
     @State private var navigateToContentView: Bool = false
 
@@ -125,7 +121,7 @@ struct ImagePickerView: View {
                 }
                 Spacer()
                 HStack{
-                    Text("おともを選択してください")
+                    Text("最初のおともはえんぴ君です")
                             .font(.system(size:28))
                 }
                 Spacer()
@@ -173,16 +169,9 @@ struct ImagePickerView: View {
                 Spacer()
                 Button(action: {
                                 generateHapticFeedback()
-                    let selectedAvatar = Avatar(name: self.selectedAvatar?.name ?? "ネッキー", attack: 20, health: 20 ,usedFlag: 1, count:1)
                     authManager.saveUserToDatabase(userName: userName) { success in
                         if success {
-                            authManager.addAvatarToUser(avatar: selectedAvatar) { success in
-                                if success {
-                                    self.navigateToContentView = true
-                                } else {
-                                    // アバターの追加に失敗した場合の処理をここに書く
-                                }
-                            }
+                            self.navigateToContentView = true
                         } else {
                             // ユーザー情報の保存に失敗した場合の処理をここに書く
                         }
@@ -235,7 +224,7 @@ struct ImagePickerView: View {
 
 struct SignUp_Previews: PreviewProvider {
     @State static var userName: String = "りょうや" // ここでダミーのユーザー名を設定
-    @State static var defaultImage = UIImage(named: "defaultProfileImage")
+    @State static var defaultImage = UIImage(named: "defaultIcon")
 
     static var previews: some View {
          SignUp()

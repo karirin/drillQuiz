@@ -31,7 +31,7 @@ struct IncorrectRikaListView: View {
                     QuizView(quizzes: shuffledQuizList, quizLevel: .incorrectRikaAnswer, authManager: authManager, audioManager: audioManager, isPresenting: $isPresenting, interstitial: sharedInterstitial)
                 }
             } else {
-                ActivityIndicator()
+                EnpiFullScreenLoadingView()
             }
         }
         .onAppear {

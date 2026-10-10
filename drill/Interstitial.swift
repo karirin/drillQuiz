@@ -13,8 +13,9 @@ extension UIApplication {
     var activeInterstitialKeyWindow: UIWindow? {
         connectedScenes
             .compactMap { $0 as? UIWindowScene }
+            .filter { $0.activationState == .foregroundActive }
             .flatMap(\.windows)
-            .first { $0.isKeyWindow }
+            .first { $0.isKeyWindow && !$0.isHidden }
     }
 
     func interstitialTopMostViewController(from base: UIViewController? = nil) -> UIViewController? {
@@ -22,6 +23,7 @@ extension UIApplication {
 
         if let presentedViewController = baseViewController?.presentedViewController,
            !presentedViewController.isBeingDismissed {
+            guard !(presentedViewController is UIAlertController) else { return nil }
             return interstitialTopMostViewController(from: presentedViewController)
         }
 
@@ -38,10 +40,14 @@ extension UIApplication {
             return interstitialTopMostViewController(from: visibleViewController)
         }
 
+        guard let baseViewController,
+              !baseViewController.isBeingDismissed,
+              !baseViewController.isBeingPresented else { return nil }
         return baseViewController
     }
 }
 
+@MainActor
 class Interstitial: NSObject, FullScreenContentDelegate, ObservableObject {
     @Published var interstitialAdLoaded: Bool = false
     @Published var flag: Bool = false
@@ -55,11 +61,14 @@ class Interstitial: NSObject, FullScreenContentDelegate, ObservableObject {
     private var isLoadingInterstitial = false
     private var loadCompletions: [((Bool) -> Void)] = []
     private var loadedAt: Date?
+    private var presentationToken: UUID?
+    private let placement: AdPlacement
     /// AdMob のインタースティシャルは1時間で失効するため、それより手前で読み直す。
     private let maxCacheAge: TimeInterval = 55 * 60
 
-    init(adUnitID: String = "ca-app-pub-4898800212808837/7363748686") {
+    init(adUnitID: String = "ca-app-pub-4898800212808837/7363748686", placement: AdPlacement? = nil) {
         self.productionAdUnitID = adUnitID
+        self.placement = placement ?? (adUnitID.hasSuffix("/2544453652") ? .storyInterstitial : .standardInterstitial)
         super.init()
     }
 
@@ -88,6 +97,10 @@ class Interstitial: NSObject, FullScreenContentDelegate, ObservableObject {
     /// クイズ開始時などに先読みしておくためのエントリポイント。
     /// 表示直前にロードすると読み込み待ちで表示機会を落とすため、必ず事前に呼ぶ。
     func preloadIfNeeded(completion: ((Bool) -> Void)? = nil) {
+        guard AppState.shared.shouldShowAds else {
+            completion?(false)
+            return
+        }
         if hasValidInterstitial {
             interstitialAdLoaded = true
             completion?(true)
@@ -109,6 +122,7 @@ class Interstitial: NSObject, FullScreenContentDelegate, ObservableObject {
         interstitialAdLoaded = false
         interstitialAd = nil
         loadedAt = nil
+        AdTelemetry.record("interstitial_load_started", placement: placement)
 
         InterstitialAd.load(with: adUnitID, request: AppAdConfiguration.makeRequest()) { [weak self] ad, error in
             DispatchQueue.main.async {
@@ -116,15 +130,18 @@ class Interstitial: NSObject, FullScreenContentDelegate, ObservableObject {
                 self.isLoadingInterstitial = false
 
                 if let error {
-                    print("loadInterstitial 😭: 読み込みに失敗しました")
-                    print("loadInterstitial 広告の読み込みに失敗しました: \(error.localizedDescription)")
+                    AdTelemetry.record("interstitial_load_failed", placement: self.placement, error: error)
                     self.interstitialAdLoaded = false
                     self.interstitialAd = nil
                     self.finishLoad(success: false)
                     return
                 }
 
-                print("loadInterstitial 😍: 読み込みに成功しましたああ")
+                guard AppState.shared.shouldShowAds else {
+                    self.finishLoad(success: false)
+                    return
+                }
+                AdTelemetry.record("interstitial_loaded", placement: self.placement)
                 self.interstitialAdLoaded = true
                 self.interstitialAd = ad
                 self.loadedAt = Date()
@@ -141,36 +158,50 @@ class Interstitial: NSObject, FullScreenContentDelegate, ObservableObject {
         completions.forEach { $0(success) }
     }
 
-    func presentInterstitial() {
-      guard !isPresenting else { return }
+    @discardableResult
+    func presentInterstitial() -> Bool {
+      AdTelemetry.record("interstitial_requested", placement: placement)
+      // A purchase/approval can arrive after the ad finished loading.
+      guard AppState.shared.shouldShowAds else { return false }
+      guard !isPresenting else { return false }
       guard let rootViewController = UIApplication.shared.interstitialTopMostViewController(),
             rootViewController.viewIfLoaded?.window != nil else {
         preloadIfNeeded()
-        return print("Ad root view controller wasn't ready")
+        AdTelemetry.record("interstitial_unavailable", placement: placement)
+        return false
       }
       guard hasValidInterstitial, let fullScreenAd = interstitialAd else {
         preloadIfNeeded()
-        return print("Ad wasn't ready")
+        AdTelemetry.record("interstitial_unavailable", placement: placement)
+        return false
+      }
+      guard let token = FullScreenAdCoordinator.shared.begin() else {
+        AdTelemetry.record("interstitial_blocked", placement: placement)
+        return false
       }
 
+      presentationToken = token
       isPresenting = true
       interstitialAdLoaded = false
       interstitialAd = nil
       loadedAt = nil
       fullScreenAd.present(from: rootViewController)
+      return true
     }
     
     func adDidRecordImpression(_ ad: FullScreenPresentingAd) {
-      print("\(#function) called")
+      AdTelemetry.record("interstitial_impression", placement: placement)
     }
 
     func adDidRecordClick(_ ad: FullScreenPresentingAd) {
-      print("\(#function) called")
+      AdTelemetry.record("interstitial_clicked", placement: placement)
     }
     
     // 失敗通知
     func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
-        print("インタースティシャル広告の表示に失敗しました")
+        AdTelemetry.record("interstitial_present_failed", placement: placement, error: error)
+        FullScreenAdCoordinator.shared.end(presentationToken)
+        presentationToken = nil
         self.isPresenting = false
         self.interstitialAdLoaded = false
         self.interstitialAd = nil
@@ -179,11 +210,13 @@ class Interstitial: NSObject, FullScreenContentDelegate, ObservableObject {
 
     // 表示通知
     func adWillPresentFullScreenContent(_ ad: FullScreenPresentingAd) {
-        print("インタースティシャル広告を表示しました")
+        AdTelemetry.record("interstitial_presented", placement: placement)
     }
 
     func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
-        print("インタースティシャル広告を閉じました")
+        AdTelemetry.record("interstitial_dismissed", placement: placement)
+        FullScreenAdCoordinator.shared.end(presentationToken)
+        presentationToken = nil
         self.isPresenting = false
         self.interstitialAdLoaded = false
         self.wasAdDismissed = true

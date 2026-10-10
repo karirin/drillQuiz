@@ -18,6 +18,8 @@ extension InventoryItemType {
             return "神ガチャを1回引けます"
         case .constellationGachaTicket:
             return "星座ガチャを1回引けます"
+        case .ruinsGachaTicket:
+            return "知恵の遺跡ガチャを1回引けます"
         case .staminaPotion:
             return "スタミナを30回復します"
         case .boostTicket:
@@ -245,7 +247,7 @@ struct InventoryView: View {
     @ViewBuilder
     private func actionButton(for type: InventoryItemType) -> some View {
         switch type {
-        case .normalGachaTicket, .rareGachaTicket, .mekaGachaTicket, .godGachaTicket, .constellationGachaTicket:
+        case .normalGachaTicket, .rareGachaTicket, .mekaGachaTicket, .godGachaTicket, .constellationGachaTicket, .ruinsGachaTicket:
             EmptyView()
         case .staminaPotion:
             Button(action: useStaminaPotion) {
@@ -359,7 +361,7 @@ struct TicketGachaView: View {
             Text(alertMessage)
         }
         .fullScreenCover(item: $activeAnimationSession) { session in
-            GachaAnimationView(rarity: session.item.rarity) {
+            GachaAnimationView(rarity: session.item.rarity, item: session.item) {
                 activeAnimationSession = nil
                 obtainedItem = session.item
                 showResult = true
@@ -459,7 +461,7 @@ struct TicketGachaView: View {
                         .fill(Color.white.opacity(0.16))
                 )
 
-            Image(item.artworkName)
+            companionArtworkImage(named: item.artworkName)
                 .resizable()
                 .scaledToFit()
                 .frame(width: 180, height: 180)

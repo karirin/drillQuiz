@@ -248,6 +248,71 @@ final class MissionManager: ObservableObject {
         return components.joined(separator: " / ")
     }
 
+    private func completionBonusReceiptKey(for category: MissionCategory) -> String? {
+        guard category.completionBonusCoin > 0 else { return nil }
+
+        let calendar = Calendar.current
+        let now = Date()
+        let periodKey: String
+        switch category {
+        case .daily:
+            let components = calendar.dateComponents([.year, .month, .day], from: now)
+            guard let year = components.year,
+                  let month = components.month,
+                  let day = components.day else { return nil }
+            periodKey = String(format: "%04d-%02d-%02d", year, month, day)
+        case .weekly:
+            let components = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: now)
+            guard let year = components.yearForWeekOfYear,
+                  let week = components.weekOfYear else { return nil }
+            periodKey = String(format: "%04d-W%02d", year, week)
+        case .normal:
+            return nil
+        }
+
+        return "missionCompletionBonus:\(category.rawValue):\(periodKey)"
+    }
+
+    private func claimCompletionBonusIfNeeded(
+        for category: MissionCategory,
+        completion: @escaping (_ success: Bool, _ newlyGrantedCoins: Int) -> Void
+    ) {
+        let categoryMissions = missionsForCategory(category)
+        let bonusCoin = category.completionBonusCoin
+        guard bonusCoin > 0,
+              !categoryMissions.isEmpty,
+              categoryMissions.allSatisfy(\.isCompleted),
+              let receiptKey = completionBonusReceiptKey(for: category) else {
+            completion(true, 0)
+            return
+        }
+
+        authManager.grantRewardBundleIfNeeded(
+            idempotencyKey: receiptKey,
+            coinAmount: bonusCoin,
+            itemRewards: []
+        ) { success, newlyGranted in
+            completion(success, newlyGranted ? bonusCoin : 0)
+        }
+    }
+
+    private func grantAvailableCompletionBonuses(completion: @escaping () -> Void) {
+        let categories: [MissionCategory] = [.daily, .weekly]
+
+        func grantNext(at index: Int) {
+            guard index < categories.count else {
+                completion()
+                return
+            }
+
+            claimCompletionBonusIfNeeded(for: categories[index]) { _, _ in
+                grantNext(at: index + 1)
+            }
+        }
+
+        grantNext(at: 0)
+    }
+
     func fetchMissions(force: Bool = false, completion: @escaping (Bool) -> Void) {
         guard let userId = authManager.currentUserId else {
             completion(false)
@@ -273,7 +338,7 @@ final class MissionManager: ObservableObject {
         isLoading = true
         let missionsRef = Database.database().reference().child("missions").child(userId)
 
-        missionsRef.observeSingleEvent(of: .value) { [weak self] snapshot in
+        missionsRef.observeSingleEvent(of: .value, with: { [weak self] snapshot in
             guard let self = self else { return }
 
             if
@@ -314,7 +379,10 @@ final class MissionManager: ObservableObject {
             self.syncMissionsWithCurrentProgress {
                 self.finishFetch(success: true)
             }
-        }
+        }, withCancel: { [weak self] error in
+            print("ミッションの読み込みに失敗しました: \(error.localizedDescription)")
+            self?.finishFetch(success: false)
+        })
     }
 
     private func finishFetch(success: Bool) {
@@ -602,16 +670,21 @@ final class MissionManager: ObservableObject {
         syncMissionsWithCurrentProgress { [weak self] in
             guard let self = self else { return }
 
-            self.lastRefreshAt = Date()
-            self.isRefreshingMissions = false
+            // 全達成カードに表示している追加報酬は受取ボタンを持たないため、
+            // 達成を同期した時点で一度だけ自動付与する。過去に全達成済みでも
+            // receipt が無ければここで補填される。
+            self.grantAvailableCompletionBonuses {
+                self.lastRefreshAt = Date()
+                self.isRefreshingMissions = false
 
-            let completions = self.pendingRefreshCompletions
-            self.pendingRefreshCompletions.removeAll()
-            completions.forEach { $0() }
+                let completions = self.pendingRefreshCompletions
+                self.pendingRefreshCompletions.removeAll()
+                completions.forEach { $0() }
 
-            if self.pendingForcedRefresh {
-                self.pendingForcedRefresh = false
-                self.refreshAllMissions(force: true)
+                if self.pendingForcedRefresh {
+                    self.pendingForcedRefresh = false
+                    self.refreshAllMissions(force: true)
+                }
             }
         }
     }
@@ -720,6 +793,7 @@ final class MissionManager: ObservableObject {
 
         let coinReward = missions[index].rewardCoin
         let itemRewards = itemRewards(for: missions[index])
+        let category = missions[index].category
         claimingMissionIds.insert(missionId)
 
         authManager.grantRewardBundle(
@@ -733,19 +807,22 @@ final class MissionManager: ObservableObject {
                 return
             }
 
-            guard let currentIndex = self.missions.firstIndex(where: { $0.id == missionId }) else {
-                self.claimingMissionIds.remove(missionId)
-                completion(false, 0, [])
-                return
-            }
-            self.missions[currentIndex].isClaimed = true
-            self.saveMissions { saveSuccess in
-                self.claimingMissionIds.remove(missionId)
-                if saveSuccess {
-                    completion(true, coinReward, itemRewards)
-                } else {
-                    self.missions[currentIndex].isClaimed = false
+            self.claimCompletionBonusIfNeeded(for: category) { bonusSuccess, bonusCoin in
+                guard bonusSuccess,
+                      let currentIndex = self.missions.firstIndex(where: { $0.id == missionId }) else {
+                    self.claimingMissionIds.remove(missionId)
                     completion(false, 0, [])
+                    return
+                }
+                self.missions[currentIndex].isClaimed = true
+                self.saveMissions { saveSuccess in
+                    self.claimingMissionIds.remove(missionId)
+                    if saveSuccess {
+                        completion(true, coinReward + bonusCoin, itemRewards)
+                    } else {
+                        self.missions[currentIndex].isClaimed = false
+                        completion(false, 0, [])
+                    }
                 }
             }
         }
@@ -777,20 +854,28 @@ final class MissionManager: ObservableObject {
                 return
             }
 
-            let claimedIds = Set(targetMissions.map(\.id))
-            for index in self.missions.indices where claimedIds.contains(self.missions[index].id) {
-                self.missions[index].isClaimed = true
-            }
-
-            self.saveMissions { saveSuccess in
-                self.claimingCategories.remove(category)
-                if saveSuccess {
-                    completion(true, coinReward, mergedItemRewards)
-                } else {
-                    for index in self.missions.indices where claimedIds.contains(self.missions[index].id) {
-                        self.missions[index].isClaimed = false
-                    }
+            self.claimCompletionBonusIfNeeded(for: category) { bonusSuccess, bonusCoin in
+                guard bonusSuccess else {
+                    self.claimingCategories.remove(category)
                     completion(false, 0, [])
+                    return
+                }
+
+                let claimedIds = Set(targetMissions.map(\.id))
+                for index in self.missions.indices where claimedIds.contains(self.missions[index].id) {
+                    self.missions[index].isClaimed = true
+                }
+
+                self.saveMissions { saveSuccess in
+                    self.claimingCategories.remove(category)
+                    if saveSuccess {
+                        completion(true, coinReward + bonusCoin, mergedItemRewards)
+                    } else {
+                        for index in self.missions.indices where claimedIds.contains(self.missions[index].id) {
+                            self.missions[index].isClaimed = false
+                        }
+                        completion(false, 0, [])
+                    }
                 }
             }
         }

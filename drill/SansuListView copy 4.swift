@@ -38,7 +38,7 @@ struct ITManagerListView: View {
     @State private var isButtonClickable: Bool = false
     @State private var showAlert: Bool = false
     @State private var preFlag: Bool = false
-    @State private var userPreFlag: Int = 0
+    @ObservedObject private var appState = AppState.shared
     @State private var isLoading: Bool = true
     
     init(isPresenting: Binding<Bool>) {
@@ -67,7 +67,7 @@ struct ITManagerListView: View {
                             Button(action: {
                                 audioManager.playKetteiSound()
                                 // 画面遷移のトリガーをオンにする
-                                if userPreFlag != 1 {
+                                if !appState.isSubscribed {
                                     preFlag = true
                                 } else {
                                     if !isIncorrectAnswersEmpty {
@@ -94,7 +94,7 @@ struct ITManagerListView: View {
                                                 .resizable()
                                                 .frame(height: isIPad() ? 200 : 70)
                                         }
-                                        if userPreFlag != 1 {
+                                        if !appState.isSubscribed {
                                             
                                             ZStack{
                                                 Color.black.opacity(0.45)
@@ -452,11 +452,7 @@ struct ITManagerListView: View {
             .onAppear {
                 reward.LoadReward()
                 fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                    authManager.fetchPreFlag()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        userPreFlag = authManager.userPreFlag
-                        isLoading = false
-                    }
+                    isLoading = false
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { // 1秒後に
                     self.isButtonClickable = true // ボタンをクリック可能に設定
@@ -495,7 +491,7 @@ struct ITManagerListView: View {
                 }
             }
             .sheet(isPresented: $preFlag) {
-                PreView(audioManager: audioManager)
+                PreView(audioManager: audioManager, source: .review)
             }
             .navigationBarBackButtonHidden(true)
             .navigationBarItems(leading: Button(action: {

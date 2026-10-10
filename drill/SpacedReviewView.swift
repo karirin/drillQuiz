@@ -1,318 +1,318 @@
-//
-//  SpacedReviewView.swift
-//  drill
-//
-//  忘却曲線(間隔反復)に基づく「苦手克服」画面です。itQuizのQuizIncorrectAnswerListViewから移植。
-//  既存の教科別「誤答リスト」(IncorrectKokugoListView など)とは別の新機能として追加しています。
-//
-
 import SwiftUI
 import Firebase
 
+/// itQuizの苦手克服ホームを小学クエストの問題・教科に接続。
 struct SpacedReviewHomeView: View {
     @Binding var isPresenting: Bool
-    @State private var shuffledQuizList: [QuizQuestion] = []
+    @ObservedObject private var authManager = AuthManager.shared
+    @StateObject private var courseStore: WeaknessCourseStore
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var dueReviews: [ScheduledReviewQuestion] = []
+    @State private var scheduledReviews: [ScheduledReviewQuestion] = []
     @State private var activeQuizList: [QuizQuestion] = []
     @State private var isDataLoaded = false
     @State private var loadErrorMessage: String?
     @State private var isRunningQuiz = false
     @State private var presentedSheet: ReviewHomeSheet?
+    @State private var selectedTopic: WeaknessCourseTopic?
+    @State private var pendingTopic: WeaknessCourseTopic?
+    @State private var requestID = UUID()
+    @State private var now = Date()
+    @State private var todayActivities: [ReviewDailyActivity] = []
     @State private var summary = ReviewScheduleSummary(dueCount: 0, totalCount: 0, nextReviewDate: nil)
-
-    private var authManager = AuthManager.shared
-    private var audioManager = AudioManager.shared
-    @StateObject var sharedInterstitial = Interstitial()
+    @StateObject private var sharedInterstitial = Interstitial()
     private let questionIdPrefix: String?
+    private let previewSummary: ReviewScheduleSummary?
 
-    init(isPresenting: Binding<Bool>, questionIdPrefix: String? = nil) {
-        self._isPresenting = isPresenting
+    init(isPresenting: Binding<Bool>, questionIdPrefix: String? = nil,
+         previewSummary: ReviewScheduleSummary? = nil, previewReviews: [ScheduledReviewQuestion] = []) {
+        _isPresenting = isPresenting
         self.questionIdPrefix = questionIdPrefix
+        self.previewSummary = previewSummary
+        _courseStore = StateObject(wrappedValue: previewSummary == nil ? .shared : WeaknessCourseStore(
+            defaults: UserDefaults(suiteName: "elementary-course-preview-\(UUID().uuidString)")!, syncEnabled: false))
+        _summary = State(initialValue: previewSummary ?? ReviewScheduleSummary(dueCount: 0, totalCount: 0, nextReviewDate: nil))
+        _dueReviews = State(initialValue: previewReviews)
+        _isDataLoaded = State(initialValue: previewSummary != nil)
     }
 
     var body: some View {
         ZStack {
             if isRunningQuiz {
-                QuizView(
-                    quizzes: activeQuizList,
-                    quizLevel: .incorrectAnswer,
-                    authManager: authManager,
-                    audioManager: audioManager,
-                    isPresenting: $isRunningQuiz,
-                    interstitial: sharedInterstitial
-                )
+                QuizView(quizzes: activeQuizList, quizLevel: .incorrectAnswer,
+                    authManager: authManager, audioManager: AudioManager.shared,
+                    isPresenting: $isRunningQuiz, interstitial: sharedInterstitial)
             } else {
-                reviewHome
+                NavigationStack {
+                    reviewHome
+                        .navigationTitle("苦手分野克服")
+                        .navigationDestination(for: ReviewHomeRoute.self) { route in
+                            switch route {
+                            case .topics:
+                                WeaknessTopicListView(store: courseStore, now: now, onSelect: { selectedTopic = $0 })
+                            case .focusedTraining:
+                                FocusedReviewSubjectsView(reviews: dueReviews) { subject in
+                                    startReviews(dueReviews.filter { $0.subject == subject }.map(\.question))
+                                }
+                            }
+                        }
+                        .toolbar(.hidden, for: .navigationBar)
+                }
             }
         }
-        .onAppear {
-            if !isRunningQuiz {
-                loadReviews()
+        .task(id: authManager.currentUserId) {
+            if previewSummary == nil {
+                requestID = UUID(); isRunningQuiz = false
+                selectedTopic = nil; pendingTopic = nil; presentedSheet = nil
+                dueReviews = []; scheduledReviews = []; todayActivities = []
+                summary = ReviewScheduleSummary(dueCount: 0, totalCount: 0, nextReviewDate: nil)
             }
+            prepareRecovery()
         }
-        .onChange(of: isRunningQuiz) { isRunning in
-            if !isRunning {
-                loadReviews()
-            }
-        }
+        .onChange(of: isRunningQuiz) { if !$0 { loadReviews() } }
+        .onChange(of: scenePhase) { if $0 == .active, !isRunningQuiz, selectedTopic == nil { prepareRecovery() } }
         .sheet(item: $presentedSheet) { sheet in
             switch sheet {
             case .mastered:
-                MasteredAnswersView()
+                MasteredAnswersView(previewQuestions: previewSummary == nil ? nil : [], store: courseStore)
+            case .guide:
+                ElementaryRecoveryGuideSheet()
             }
+        }
+        .fullScreenCover(item: $selectedTopic, onDismiss: {
+            if let pendingTopic {
+                self.pendingTopic = nil
+                selectedTopic = pendingTopic
+            } else { loadReviews() }
+        }) { topic in
+            WeaknessCourseFlow(topic: topic, store: courseStore) { pendingTopic = $0 }
         }
     }
 
     private var reviewHome: some View {
         ZStack {
-            LinearGradient(
-                colors: [Color(hex: "edf5ff"), Color(hex: "f8fbff")],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-
-            if !isDataLoaded {
-                ProgressView("復習状況を確認中…")
-            } else if let loadErrorMessage {
-                reviewStatusView(
-                    icon: "exclamationmark.triangle.fill",
-                    title: "復習状況を読み込めませんでした",
-                    message: loadErrorMessage,
-                    buttonTitle: "もう一度試す",
-                    buttonAction: loadReviews
-                )
-            } else {
-                VStack(spacing: 0) {
-                    reviewNavigationBar
-                    ScrollView(showsIndicators: false) {
-                        VStack(spacing: 20) {
-                            reviewHeader
-                            todayReviewCard
-                            stageBreakdown
-                            masteredCard
+            RecoveryStyle.background
+            VStack(spacing: 0) {
+                HStack {
+                    Button { generateHapticFeedback(); isPresenting = false } label: {
+                        Label("戻る", systemImage: "chevron.left")
+                    }
+                    .accessibilityIdentifier("review.close")
+                    Spacer()
+                    Text("苦手分野克服").font(.headline)
+                    Spacer()
+                    Button { presentedSheet = .guide } label: { Image(systemName: "questionmark.circle") }
+                        .accessibilityLabel("苦手克服のしくみ")
+                        .accessibilityIdentifier("review.guide")
+                }
+                .font(.body.bold()).foregroundStyle(RecoveryTint.review.main)
+                .padding(.horizontal, 18).padding(.vertical, 14).background(.ultraThinMaterial)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        if !isDataLoaded { ProgressView("復習状況を確認中…").frame(maxWidth: .infinity).padding(40) }
+                        else {
+                            if let loadErrorMessage {
+                                RecoveryCard {
+                                    Label("問題の復習状況を読み込めませんでした", systemImage: "exclamationmark.triangle")
+                                        .font(.headline)
+                                    Text(loadErrorMessage).font(.subheadline)
+                                    Button("もう一度試す", action: loadReviews)
+                                        .buttonStyle(RecoveryOutlineButtonStyle(tint: .review))
+                                }
+                            }
                         }
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 32)
+                        WeaknessReviewHomeContent(plan: homePlan, context: homeContext, onAction: handle, now: now)
+                        if let message = courseStore.syncMessage {
+                            HStack(alignment: .top) {
+                                Text(message).font(.caption).foregroundStyle(RecoveryStyle.secondaryText)
+                                Spacer()
+                                Button("再試行") { courseStore.sync() }.font(.caption.bold()).disabled(courseStore.isSyncing)
+                            }
+                        }
                     }
-                    .refreshable {
-                        loadReviews()
-                    }
+                    .padding(16).frame(maxWidth: 640).frame(maxWidth: .infinity)
                 }
+                .refreshable { prepareRecovery() }
             }
         }
     }
 
-    private var reviewNavigationBar: some View {
-        HStack {
-            Button {
-                generateHapticFeedback()
-                isPresenting = false
-            } label: {
-                Label("戻る", systemImage: "chevron.left")
-                    .font(.system(size: 16, weight: .semibold))
-            }
-            Spacer()
-            Text("苦手克服")
-                .font(.headline)
-            Spacer()
-            Color.clear.frame(width: 58, height: 1)
+    private var homePlan: ReviewHomePlan {
+        let cloud = courseStore.state.cloud
+        let active = courseStore.state.activeSession.map { session in
+            ReviewThemeResume(topicID: session.topicID,
+                step: session.kind == .practice ? .practice : .checkup(session.confirmedCountAtStart + 1),
+                questionIndex: session.questionIndex, questionCount: session.questions.count)
         }
-        .foregroundColor(Color(hex: "185ca8"))
-        .padding(.horizontal, 18)
-        .padding(.vertical, 12)
-        .background(.ultraThinMaterial)
+        let dueThemes = WeaknessRecoveryOverview(state: cloud, now: now).dueTopicIDs.map {
+            ReviewDueTheme(topicID: $0, checkupNumber: (cloud.progress[$0]?.confirmedCount ?? 0) + 1)
+        }
+        let upcoming = ReviewUpcomingItem.make(reviewDates: scheduledReviews.map(\.nextReviewAt),
+            themes: cloud.progress.compactMap { id, progress in
+                guard progress.stage == .waiting, let date = progress.nextReviewAt else { return nil }
+                return (id, progress.confirmedCount + 1, date)
+            }, now: now)
+        let availableReviews = isDataLoaded ? dueReviews : []
+        return ReviewHomeResolver.resolve(ReviewHomeInput(subscribed: true, activeSession: active,
+            dueReviewCount: availableReviews.count, availableReviewCount: availableReviews.count,
+            availableFinalStageCount: summary.finalReviewCount, freeRemaining: Int.max,
+            dueThemes: dueThemes, hasReviewHistory: summary.totalCount > 0 || summary.masteredCount > 0,
+            hasThemeProgress: !cloud.progress.isEmpty, todayActivities: todayActivities, upcoming: upcoming))
     }
 
-    private var reviewHeader: some View {
-        HStack(alignment: .firstTextBaseline) {
-            Text("苦手克服ホーム")
-                .font(.system(size: 25, weight: .bold))
-                .foregroundColor(.primary)
-            Spacer()
-            Label("復習連続 \(summary.reviewStreak)日", systemImage: "flame.fill")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(summary.reviewStreak > 0 ? .orange : .secondary)
-        }
-        .padding(.top, 18)
+    private var homeContext: ReviewHomeContext {
+        let learning = courseStore.recommendedTopics.first
+        return ReviewHomeContext(subscribed: true, freeRemaining: Int.max, freeClaimTopicID: nil,
+            masteredQuestionCount: summary.masteredCount, masteredTopicCount: courseStore.masteredTopics.count,
+            learningTopicID: learning?.id,
+            learningTopicNearMastery: learning.flatMap { courseStore.state.cloud.progress[$0.id] }?.confirmedCount == 1,
+            reviewStreak: summary.reviewStreak,
+            todayMasteredCount: todayActivities.filter { $0.kind == .review }.reduce(0) { $0 + $1.masteredCount })
     }
 
-    private var todayReviewCard: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(summary.dueCount > 0 ? "今日の復習" : "今日の復習は完了")
-                    .font(.system(size: 18, weight: .medium))
-                if summary.dueCount > 0 {
-                    Text("\(summary.dueCount)問")
-                        .font(.system(size: 34, weight: .bold))
-                } else {
-                    Image(systemName: "checkmark.seal.fill")
-                        .font(.title2)
-                        .foregroundColor(.green)
-                }
-            }
-
-            Text(todayCardMessage)
-                .font(.system(size: 14, weight: .medium))
-                .foregroundColor(Color(hex: "185ca8").opacity(0.9))
-
-            Button(action: startAllReviews) {
-                Text(summary.dueCount > 0 ? "復習をはじめる" : "今日はすべて完了")
-                    .font(.system(size: 17, weight: .bold))
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 15)
-                    .background(summary.dueCount > 0 ? Color(hex: "2f7edb") : Color.gray.opacity(0.55))
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
-            }
-            .disabled(summary.dueCount == 0)
-        }
-        .foregroundColor(Color(hex: "14549b"))
-        .padding(20)
-        .background(Color(hex: "cfe4ff"))
-        .clipShape(RoundedRectangle(cornerRadius: 22))
-    }
-
-    private var todayCardMessage: String {
-        if summary.dueCount > 0 {
-            return summary.finalReviewCount > 0
-                ? "克服直前が\(summary.finalReviewCount)問。あと1回で苦手を倒せます"
-                : "1日後・3日後・7日後の復習で知識を定着"
-        }
-        if let nextReviewDate = summary.nextReviewDate {
-            return "次の復習は\(nextReviewDate.formatted(date: .abbreviated, time: .shortened))です"
-        }
-        return "問題を間違えると、忘れかけた頃に自動で出題します"
-    }
-
-    private var stageBreakdown: some View {
-        HStack(spacing: 12) {
-            stageCard(title: "1日後", count: summary.firstReviewCount, color: .primary)
-            stageCard(title: "3日後", count: summary.secondReviewCount, color: .primary)
-            stageCard(title: "克服直前", count: summary.finalReviewCount, color: .green)
+    private func handle(_ action: ReviewHomeAction) {
+        switch action {
+        case .startReview: startReviews(dueReviews.map(\.question))
+        case .openTopic(let id): selectedTopic = WeaknessCourseCatalog.topic(id)
+        case .openMastered: presentedSheet = .mastered
+        case .openGuide: presentedSheet = .guide
+        case .close: isPresenting = false
+        case .openPremium: break
         }
     }
 
-    private func stageCard(title: String, count: Int, color: Color) -> some View {
-        VStack(spacing: 8) {
-            Text(title)
-                .font(.system(size: 13, weight: .medium))
-                .foregroundColor(.secondary)
-            Text("\(count)問")
-                .font(.system(size: 23, weight: .bold))
-                .foregroundColor(color)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 18)
-        .background(.white)
-        .clipShape(RoundedRectangle(cornerRadius: 18))
-        .shadow(color: .black.opacity(0.05), radius: 8, y: 3)
-    }
-
-    private var masteredCard: some View {
-        Button {
-            presentedSheet = .mastered
-        } label: {
-            HStack(spacing: 14) {
-                Image(systemName: "trophy.fill")
-                    .font(.title2)
-                    .foregroundColor(Color(hex: "d89b16"))
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("克服図鑑")
-                        .font(.system(size: 17, weight: .bold))
-                    Text("これまでに \(summary.masteredCount)問を克服")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.secondary)
-                }
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .foregroundColor(.secondary)
-            }
-            .padding(18)
-            .background(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 18))
-            .shadow(color: .black.opacity(0.05), radius: 8, y: 3)
-        }
-        .buttonStyle(.plain)
+    private func prepareRecovery() {
+        if previewSummary == nil { courseStore.configure(userID: authManager.currentUserId) }
+        else { courseStore.configure(userID: "elementary-course-preview") }
+        loadReviews()
     }
 
     private func loadReviews() {
+        now = Date()
+        guard previewSummary == nil else { return }
+        let request = UUID(); requestID = request
         guard let userId = authManager.currentUserId else {
+            dueReviews = []; scheduledReviews = []; activeQuizList = []; todayActivities = []
+            summary = ReviewScheduleSummary(dueCount: 0, totalCount: 0, nextReviewDate: nil)
             loadErrorMessage = "ログイン状態を確認して、もう一度お試しください。"
             isDataLoaded = true
             return
         }
-
-        isDataLoaded = false
-        loadErrorMessage = nil
+        todayActivities = ReviewDailyActivityLog.today(userID: userId)
+        isDataLoaded = false; loadErrorMessage = nil
         ReviewScheduleService.fetchSummary(userId: userId, questionIdPrefix: questionIdPrefix) { fetchedSummary in
+            guard requestID == request, authManager.currentUserId == userId else { return }
             summary = fetchedSummary
-            ReviewScheduleService.fetchDueQuestions(userId: userId, questionIdPrefix: questionIdPrefix) { result in
+            ReviewScheduleService.fetchDueReviews(userId: userId, questionIdPrefix: questionIdPrefix, dueOnly: false) { result in
+                guard requestID == request, authManager.currentUserId == userId else { return }
                 switch result {
-                case .success(let questions):
-                    shuffledQuizList = questions.shuffled()
-                    isDataLoaded = true
+                case .success(let reviews):
+                    scheduledReviews = reviews
+                    dueReviews = reviews.filter { $0.nextReviewAt <= now }
+                    if questionIdPrefix == nil { courseStore.importQuestions(reviews.map(\.question)) }
                 case .failure:
-                    loadErrorMessage = "通信環境を確認して、もう一度お試しください。"
-                    isDataLoaded = true
+                    dueReviews = []; scheduledReviews = []
+                    loadErrorMessage = "通信環境を確認してください。テーマの学習は続けられます。"
                 }
+                isDataLoaded = true
             }
         }
     }
 
-    private func startAllReviews() {
-        guard !shuffledQuizList.isEmpty else { return }
-        activeQuizList = shuffledQuizList
-        isRunningQuiz = true
-    }
-
-    @ViewBuilder
-    private func reviewStatusView(
-        icon: String,
-        title: String,
-        message: String,
-        buttonTitle: String,
-        buttonAction: @escaping () -> Void
-    ) -> some View {
-        VStack(spacing: 20) {
-            Image(systemName: icon)
-                .font(.system(size: 58, weight: .semibold))
-                .foregroundStyle(Color("loading"))
-
-            Text(title)
-                .font(.title2.bold())
-                .foregroundColor(Color("fontGray"))
-
-            Text(message)
-                .font(.body)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .lineSpacing(5)
-
-            Button(action: buttonAction) {
-                Text(buttonTitle)
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(Color("loading"))
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
-            }
-        }
-        .padding(28)
-        .background(.white)
-        .clipShape(RoundedRectangle(cornerRadius: 24))
-        .shadow(color: .black.opacity(0.12), radius: 16, y: 8)
-        .padding(.horizontal, 28)
+    private func startReviews(_ questions: [QuizQuestion]) {
+        guard previewSummary == nil, !questions.isEmpty else { return }
+        activeQuizList = questions.shuffled(); isRunningQuiz = true
     }
 }
 
 private enum ReviewHomeSheet: String, Identifiable {
-    case mastered
+    case mastered, guide
     var id: String { rawValue }
+}
+
+private struct ElementaryRecoveryGuideSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    RecoveryCard {
+                        Label("まちがえた問題の解き直し", systemImage: "arrow.counterclockwise").font(.headline)
+                        Text("クイズでまちがえた問題を、忘れかけたころにもう一度解きます。3回正解すると克服図鑑に記録されます。")
+                        RecoveryVerticalSteps(steps: [.init(title: "翌日に復習"), .init(title: "正解から3日後"),
+                            .init(title: "正解から7日後"), .init(title: "克服！", isGoal: true)], tint: .review)
+                    }
+                    RecoveryCard {
+                        Label("小学クエストのテーマ学習", systemImage: "book").font(.headline)
+                        Text("国語・算数・理科・社会の10テーマ。学年の目安を見て、学びたいテーマを選びましょう。")
+                        RecoveryVerticalSteps(steps: [.init(title: "説明を読む"), .init(title: "3問を練習"),
+                            .init(title: "全問正解の翌日に2問のおさらい"), .init(title: "さらに3日後に2問のおさらい"),
+                            .init(title: "マスター！", isGoal: true)], tint: .theme)
+                        Text("まちがえたときは説明からもう一度。あとで続けるときは、回答と続きの場所が保存されます。")
+                    }
+                }.font(.subheadline).foregroundStyle(RecoveryStyle.text).padding(16)
+            }
+            .background(RecoveryStyle.background).navigationTitle("苦手克服のしくみ")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("閉じる") { dismiss() } } }
+        }
+    }
+}
+
+private struct FocusedReviewSubjectsView: View {
+    @Environment(\.dismiss) private var dismiss
+    let reviews: [ScheduledReviewQuestion]
+    let onStart: (ReviewSubject) -> Void
+
+    var body: some View {
+        List {
+                Section {
+                    Text("今日の復習から、選んだ教科の問題だけを出題します。正解すると次の復習に進み、3回の復習で克服図鑑に記録されます。")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                Section("教科を選ぶ") {
+                    ForEach(ReviewSubject.allCases) { subject in
+                        let count = reviews.filter { $0.subject == subject }.count
+                        Button {
+                            onStart(subject)
+                        } label: {
+                            HStack {
+                                Text(subject.title).font(.headline)
+                                Spacer()
+                                Text(count > 0 ? "\(count)問を復習" : "今日の復習はありません")
+                                    .font(.subheadline)
+                                Image(systemName: "chevron.right")
+                            }
+                            .padding(.vertical, 8)
+                        }
+                        .disabled(count == 0)
+                        .accessibilityIdentifier("review.subject.\(subject.rawValue)")
+                    }
+                }
+                if reviews.contains(where: { $0.subject == nil }) {
+                    Section {
+                        Text("教科が記録されていない問題は、苦手分野克服の「解き直す」から復習できます。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+            .toolbar(.visible, for: .navigationBar)
+            .navigationTitle("教科別の集中特訓")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("閉じる") { dismiss() }
+                }
+            }
+    }
 }
 
 private struct MasteredAnswersView: View {
     @Environment(\.dismiss) private var dismiss
+    let previewQuestions: [MasteredReviewQuestion]?
+    @ObservedObject var store: WeaknessCourseStore
     @State private var questions: [MasteredReviewQuestion] = []
     @State private var isLoading = true
     @State private var loadFailed = false
@@ -321,16 +321,16 @@ private struct MasteredAnswersView: View {
     var body: some View {
         NavigationView {
             Group {
-                if isLoading {
+                if isLoading && store.masteredTopics.isEmpty {
                     ProgressView("克服した問題を読み込み中…")
-                } else if loadFailed {
+                } else if loadFailed && store.masteredTopics.isEmpty {
                     VStack(spacing: 14) {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .font(.largeTitle)
                             .foregroundColor(.orange)
                         Text("克服図鑑を読み込めませんでした")
                     }
-                } else if questions.isEmpty {
+                } else if questions.isEmpty && store.masteredTopics.isEmpty {
                     VStack(spacing: 14) {
                         Image(systemName: "trophy")
                             .font(.system(size: 48))
@@ -344,20 +344,45 @@ private struct MasteredAnswersView: View {
                     }
                     .padding(30)
                 } else {
-                    List(questions) { question in
+                    List {
+                        if isLoading { ProgressView("克服した問題を読み込み中…") }
+                        if loadFailed {
+                            Text("問題の記録を読み込めませんでした。端末に保存されたテーマの成果を表示しています。")
+                                .font(.caption).foregroundStyle(.secondary)
+                            Button("もう一度試す", action: load)
+                        }
+                        if !store.masteredTopics.isEmpty {
+                            Section("マスターしたテーマ \(store.masteredTopics.count)テーマ") {
+                                ForEach(store.masteredTopics) { topic in
+                                    DisclosureGroup(topic.title) {
+                                        Text(topic.lesson).font(.subheadline).lineSpacing(5)
+                                    }
+                                }
+                            }
+                        }
+                        Section("克服した問題 \(questions.count)問") {
+                            ForEach(questions) { question in
                         VStack(alignment: .leading, spacing: 8) {
-                            Text(question.question)
-                                .font(.system(size: 15, weight: .semibold))
+                            DisclosureGroup {
+                                Text(question.explanation)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            } label: {
+                                Text(question.question)
+                                    .font(.system(size: 15, weight: .semibold))
+                            }
                             HStack {
                                 Label(question.masteredAt.formatted(date: .abbreviated, time: .omitted), systemImage: "checkmark.seal.fill")
-                                if let sourceQuizLevel = question.sourceQuizLevel {
-                                    Text("・\(sourceQuizLevel)")
+                                if let subject = ReviewSubject.resolve(sourceQuizLevel: question.sourceQuizLevel) {
+                                    Text("・\(subject.title)")
                                 }
                             }
                             .font(.caption)
                             .foregroundColor(.secondary)
                         }
                         .padding(.vertical, 6)
+                            }
+                        }
                     }
                     .listStyle(.plain)
                 }
@@ -375,6 +400,12 @@ private struct MasteredAnswersView: View {
     }
 
     private func load() {
+        isLoading = true; loadFailed = false
+        if let previewQuestions {
+            questions = previewQuestions
+            isLoading = false
+            return
+        }
         guard let userId = authManager.currentUserId else {
             isLoading = false
             loadFailed = true
@@ -394,6 +425,32 @@ private struct MasteredAnswersView: View {
 }
 
 #if DEBUG
+struct WeaknessReviewPreviewHost: View {
+    @State private var isPresenting = true
+
+    var body: some View {
+        if isPresenting {
+            SpacedReviewHomeView(isPresenting: $isPresenting,
+                previewSummary: ReviewScheduleSummary(
+                    dueCount: 3, totalCount: 5, nextReviewDate: nil,
+                    firstReviewCount: 1, secondReviewCount: 1, finalReviewCount: 1,
+                    masteredCount: 0, reviewStreak: 3),
+                previewReviews: [
+                    sample("sansu-1", subject: .sansu),
+                    sample("sansu-2", subject: .sansu),
+                    sample("kokugo-1", subject: .kokugo)
+                ])
+        } else {
+            Text("苦手分野克服を閉じました")
+        }
+    }
+
+    private func sample(_ id: String, subject: ReviewSubject) -> ScheduledReviewQuestion {
+        ScheduledReviewQuestion(question: QuizQuestion(id: id, question: "確認用の問題",
+            choices: ["答え1", "答え2"], correctAnswerIndex: 0, explanation: "確認用の解説"), subject: subject)
+    }
+}
+
 struct ReviewDeveloperModeView: View {
     @Binding var isPresenting: Bool
     @ObservedObject private var authManager = AuthManager.shared
@@ -556,6 +613,15 @@ struct ReviewDeveloperModeView: View {
 
 struct SpacedReviewHomeView_Previews: PreviewProvider {
     static var previews: some View {
-        SpacedReviewHomeView(isPresenting: .constant(false))
+        Group {
+            SpacedReviewHomeView(isPresenting: .constant(true), previewSummary:
+                ReviewScheduleSummary(dueCount: 6, totalCount: 10, nextReviewDate: nil,
+                                      firstReviewCount: 3, secondReviewCount: 2, finalReviewCount: 1,
+                                      masteredCount: 12, reviewStreak: 3))
+                .previewDisplayName("今日の復習あり")
+            SpacedReviewHomeView(isPresenting: .constant(true), previewSummary:
+                ReviewScheduleSummary(dueCount: 0, totalCount: 0, nextReviewDate: nil))
+                .previewDisplayName("初回")
+        }
     }
 }

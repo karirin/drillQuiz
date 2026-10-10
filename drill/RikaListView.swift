@@ -30,7 +30,7 @@ struct RikaListView: View {
     @State private var isIncorrectAnswersEmpty: Bool = true
     @State private var isLoading: Bool = true
     @State private var preFlag: Bool = false
-    @State private var userPreFlag: Int = 0
+    @ObservedObject private var appState = AppState.shared
     @State private var tutorialNum: Int = 0
     @State private var buttonRect: CGRect = .zero
     
@@ -53,11 +53,8 @@ struct RikaListView: View {
     // MARK: - Body
     var body: some View {
         ZStack {
-            // Background
-            SubjectBackgroundView(theme: theme)
-            
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 20) {
+                VStack(spacing: 24) {
                     // Review Section
                     reviewSection
                     
@@ -71,7 +68,7 @@ struct RikaListView: View {
         }
         .onAppear(perform: setupView)
         .fullScreenCover(isPresented: $preFlag) {
-            PreView(audioManager: audioManager)
+            PreView(audioManager: audioManager, source: .review)
         }
         .fullScreenCover(isPresented: $isPresentingQuizIncorrectAnswer) {
             IncorrectRikaListView(isPresenting: $isPresentingQuizIncorrectAnswer)
@@ -108,17 +105,17 @@ struct RikaListView: View {
     // MARK: - Review Section
     private var reviewSection: some View {
         VStack(spacing: 12) {
-            SectionHeader(title: "復習問題", theme: theme)
+            SectionHeader(title: "復習問題", icon: "arrow.counterclockwise", colors: [QuizColors.reviewStart, QuizColors.reviewEnd])
             
             ReviewCard(
                 subjectName: "理科",
                 theme: theme,
                 hasIncorrectAnswers: !isIncorrectAnswersEmpty,
                 isLoading: isLoading,
-                isLocked: userPreFlag != 1
+                isLocked: !appState.isSubscribed
             ) {
                 audioManager.playKetteiSound()
-                if userPreFlag != 1 {
+                if !appState.isSubscribed {
                     preFlag = true
                 } else if !isIncorrectAnswersEmpty {
                     isPresentingQuizIncorrectAnswer = true
@@ -130,7 +127,7 @@ struct RikaListView: View {
     // MARK: - Grades Section
     private var gradesSection: some View {
         VStack(spacing: 12) {
-            SectionHeader(title: "学年を選択", theme: theme)
+            SectionHeader(title: "学年を選択", icon: "folder.fill", colors: theme.gradientColors)
             
             ForEach(Array(grades.enumerated()), id: \.offset) { index, gradeData in
                 GradeCard(
@@ -148,11 +145,7 @@ struct RikaListView: View {
     // MARK: - Helper Methods
     private func setupView() {
         fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { _ in
-            authManager.fetchPreFlag()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                userPreFlag = authManager.userPreFlag
-                isLoading = false
-            }
+            isLoading = false
         }
         
         authManager.fetchUserInfo { (_, _, _, _, _, tutorialNum) in

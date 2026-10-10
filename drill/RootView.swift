@@ -44,7 +44,8 @@ struct RootView: View {
             } else {
                 self.isUserExists = false
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            // 起動演出（えんぴ君の着地〜サブコピー表示）が終わるまで待つ
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.3) {
                 withAnimation {
                     self.isActive = true
                 }

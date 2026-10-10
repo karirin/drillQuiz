@@ -7,6 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C6A700000000000000010001 /* GachaTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6A700000000000000020001 /* GachaTheme.swift */; };
+		C6A700000000000000010002 /* DelaGothicOne-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C6A700000000000000020002 /* DelaGothicOne-Regular.ttf */; };
+		C6A700000000000000010003 /* Cinzel-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C6A700000000000000020003 /* Cinzel-Bold.ttf */; };
+		A9D700000000000000010010 /* AdventureDialogueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D700000000000000020010 /* AdventureDialogueView.swift */; };
+		A9D700000000000000010009 /* AdventureStory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D700000000000000020009 /* AdventureStory.swift */; };
+		B7B500000000000000000001 /* StoreKit.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 18324D192CA1132A00B4043D /* StoreKit.storekit */; };
+		A9D700000000000000010000 /* AdventureWorld.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D700000000000000020000 /* AdventureWorld.swift */; };
+		A9D700000000000000010001 /* AdventureProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D700000000000000020001 /* AdventureProgress.swift */; };
+		A9D700000000000000010002 /* AdventureStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D700000000000000020002 /* AdventureStore.swift */; };
+		A9D700000000000000010003 /* AdventureArtwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D700000000000000020003 /* AdventureArtwork.swift */; };
+		A9D700000000000000010004 /* AdventureMapGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D700000000000000020004 /* AdventureMapGeometry.swift */; };
+		A9D700000000000000010005 /* AdventureMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D700000000000000020005 /* AdventureMapView.swift */; };
+		A9D700000000000000010006 /* AdventureImageBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D700000000000000020006 /* AdventureImageBackground.swift */; };
+		A9D700000000000000010007 /* AdventureEventSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D700000000000000020007 /* AdventureEventSheet.swift */; };
+		A9D700000000000000010008 /* StoryAdventureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D700000000000000020008 /* StoryAdventureView.swift */; };
 		18037ED12F77CB48006547BC /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 18037ED02F77CB48006547BC /* FirebaseAnalytics */; };
 		18037ED32F77CB48006547BC /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 18037ED22F77CB48006547BC /* FirebaseAuth */; };
 		18037ED52F77CB48006547BC /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 18037ED42F77CB48006547BC /* FirebaseDatabase */; };
@@ -77,7 +92,7 @@
 		18FC72A22C931D3400A95341 /* GraphManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72A12C931D3400A95341 /* GraphManagerView.swift */; };
 		18FC72A42C931D5E00A95341 /* BarChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72A32C931D5E00A95341 /* BarChartView.swift */; };
 		18FC72A62C931D8200A95341 /* PentagonManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72A52C931D8200A95341 /* PentagonManagerView.swift */; };
-		18FC72A82C931DCB00A95341 /* ActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72A72C931DCB00A95341 /* ActivityIndicator.swift */; };
+		18FC72A82C931DCB00A95341 /* EnpiLoadingViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72A72C931DCB00A95341 /* EnpiLoadingViews.swift */; };
 		18FC72AD2C951D1400A95341 /* SansuListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72AC2C951D1400A95341 /* SansuListView.swift */; };
 		18FC72AF2C95244200A95341 /* Sansu1ListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72AE2C95244200A95341 /* Sansu1ListView.swift */; };
 		18FC72B12C95257200A95341 /* Interstitial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FC72B02C95257200A95341 /* Interstitial.swift */; };
@@ -160,6 +175,19 @@
 		D9E573F0EEEA4ED5ABC667A2 /* FriendListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FCF1F57551E4302A665B4B8 /* FriendListView.swift */; };
 		F4F91B72505A4182B46BD3CA /* ReviewScheduleService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82D5F8260F640D0B18A0F1A /* ReviewScheduleService.swift */; };
 		F80587DB7AC4473FBA8E442B /* LoginBonusConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D6654F3C5E4BC1A6DF8F0B /* LoginBonusConfig.swift */; };
+		D175CA2C1C514FD3AA020FBB /* WeaknessCourse.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B9AC1234AF49D5A9C3AB3A /* WeaknessCourse.swift */; };
+		8C3AD79BE1CB428FB83C88A8 /* CourseCloudCodec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 547FDDC5622544A7914E552A /* CourseCloudCodec.swift */; };
+		7F86FEF93B24491EA6CC1A00 /* CourseQuestionIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A45287B478648349783DC2B /* CourseQuestionIndex.swift */; };
+		11FEE59F6406455B8A4986D3 /* WeaknessCourseCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B336C3750D464B7180C9924C /* WeaknessCourseCatalog.swift */; };
+		4750AFB31DB647F79E44816D /* WeaknessCourseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12BEE33809BC49D880D631A8 /* WeaknessCourseStore.swift */; };
+		A2C37919DB684854A4D8CD2A /* ReviewHomeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2E8DF3FF33A42A8BA328616 /* ReviewHomeState.swift */; };
+		6541AA46CA1442B583EAD99F /* ReviewDailyActivityLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BACE28E663B47768F515997 /* ReviewDailyActivityLog.swift */; };
+		95A968303EC9463EA01D2E02 /* WeaknessReviewHomeComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF8EEC5B00194DAB947C8A22 /* WeaknessReviewHomeComponents.swift */; };
+		F1FD511771DD4F5EA8C1E8D7 /* WeaknessReviewHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 089C469FA6E64E6EAF08E8F2 /* WeaknessReviewHomeView.swift */; };
+		5FE432692F45463F8060E86B /* WeaknessTopicListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC9369E4073F40E593593C47 /* WeaknessTopicListView.swift */; };
+		48598B90C95949E4960C193D /* ThemeIntroductionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7501DEA056F46C59F98926C /* ThemeIntroductionView.swift */; };
+		0BEA932478E34E41BFDFA3FD /* ThemeSessionResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D001FF404E5541A5A8AF5CC3 /* ThemeSessionResultView.swift */; };
+		80A892EE7E89465CA42E2BE9 /* WeaknessCourseViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A17CBF16CAE465C84C02E8C /* WeaknessCourseViews.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -180,6 +208,20 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C6A700000000000000020001 /* GachaTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GachaTheme.swift; sourceTree = "<group>"; };
+		C6A700000000000000020002 /* DelaGothicOne-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = DelaGothicOne-Regular.ttf; sourceTree = "<group>"; };
+		C6A700000000000000020003 /* Cinzel-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Cinzel-Bold.ttf; sourceTree = "<group>"; };
+		A9D700000000000000020010 /* AdventureDialogueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureDialogueView.swift; sourceTree = "<group>"; };
+		A9D700000000000000020009 /* AdventureStory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureStory.swift; sourceTree = "<group>"; };
+		A9D700000000000000020000 /* AdventureWorld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureWorld.swift; sourceTree = "<group>"; };
+		A9D700000000000000020001 /* AdventureProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureProgress.swift; sourceTree = "<group>"; };
+		A9D700000000000000020002 /* AdventureStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureStore.swift; sourceTree = "<group>"; };
+		A9D700000000000000020003 /* AdventureArtwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureArtwork.swift; sourceTree = "<group>"; };
+		A9D700000000000000020004 /* AdventureMapGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureMapGeometry.swift; sourceTree = "<group>"; };
+		A9D700000000000000020005 /* AdventureMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureMapView.swift; sourceTree = "<group>"; };
+		A9D700000000000000020006 /* AdventureImageBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureImageBackground.swift; sourceTree = "<group>"; };
+		A9D700000000000000020007 /* AdventureEventSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureEventSheet.swift; sourceTree = "<group>"; };
+		A9D700000000000000020008 /* StoryAdventureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryAdventureView.swift; sourceTree = "<group>"; };
 		06845309774145F7A09D3807 /* GuildManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuildManager.swift; sourceTree = "<group>"; };
 		0E00A471925341778310DCA8 /* BattleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattleView.swift; sourceTree = "<group>"; };
 		180A9FCE2CE231EA00B35C83 /* StampAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StampAnimationView.swift; sourceTree = "<group>"; };
@@ -250,7 +292,7 @@
 		18FC72A12C931D3400A95341 /* GraphManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphManagerView.swift; sourceTree = "<group>"; };
 		18FC72A32C931D5E00A95341 /* BarChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarChartView.swift; sourceTree = "<group>"; };
 		18FC72A52C931D8200A95341 /* PentagonManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PentagonManagerView.swift; sourceTree = "<group>"; };
-		18FC72A72C931DCB00A95341 /* ActivityIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicator.swift; sourceTree = "<group>"; };
+		18FC72A72C931DCB00A95341 /* EnpiLoadingViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnpiLoadingViews.swift; sourceTree = "<group>"; };
 		18FC72A92C933D9A00A95341 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		18FC72AC2C951D1400A95341 /* SansuListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SansuListView.swift; sourceTree = "<group>"; };
 		18FC72AE2C95244200A95341 /* Sansu1ListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sansu1ListView.swift; sourceTree = "<group>"; };
@@ -332,6 +374,19 @@
 		D3D6654F3C5E4BC1A6DF8F0B /* LoginBonusConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginBonusConfig.swift; sourceTree = "<group>"; };
 		F614D0A46FCC4090B489E966 /* WeeklyLeagueService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyLeagueService.swift; sourceTree = "<group>"; };
 		FFAB049C599C480C85E51CAF /* LoginBonusListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginBonusListView.swift; sourceTree = "<group>"; };
+		F8B9AC1234AF49D5A9C3AB3A /* WeaknessCourse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeaknessCourse.swift; sourceTree = "<group>"; };
+		547FDDC5622544A7914E552A /* CourseCloudCodec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CourseCloudCodec.swift; sourceTree = "<group>"; };
+		8A45287B478648349783DC2B /* CourseQuestionIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CourseQuestionIndex.swift; sourceTree = "<group>"; };
+		B336C3750D464B7180C9924C /* WeaknessCourseCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeaknessCourseCatalog.swift; sourceTree = "<group>"; };
+		12BEE33809BC49D880D631A8 /* WeaknessCourseStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeaknessCourseStore.swift; sourceTree = "<group>"; };
+		A2E8DF3FF33A42A8BA328616 /* ReviewHomeState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewHomeState.swift; sourceTree = "<group>"; };
+		4BACE28E663B47768F515997 /* ReviewDailyActivityLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewDailyActivityLog.swift; sourceTree = "<group>"; };
+		EF8EEC5B00194DAB947C8A22 /* WeaknessReviewHomeComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeaknessReviewHomeComponents.swift; sourceTree = "<group>"; };
+		089C469FA6E64E6EAF08E8F2 /* WeaknessReviewHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeaknessReviewHomeView.swift; sourceTree = "<group>"; };
+		FC9369E4073F40E593593C47 /* WeaknessTopicListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeaknessTopicListView.swift; sourceTree = "<group>"; };
+		E7501DEA056F46C59F98926C /* ThemeIntroductionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeIntroductionView.swift; sourceTree = "<group>"; };
+		D001FF404E5541A5A8AF5CC3 /* ThemeSessionResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeSessionResultView.swift; sourceTree = "<group>"; };
+		3A17CBF16CAE465C84C02E8C /* WeaknessCourseViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeaknessCourseViews.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -394,6 +449,17 @@
 		18FC72552C93128E00A95341 /* drill */ = {
 			isa = PBXGroup;
 			children = (
+				A9D700000000000000020000 /* AdventureWorld.swift */,
+				A9D700000000000000020001 /* AdventureProgress.swift */,
+				A9D700000000000000020002 /* AdventureStore.swift */,
+				A9D700000000000000020003 /* AdventureArtwork.swift */,
+				A9D700000000000000020004 /* AdventureMapGeometry.swift */,
+				A9D700000000000000020005 /* AdventureMapView.swift */,
+				A9D700000000000000020006 /* AdventureImageBackground.swift */,
+				A9D700000000000000020007 /* AdventureEventSheet.swift */,
+				A9D700000000000000020008 /* StoryAdventureView.swift */,
+				A9D700000000000000020010 /* AdventureDialogueView.swift */,
+				A9D700000000000000020009 /* AdventureStory.swift */,
 				F614D0A46FCC4090B489E966 /* WeeklyLeagueService.swift */,
 				210C954A797248CDAF8C4377 /* WeeklyLeagueView.swift */,
 				3466558560F740D29FE39DBB /* BattleManager.swift */,
@@ -403,6 +469,19 @@
 				B0ADFE2B454742879B3281FC /* GuildBossBattleView.swift */,
 				A82D5F8260F640D0B18A0F1A /* ReviewScheduleService.swift */,
 				518E79B3B2734E888D23F5E6 /* SpacedReviewView.swift */,
+				3A17CBF16CAE465C84C02E8C /* WeaknessCourseViews.swift */,
+				D001FF404E5541A5A8AF5CC3 /* ThemeSessionResultView.swift */,
+				E7501DEA056F46C59F98926C /* ThemeIntroductionView.swift */,
+				FC9369E4073F40E593593C47 /* WeaknessTopicListView.swift */,
+				089C469FA6E64E6EAF08E8F2 /* WeaknessReviewHomeView.swift */,
+				EF8EEC5B00194DAB947C8A22 /* WeaknessReviewHomeComponents.swift */,
+				4BACE28E663B47768F515997 /* ReviewDailyActivityLog.swift */,
+				A2E8DF3FF33A42A8BA328616 /* ReviewHomeState.swift */,
+				12BEE33809BC49D880D631A8 /* WeaknessCourseStore.swift */,
+				B336C3750D464B7180C9924C /* WeaknessCourseCatalog.swift */,
+				8A45287B478648349783DC2B /* CourseQuestionIndex.swift */,
+				547FDDC5622544A7914E552A /* CourseCloudCodec.swift */,
+				F8B9AC1234AF49D5A9C3AB3A /* WeaknessCourse.swift */,
 				2BC5CBC2355E47A79B88411C /* FriendManager.swift */,
 				2FCF1F57551E4302A665B4B8 /* FriendListView.swift */,
 				7D0D683CFD004828ABD93DC5 /* SocialDesignSystem.swift */,
@@ -411,6 +490,9 @@
 				309D2DE41F39D9768CDFD20C /* UIComponentsUpdated.swift */,
 				18A236DE2F1516050007E444 /* SubjectComponents.swift */,
 				181476082F7785CF007FFCFF /* GachaCatalogView.swift */,
+				C6A700000000000000020001 /* GachaTheme.swift */,
+				C6A700000000000000020002 /* DelaGothicOne-Regular.ttf */,
+				C6A700000000000000020003 /* Cinzel-Bold.ttf */,
 				7A4D1B5E3C0A4D0100000014 /* InventoryView.swift */,
 				7A4D1B5E3C0A4D0100000011 /* Mission.swift */,
 				7A4D1B5E3C0A4D0100000012 /* MissionManager.swift */,
@@ -443,7 +525,7 @@
 				18FC72A12C931D3400A95341 /* GraphManagerView.swift */,
 				18FC72A52C931D8200A95341 /* PentagonManagerView.swift */,
 				18FC72A32C931D5E00A95341 /* BarChartView.swift */,
-				18FC72A72C931DCB00A95341 /* ActivityIndicator.swift */,
+				18FC72A72C931DCB00A95341 /* EnpiLoadingViews.swift */,
 				18FC731A2C981E0500A95341 /* PentagonSansuView.swift */,
 				18FC73202C9822FE00A95341 /* PentagonKokugoView.swift */,
 				18FC731E2C9822FC00A95341 /* PentagonShakaiView.swift */,
@@ -715,6 +797,8 @@
 				18A233DC2F13F8D60007E444 /* 称号.mp3 in Resources */,
 				18A233DD2F13F8D60007E444 /* 味方攻撃.mp3 in Resources */,
 				18324D1B2CA11BC300B4043D /* GoogleService-Info.plist in Resources */,
+				C6A700000000000000010002 /* DelaGothicOne-Regular.ttf in Resources */,
+				C6A700000000000000010003 /* Cinzel-Bold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -722,6 +806,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B7B500000000000000000001 /* StoreKit.storekit in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -739,6 +824,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9D700000000000000010000 /* AdventureWorld.swift in Sources */,
+				A9D700000000000000010001 /* AdventureProgress.swift in Sources */,
+				A9D700000000000000010002 /* AdventureStore.swift in Sources */,
+				A9D700000000000000010003 /* AdventureArtwork.swift in Sources */,
+				A9D700000000000000010004 /* AdventureMapGeometry.swift in Sources */,
+				A9D700000000000000010005 /* AdventureMapView.swift in Sources */,
+				A9D700000000000000010006 /* AdventureImageBackground.swift in Sources */,
+				A9D700000000000000010007 /* AdventureEventSheet.swift in Sources */,
+				A9D700000000000000010008 /* StoryAdventureView.swift in Sources */,
+				A9D700000000000000010010 /* AdventureDialogueView.swift in Sources */,
+				A9D700000000000000010009 /* AdventureStory.swift in Sources */,
 				870852FFD37E4C859F568CB5 /* WeeklyLeagueService.swift in Sources */,
 				6FD74ACBE2844AEEBD561F79 /* WeeklyLeagueView.swift in Sources */,
 				9741990A691842DC8683B189 /* BattleManager.swift in Sources */,
@@ -748,6 +844,19 @@
 				793507BF55304AA68AB27480 /* GuildBossBattleView.swift in Sources */,
 				F4F91B72505A4182B46BD3CA /* ReviewScheduleService.swift in Sources */,
 				482EF9EBFFB84C419E9C6417 /* SpacedReviewView.swift in Sources */,
+				80A892EE7E89465CA42E2BE9 /* WeaknessCourseViews.swift in Sources */,
+				0BEA932478E34E41BFDFA3FD /* ThemeSessionResultView.swift in Sources */,
+				48598B90C95949E4960C193D /* ThemeIntroductionView.swift in Sources */,
+				5FE432692F45463F8060E86B /* WeaknessTopicListView.swift in Sources */,
+				F1FD511771DD4F5EA8C1E8D7 /* WeaknessReviewHomeView.swift in Sources */,
+				95A968303EC9463EA01D2E02 /* WeaknessReviewHomeComponents.swift in Sources */,
+				6541AA46CA1442B583EAD99F /* ReviewDailyActivityLog.swift in Sources */,
+				A2C37919DB684854A4D8CD2A /* ReviewHomeState.swift in Sources */,
+				4750AFB31DB647F79E44816D /* WeaknessCourseStore.swift in Sources */,
+				11FEE59F6406455B8A4986D3 /* WeaknessCourseCatalog.swift in Sources */,
+				7F86FEF93B24491EA6CC1A00 /* CourseQuestionIndex.swift in Sources */,
+				8C3AD79BE1CB428FB83C88A8 /* CourseCloudCodec.swift in Sources */,
+				D175CA2C1C514FD3AA020FBB /* WeaknessCourse.swift in Sources */,
 				84B32B8C8B37434ABEC15083 /* FriendManager.swift in Sources */,
 				D9E573F0EEEA4ED5ABC667A2 /* FriendListView.swift in Sources */,
 				35E1826D8D234DFB80954E27 /* SocialDesignSystem.swift in Sources */,
@@ -833,6 +942,7 @@
 				18C37B4C2D142F3F00326A2E /* TutorialStoryModalView.swift in Sources */,
 				18FC729E2C931C1600A95341 /* ManagerTabView.swift in Sources */,
 				181476092F7785CF007FFCFF /* GachaCatalogView.swift in Sources */,
+				C6A700000000000000010001 /* GachaTheme.swift in Sources */,
 				18FC72C72C952C9B00A95341 /* ModalView.swift in Sources */,
 				18FC72CD2C95B15300A95341 /* Sansu4ListView.swift in Sources */,
 				18FC72CB2C95B15100A95341 /* Sansu2ListView.swift in Sources */,
@@ -856,7 +966,7 @@
 				18FC72E72C95BED600A95341 /* Kokugo6ListView.swift in Sources */,
 				18FC72D82C95B2D000A95341 /* Shakai5ListView.swift in Sources */,
 				18C37B482D142F3F00326A2E /* StoryQuizResultView.swift in Sources */,
-				18FC72A82C931DCB00A95341 /* ActivityIndicator.swift in Sources */,
+				18FC72A82C931DCB00A95341 /* EnpiLoadingViews.swift in Sources */,
 				18FC731D2C9822FA00A95341 /* PentagonRikaView.swift in Sources */,
 				18FC72AF2C95244200A95341 /* Sansu1ListView.swift in Sources */,
 				18FC72DD2C95B2D000A95341 /* Shakai4ListView.swift in Sources */,
@@ -1025,7 +1135,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3.14;
+				CURRENT_PROJECT_VERSION = 3.19;
 				DEVELOPMENT_ASSET_PATHS = "\"drill/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
 				ENABLE_PREVIEWS = YES;
@@ -1043,7 +1153,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.17;
+				MARKETING_VERSION = 4.9;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.drillQuiz3948";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1058,7 +1168,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3.14;
+				CURRENT_PROJECT_VERSION = 3.19;
 				DEVELOPMENT_ASSET_PATHS = "\"drill/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
 				ENABLE_PREVIEWS = YES;
@@ -1076,7 +1186,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.17;
+				MARKETING_VERSION = 4.9;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.drillQuiz3948";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

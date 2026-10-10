@@ -30,7 +30,7 @@ struct SansuListView: View {
     @State private var isIncorrectAnswersEmpty: Bool = true
     @State private var isLoading: Bool = true
     @State private var preFlag: Bool = false
-    @State private var userPreFlag: Int = 0
+    @ObservedObject private var appState = AppState.shared
     @State private var tutorialNum: Int = 0
     @State private var buttonRect: CGRect = .zero
     @State private var bubbleHeight: CGFloat = 0.0
@@ -55,11 +55,8 @@ struct SansuListView: View {
     // MARK: - Body
     var body: some View {
         ZStack {
-            // Background
-            SubjectBackgroundView(theme: theme)
-            
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 20) {
+                VStack(spacing: 24) {
                     // Review Section
                     reviewSection
                     
@@ -78,7 +75,7 @@ struct SansuListView: View {
         }
         .onAppear(perform: setupView)
         .fullScreenCover(isPresented: $preFlag) {
-            PreView(audioManager: audioManager)
+            PreView(audioManager: audioManager, source: .review)
         }
         .fullScreenCover(isPresented: $isPresentingQuizIncorrectAnswer) {
             IncorrectSansuListView(isPresenting: $isPresentingQuizIncorrectAnswer)
@@ -124,17 +121,17 @@ struct SansuListView: View {
     // MARK: - Review Section
     private var reviewSection: some View {
         VStack(spacing: 12) {
-            SectionHeader(title: "復習問題", theme: theme)
+            SectionHeader(title: "復習問題", icon: "arrow.counterclockwise", colors: [QuizColors.reviewStart, QuizColors.reviewEnd])
             
             ReviewCard(
                 subjectName: "算数",
                 theme: theme,
                 hasIncorrectAnswers: !isIncorrectAnswersEmpty,
                 isLoading: isLoading,
-                isLocked: userPreFlag != 1
+                isLocked: !appState.isSubscribed
             ) {
                 audioManager.playKetteiSound()
-                if userPreFlag != 1 {
+                if !appState.isSubscribed {
                     preFlag = true
                 } else if !isIncorrectAnswersEmpty {
                     isPresentingQuizIncorrectAnswer = true
@@ -146,7 +143,7 @@ struct SansuListView: View {
     // MARK: - Grades Section
     private var gradesSection: some View {
         VStack(spacing: 12) {
-            SectionHeader(title: "学年を選択", theme: theme)
+            SectionHeader(title: "学年を選択", icon: "folder.fill", colors: theme.gradientColors)
             
             ForEach(Array(grades.enumerated()), id: \.offset) { index, gradeData in
                 GradeCard(
@@ -182,14 +179,14 @@ struct SansuListView: View {
             ZStack {
                 Color.black.opacity(0.6)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        RoundedRectangle(cornerRadius: 22, style: .continuous)
                             .frame(width: cutoutWidth, height: cutoutHeight)
                             .position(x: localX, y: localY)
                             .blendMode(.destinationOut)
                     )
                     .compositingGroup()
 
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
                     .stroke(Color(hex: "667eea"), lineWidth: 3)
                     .frame(width: cutoutWidth, height: cutoutHeight)
                     .position(x: localX, y: localY)
@@ -290,11 +287,7 @@ struct SansuListView: View {
     // MARK: - Helper Methods
     private func setupView() {
         fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { _ in
-            authManager.fetchPreFlag()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                userPreFlag = authManager.userPreFlag
-                isLoading = false
-            }
+            isLoading = false
         }
         
         authManager.fetchUserInfo { (_, _, _, _, _, tutorialNum) in
